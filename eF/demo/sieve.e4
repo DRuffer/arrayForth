@@ -1,0 +1,41 @@
+CR .( Eratosthenes Sieve )
+\ ==============================================================
+\ todo
+\ ==============================================================
+
+[defined] m.sieve 0= if\ m.sieve
+marker m.sieve
+decimal
+
+\ ==============================================================
+\ Eratosthenes Sieve benchmark program
+\ The original BYTE benchmark.
+\ ==============================================================
+
+8190 CONSTANT SIZE
+CREATE FLAGS   SIZE ALLOT
+
+: DO-PRIME ( -- n )
+  FLAGS SIZE -1 FILL  0  SIZE 0
+  DO FLAGS I + C@
+    IF I 2* 3 + DUP I +
+      BEGIN DUP SIZE <
+      WHILE 0 OVER FLAGS + C!  OVER +
+      REPEAT 2DROP  1+
+    THEN
+  LOOP ;
+
+: SIEVE ( -- ) ( 1899 )
+  ." Eratosthenes " DO-PRIME . ." Primes" ;
+
+: 10SIEVE ( -- ) ( s40 8.19s -- ga144 5.50s with u. )
+  10 0 DO DO-PRIME u. LOOP ;
+
+CR
+.( Type SIEVE to run Eratosthenes Sieve Demo)
+CR
+
+\ ==============================================================
+
+[DEFINED] SFILE 0= IF\ HAND
+

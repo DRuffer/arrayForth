@@ -1,0 +1,772 @@
+arrayForth(R) Software Change Record
+EVB001/G144A12 Support Package
+Changes to make Release .... 01g and 01f
+Based upon ................. 01e
+History back to 01a creation.
+==========================================
+
+TO DO:
+
+- Vacate bins 800 to 1600 completely
+
+==========================================
+
+MAJOR THINGS DONE / TO DOCUMENT:
+
+arrayForth/colorForth:
+
+01g:
+
+- Remove  74 load  from  html  and  index  utilities; now that
+  74 is resident this is not merely redundant but lobbers
+  standard file names.
+- softsim improvements:
+  - pin wakeup now works correctly.
+  - pin functions added for serdes and analog nodes.
+  - testbed (external signal) facilities improved and documented.
+  - minor human interface cleanups.
+  - Boot descriptor processing upgraded and documented.
+  - Breakpoint mechanism is now documented.
+
+01f: (internal release only)
+- REQUIRES NEW KERNEL 4.2c.
+- F18 Compilation Improvements
+  - node now sets F18 compiler as though 0 org had been written
+  - org now forces alignment by insertion of nops instead of ;s
+  - Grey words no longer force alignment; now display slots.
+- Display Feedback Area Improvements
+  - word entry area now out of way of stack display
+  - stack display indicates emptiness and limits to top 5 items
+  - stack color no longer changes when editor colors selected
+  - message area added
+- empty no longer changes display unless it is necessary
+- fixed old bug in pause that failed to display top stack item.
+- .' is now more powerful
+
+01e:
+- Updated and reorganized polyFORTH virtual machine:
+  - Snorkel and Ganglia added for polyFORTH.
+  - SRAM Mk1 function codes 0 and 1 for  mk!  redefined.
+  - Added polyFORTH general purpose I/O mechanism using
+    background of ganglia and snorkel for access; added
+    BLOCK access to SPI flash.
+  - Enlarged polyFORTH nucleus to 9k for flash I/O inclusion.
+  - Simplifed SRAM initialization for polyFORTH.
+- Improved and normalized program loading tools
+  - Added  loader  for IDE automatic chip loading
+  - Normalized load descriptor syntax so that applications
+    need only one set for IDE loader, streamer, and soon
+    for softsim.
+  - streamer can now generate a final frame to load the
+    boot node (such as 705 for SPI boot streams.)
+  - Lengths are now displayed while burning flash.
+- Defined preliminary module structure, applied to SRAM mk1.
+- Added complete set of 16 "rdlu" calls in F18 compiler.
+- Removed obsolete "o" definition from F18 compiler.
+
+01d:
+- REQUIRES NEW KERNEL 4.2b.
+- Updated blue word handling with , . .. ... and * added.
+    WARNING:  OLD SYSTEMS WILL CRASH WHEN DISPLAYING NEW SOURCE.
+    Blue word handling made more robust by only executing marked
+    words, so that this will not recur in future.
+- Updated HTML generator to understand new blue words.
+- Further decoupled polyForth and eForth VM code.
+- Reassigned object code bins for GA tools so they may always be
+  compiled without impacting each other or user application code.
+- Rearranged ATS source code.
+- Changed method of displaying block number for editor
+    Color now indicates active editor mode
+- Defined  abuf  for audit and  cbuf  for compression.
+- Moved both buffers up significantly
+- New kernel allocates 2880 blocks for source code.
+- Extended qx to show differences when audit is loaded.
+
+01c:
+- REQUIRES NEW KERNEL 4.2a.
+  WILL DIE WITH BLACK SCREEN ON OLDER KERNEL VERSIONS.
+  INSTALLATION PROCEDURES FOR SERIAL PORTS HAVE CHANGED:
+  PORT NUMBERS AND BAUD RATES NO LONGER SET IN .BAT SCRIPT
+  FILES, INSTEAD IN BLOCK 202.  SEE NEW USER'S MANUAL!
+- Fixed ancient editor bugs when cursor not visible under
+  some conditions:  Insertion at wrong place by paste, traps
+  and crashes on cut/copy.
+- Obsolete cased comment tags removed from editor.
+- Added  onamed  and  bnamed  to change the .cf filenames
+  used when saving working source file, and when reading or
+  writing backup source file.  (4.2a kernel required)
+- Added mechanism to set COM port modes from within arrayForth
+  and moved baud rate parameters from .bat and .sh files to
+  block 202 as  a-bps  and  c-bps .  (4.2a kernel required)
+- Softsim now has known state after boot.
+- Softsim interactive IDE-like vocabulary added and documented
+- Softsim handling of p9 and extended arithmetic mode corrected
+- Softsim now displays carry latch in overview
+- Softsim handling of +* corrected
+- Softsim SPI testbed updated, testbeds not supported yet.
+- Updated native IDE for current systems and hardware conventions
+
+01b:
+- Added QX and friends.
+- Rechartered "l" to list editor block
+- Added  finish
+- Added  flush
+- host & target now default to no canonicals
+- updated all nodes RAM and power tests to current standards
+
+01a:
+- Float nucleus/kernel images back into sF and eF
+  directories.
+- Use ascii pathnames for retrieving these
+- Final touches on load ordering and factoring
+
+Virtual Machines:
+
+polyFORTH SYSTEM:
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01g
+(against 01f):
+=============================
+
+18* - Version (01g).
+
+76 - GB Remove  74 load set0  which is no longer legal above  empty
+
+94 - GB Add error message for THEN out of range in x86 compiler.
+
+148 - CS Changed softsim load order here to accomodate additions later on. "/softsim" now always resets the time to zero and makes the node in the detailed view become the focus node for interactive purposes. The "other" node was incorrectly made the focus node before.
+
+176 - GB Remove  74 load  which is no longer legal above  empty
+
+212 - CS Removed dead code named "init". Made obsolete some time ago but not removed until now.
+
+216 - GB Designate softsim configuration block.
+
+244 - GB Make 'stream start one word after beginning so there is an empty cell to save length (and commit to cleanup later).
+
+404 - GB Add slowin for spi, to handle low speed rx from MMC.
+
+1080 - JR Added 1813 bin to node 600. To allow Dean's example to be compiled after eForth.
+
+1126 - CS Clean up blue words.
+
+1140 - JR Expose factor of hoot for use with bins.
+
+1164 - JR Provide bin factors for wire and plug, and apply to node 600.
+
+1182 - JR Provide bin factor for plug and apply to node 600.
+
+1230 - CS Added a testbed for sync boot on node 300.  GB eliminate stack args, teach it to find the stream all by itself.
+
+1236 - CS Boot descriptor tables for softsim added here.
+
+1238 - CS Interactive ALU words are now part of the instruction definitions, not here anymore. Added "deliver" to initialize nodes in softsim according to boot descriptors.
+
+1240 - CS Interactive memory words simplified and "break" and "-break" added.
+
+1242 - CS Now a load screen for building the stream used in the sync boot testbed. spi testbed loader commented out.  Have it set stream length but NOT return same.
+
+1244 - GB Bias 'stream one more for new length storage convention.
+
+1246 - JR spi testbed modified to allow restarting when "power" is applied.
+
+1250 - CS Added a node variable named "brk". "/enter" initializes entry points. Named port constants moved here to be available sooner. "enter" is still here but is deprecated in favor of "+node /p".
+
+1252 - CS Changed "bus" to "edge". Name change for clarity.
+
+1254 - CS Added facility for automatically tracking the instruction word in the memory display. JR Changed "'op" to "'opcode", "bp'" to "'group", added "'bed", "iom" and "?v" for use in testbeds.
+
+1256 - JR Refactored. ?wake replaces ?pins. Phantom and shared pins now wake properly. 
+
+1258 - JR Added "!ios" and comments.
+
+1262 - CS Added 'boot for a forward reference. "/enter" moved to an earlier block. "'boot xqt" initializes  according to boot descriptors. Added "-track" to ipower. JR Factored "!ios" out of "update". Added testbed initialization to "ipower". Moved "update" out of "newop".
+
+1264 - JR Added a check for writing to ROM. Renamed "pr/w" to "@ports".
+
+1266 - JR Now hangs the node when writing to ROM. Reformatted. "access" uses new names for 'group and 'opcode.
+
+1268 - JR changed masks from xf8 to x2f8 and x37f to x27f to avoid changing P9 when incrementing the address bus or making a slot 2 jump.
+
+1270 - JR More understandable names and formatting.
+
+1272 - JR More understandable names and formatting. CS "remote" labels added for interactive.
+
+1274 - CS ALU opcodes have their interactive versions defined here, just by adding labels in the right places. Formerly redundantly done at block 1238.
+
+1278 - CS Added "broke" to "?brk". Now the separate breakpoints display themselves in the map and only for a single instruction step.
+
+1284 - JR Formatting. Separated serdes and analog pin display.
+
+1286 - CS Added "?track" to "/mem." so when enabled the memory display will track the instruction word address.
+
+1288 - CS Formatting change. Removed commented out code.
+
+1292 - CS Changed jump in memory display from 16 to 8 and reformatted source.
+
+1294 - CS Added "+stp" and "-stp". "+stp" takes one step then runs until the instruction is finished in the focus node. It also sets up instruction tracking, so the memory display will keep the currently running instruction word on the display. "-stp" turns of instruction tracking and runs a single step, not necessarily completing an instruction. Removed overview resizing commands from control panel.
+
+1296 - JR Removed "edge" global variable. Added default pin mask initialization to edges.
+
+1298 - JR Added io register bitmask to pin initialization.
+
+1404 - GB Add error message for THEN out of range in f18 compiler.
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01f
+(against 01e):
+=============================
+
+0..12 - New kernel 4.2c
+
+18* - Version (01f).  GB Load block 44 for intelligent empty.
+
+44 - GB Factor out logo and empty, make intelligent.  Move the editor extensions here too.
+
+46 - GB Relabel as miscellaneous.  Redefine pause to push an extra item on stack while displaying; display routine turns out to assume there is an extra item in keyboard wait function so to behave like that normal case an extra item is necessary everywhere.
+
+70 - GB Update grey words to suppress leading zero and to display slots if present.
+
+88 - GB Add .shans and extend .' to display all following comments (both long and multiple) from the source with proper spacing.
+
+94 - GB Add improved stack display.
+
+144 - Load improved stack display.
+
+146 - GB Have  node  do a  0 -org  to protect  org  and others.
+
+180 - CS Renamed ".3hex" to ".ad/s" hand made it match the new grey word behavior.
+
+184 - CS Replaced ".3hex" with ".ad/s", new grey word.
+
+276 - GB Grey word change, does not affect code.
+
+374 - GB Grey word change, does not affect code.
+
+400 - GB Grey word change, does not affect code.
+
+496 - GB Move .. to clarify grey word.
+
+510 - GB Fix code of +@ for correct alignment.
+
+514 - GB Force alignment.
+
+522 - MS Clean up for new grey words.
+
+524 - MS Remove unnecessary grey word.
+
+526 - MS Remove unnecessary grey word.
+
+546 - GB Grey word change.  Insert .. to keep align same.
+
+640 - GB Grey word change, add .. to preserve timing.
+
+642 - GB Grey word change, add .. to preserve timing.
+
+1082 - GB Grey word change, does not affect code.
+
+1126 - GB Grey word change, does not affect code.
+
+1344 - GB Grey word change, does not affect code.
+
+1400 - GB Rename org as -org and include zeroing of call?
+
+1402 - GB Stop invoking  here  in grey words.  Instead, save h and slot number times 1k.  Thus grey words no longer force word boundaries.  Define  org  to fill preceding word with nops using  .. .
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01e
+(against 01d):
+=============================
+
+18* - Version (01d1).
+
+202 - GB Add defn of  loader  utility (using IDE).  Add name for SRAM module.
+
+210 - CS Add ide  loader  scripting words using tables for configuration, similar to stream loader using same interface words.  GB Make  ship  take argument which is path number to use for IDE loader.  Use  pth  in  ship  and  body .  CS Added variable "root" to help avoid visiting the root node if it happens to be at the end of the path. In "ship" the active node, which is the root node at this point, is stored into "root" and the path is incremented. Commented "pause" has been moved to "deliver" in 214. Also hooking of the active path has been moved into "deliver", on 214.
+
+212 - CS Added configuration tables for ide load scripts.  GB Set default  P  to 0a9 and  B  to io.
+
+214 - CS Added routing and delivery for ide load scripts.  CS "route" now leaves the root node as active, so that "ship" can copy it into "root". "deliver" now does the hooking, factoring it out of "body". A commented "pause" has been moved here for the same reason, factoring.  CS Remove default for P from this code, let it be in the table.
+
+240 - CS Changed "frame" to conditionally tack on an extra boot frame for loading the root node.  CS In "frame" removed the test for visiting the root node and inserted "exec" as the parameter to "head". Now we always visit the root node and there's no decision to be made concerning the concatenation address.
+
+242 - CS Added "/part" as synonym for "boot". "boot" is deprecated for the stream loader.  GB Deprecate  node  and  boot  usage in  framer .  GB Set default  P  to 0a9 and  B  to io.
+
+244 - GB Add  course  as the formal way for selecting a path to use for stream loading.  Add  create .
+
+248 - GB Use +node .  Use /part .  CS Update  scrub  to default  b  to  io  (should use fresh to actually initialize it in next rev and to clean stack as well.)
+
+262 - GB Rename  path  as  entire and simply a table.  Rename  thru  as  to .  Use  +node .
+
+264 - GB Move 268 here; first block of a module is its load block (for compilation).  Document cluster and its packaging.
+
+266 - GB Move 264 here; second block of a module is its boot.  CS Removed node 108 from sram setup in the sram module.
+
+268 - GB Move 266 here; third block, if needed, of a module is the residual path.  Remove retention of async boot, belongs elsewhere.  Move IDE residual path here.
+
+276 - GB Reverse codes for mk! zero is stim 1 is set-mask.  Clean up.
+
+284 - CS Added display of stream length to feedback screen for flash burning.
+
+360 - GB Load ganglia components as part of poly.  Clean up.  Load SPI support functions.  CS Removed compiling of node 108 with generic code from the sram module. 108 is compiled along with the other image tranfer code now.  GB Load sram code by name.
+
+366 - GB Generate ganglia.
+
+368 - GB Add ganglion template.
+
+370 - GB Add snorkel.
+
+404 - GB Add working SPI Flash support for SST25xxx chips.
+
+406,8 - GB Move SRAM loader mechanism.
+
+406 - GB Add minimal but slower SPI code as a model.
+
+420..44 - GB Wipe the obsoleted IDE and flash loaders for pF.
+
+446..8 - GB Move sram loader f18 code here from 406,8.
+
+450..456 - GB Massively clean up and move pF IDE loader procedures here.
+
+452 - CS Removed extra node 10 from custom IDE path as a result of changes in 210 to allow visiting last node in list.
+
+460..468 - GB Massively clean up and move pF flash installation procedures here.
+
+460 - GB Set  len  to 4607 for 9 block nucleus.  Correct arithmetic to show precise length in bytes (words will be wrong so long as the display assumes 18 bits.)
+
+462 - GB Increase size of nucleus boot file read from 8k to 9k.
+
+466 - CS Change  warm frame  to  exec frame  which allows the final frame, loading node 705, to be generated.  CS Removed the "exec" and "warm" parameters before "frame". A result of the changes in 240.
+
+470..476 - GB Reorganize pF boot descriptors and place them here, converted for usability with ide loader, flash streamer, and softsim.
+
+846 - CS Template for loader. (Where does it actually belong?)
+
+848 - CS Template for flamer and flash burner. (Where does it actually belong?)
+
+1080 - CS Now using "sram load" to load module by name.
+
+1140 - CS Using "host load" instead of "serial load".
+
+1162 - CS Now using bin number instead of node numbers to load ram and mask changed from xa00 to x8a00.
+
+1174 - CS Specs for 705 and 108 have been moved here, the whole flash to sram bunch.
+
+1180 - GB Load sram boot descriptor by name (sram 2 +) and path (sram 4 +).  CS Removed the "exec" and "warm" parameters before "frame". Replaced "path" with "entire course". Removed second "/root" since "frame" now takes care of that detail. Added "708 +node xaa /p" as in the polyFORTH version to keep 708 bootable for IDE just in case.
+
+1182 - CS Changed "node" to "+node" and "boot" to "/part".
+
+1190 - CS Added feedback, length of eforth image.
+
+1194 - CS Added feedback, length of boot stream.
+
+1380 - DS Make complete set of port call combinations.
+
+1400 - CM Delete "o" as both obsolete and broken.
+
+1428 - GB Add documentation of SPI node pins.
+
+1438 - GB Put head on  warm  in null ROM so label always exists.
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01d
+(against 01c):
+=============================
+
+18* - Version.  GB Increase load at 62 from 4 to 5 blocks to include 70 for new blue word code.  Clean up with new blue words.  Get rid of symbol for png utility's load block.  Add  abuf  and  cbuf , reset their positions from 3000 and 5000 to 10000 and 29000 respectively.
+
+20 - GB Add  4@  as a macro.
+
+24 - GB Move  exit  here from 144 so it is usable early in the 18 load for testing.
+
+30 - GB Use  cbuf  instead of 5000 for source decompression buffer.
+
+36 - GB Use  abuf  instead of  3000  for @cyls buffer.  Clean up.
+
+46 - GB Deprecate background watermark and huge numbers, replace with double size numbers over the hint area and animate color to indicate when HOT in editor.
+
+52 - GB Use  abuf  instead of  3000  in floppy check.
+
+68 - GB Redesign blue word implementation for improved control over block display.  Move  exb  to block 70.  Add  blu  and  -blue  test.  Use  blu  in  -cr .  CS Fix typo in test for  ..  in blue.
+
+70 - GB Add a second block for blue/grey word implementation.  Move  exb  here from 68.  Test  -blue  in  exb .  Use  blu  in  br cr indent  to authorize their use.
+
+74 - GB Mark block not to load on native systems.
+
+76 - GB Use  abuf  for text buffer used in writing index files.
+
+80 - GB Use  abuf  instead of 3000 for OX offset.  Split formatting functions into 82.  Add mechanism for extending to display differences in audit mode.
+
+82 - GB Split qx formatting into this block.
+
+84 - GB Use  cbuf  instead of 5000 for resident  save  compression buffer.
+
+90 - GB Use  cbuf  instead of 5000 for decompression buffer in audit util.  Use  abuf  instead of 3000 for audit comparison area.
+
+92 - GB Remove redundant  check  defn.  Use  abuf  instead of 3000 for audit comparison area.  Add mechanism to indicate differences in qx.
+
+118 - GB Reassign IDE bin 800 to 1600.
+
+126 - GB Reassign IDE bins 802,3 to 1602,3
+
+135 - GB Use  blu  in  .s  .pth  .ram .
+
+142 - GB Reassign IDE bin 804 to 1604.
+
+144 - GB Move  exit  to 24.  Put  exit  back at end of  -nat .  Get rid of symbol for  png  utility's load block.
+
+150 - GB Document bin assignments.  Swap compilation order of eforth and pF.  Always compile both.
+
+160 - GB Use  cbuf  instead of 5000 in Chuck's compare.  Use abuf instead of 3000 there too.
+
+176 - GB Use  abuf  for text buffer used in writing html files.
+
+180 - CS html utility, corrected spacing for new blue words.
+
+182 - CS Added new "simple" blue words.
+
+184 - CS Put ?simple before .blue.
+
+250 - GB Reassign bin 813 to 1613.
+
+252 - GB Reassign bins 809,10 to 1609,10.
+
+258 - GB Reassign bin 811 to 1611.
+
+264 - GB Get code for SRAM from bins 1614..17
+
+270 - GB Put SRAM node 009 in bin 1617
+
+272 - GB Put SRAM node 008 in bin 1616
+
+274 - GB Put SRAM node 007 in bin 1615
+
+276 - GB Put SRAM interface in bin 1614.
+
+284 - CS Added "blu" to each of the display words for flash burning feedback, ".now", ".ask", ".at.", and ".res".
+
+288 - GB Reassign flash r/w funcs from 808ff to 1608ff.
+
+290 - GB Reassign bin 808 to 1608.
+
+360 - GB Assign pF serial wire to bin 1709.  Commit old SRAM interface to bin 1713.`  Re-order load sequence to permit more scope control.  Shorten flash-sram transfer to two blocks at 406.
+
+374 - GB Remove superfluous  exit .
+
+376 - GB Assign pF stack node to bin 1700.
+
+380 - GB Assign pF bitsy node to bin 1703.
+
+382 - GB Assign pF stack down to bin 1701.
+
+386 - GB Assign pF stack up to bin 1702.
+
+390 - GB Assign pF bitsy down to bin 1704.
+
+394 - GB Assign pF bitsy up to bin 1705.
+
+398 - GB Assign serial tx to bin 1706.
+
+400 - GB Assign serial rx to bin 1707.
+
+402 - GB Assign serial interface to bin 1708.
+
+406 - GB Copy 4 blocks to eForth 1170 for its own version.  Org this code at 0.  Assign node 208 sram loader to bin 1712.  Add code for sram loader wire nodes.
+
+408 - GB Org the wires at zero.  Delete obsolete code.  Move from 412.
+
+410 - GB Delete obsolete code.
+
+412 - GB Reassign bin 812 to 1612.  Now that this is pF specific store it in bin 1710 (eForth's is in 1612 for now.)  Move to 408.
+
+432 - GB Reassign bin 102 to 1709 in pF /wire for IDE boot.
+
+434 - GB Delete superfluous  exit .  Load 108 from bin 1713 instead of whatever has been compiled for 108 in the application.
+
+438 - GB Reassign bins in polyFORTH IDE boot.  Comment loading of serdes.
+
+454 - GB Org node 208 at 0.  Same for wire nodes.  Load node 208 from bin 1712.  GB Define /nwire to generate stream for wire nodes in the pF nucleus booting sequence.  Use to load 8 nodes with one node of object code.
+
+460 - GB Reassign bins in polyFORTH flash boot.  Get wire from 1709.
+
+462 - GB Reassign bins in polyFORTH flash boot.
+
+464 - GB Reassign bins 808,12 to 1608,12.  Get node 108 code from what was saved in bin 1713.  Load 705 from bin 1710 not 1612.
+
+466 - GB Wipe apocryphal code.
+
+480 - GB Document creeper bin reassignments.  Don't compile the SMTM or the ATS CS components.
+
+482..516 - GB Reassign creeper bins 900..17 to 2000.17
+
+518..540 - GB Reassign creeper bins 1000..11 to 2100..11
+
+560..72 - GB Move ATS/IDE components to 630ff.
+
+556..570 - GB Move creeper tests 2201..8 from 630ff here.
+
+576 - GB Decommission SMTM, move to 658.
+
+580..86 - GB Move ATS components to 648..54 for now.
+
+630..44 - GB Move creeper tests 2201..8 to 556ff.
+
+630..42 - GB Move ATS/IDE components here.  Reassign ATS/IDE bins 1200..6 to 1900..6.
+
+648..54 - GB Move ATS components here.
+
+658 - GB Move SMTM here from 576.
+
+660 - GB Reassign ats bin 1200 to 1900.
+
+666 - GB Use  blu  in  .pok .
+
+668 - GB Reassign ats bin 1201,2,3,4,5 to 1901,2,3,4,5.
+
+670 - GB Reassign creeper bins 902,7 to 2002,7
+
+672 - GB Reassign creeper bins 1000.11 to 2100..11
+
+682 - GB Reassign ats bin 1200 to 1900.
+
+692 - GB Use  blu  in  .pok .
+
+694 - GB Reassign creeper bin 911 to 2011
+
+696 - GB Reassign creeper bin 1000 to 2100; 913, 17 to 2013, 17.
+
+716 - GB Reassign ats bin 1201,2,3,4,5 to 1901,2,3,4,5.
+
+1080 - GB Load eForth version of sram boot components.  CS Add 1817 bin, remove 1176 load.
+
+**1124 - GB TEMP set maxim mode for UART.
+
+1170..6 - GB Copy 406ff here for eForth local version of kernel to SRAM.
+
+1170 - CS Added compile of node 605, 1815 bin. Added 1816 bin to compile of node 208.
+
+1172 - CS Move 8 bit flash code here from block 1176. Add 1814 bin.
+
+1174 - CS Copied wire setup here from polyFORTH and changed bin numbers.
+
+1176 - CS Deleted (moved to 1172).
+
+1180 - GB Reassign bins 808,12 to 1608,12.  CS Added a line to configure node 108 via bin 1817. Changed bin 1612 to 1814.
+
+1302 - GB Reassign flash r/w funcs from 808ff to 1608ff.
+
+1350 - GB Reassign IDE bin 804 to 1604
+
+1372..8 - GB Reassign IDE bins 800..3 to 1600.3
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01c
+(against 01b):
+=============================
+
+0..11 - Replace with native 4.2a-pd kernel.
+
+18* - Version.
+
+34 - GB Change native  serial  to be 108 .
+
+36 - GB Change windows  serial  to be 112 .
+
+46 - GB Remove kludge defns of forths & macros .
+
+66 - GB De-implement obsolete tags 10 and 11 (cased comments) by removing from editor hint map and nullifying behaviors.  Change the hint for white to w.
+
+74 - GB Remove old example, update shadow.  Add onamed and bnamed for filename override.
+
+108..114 - GB Move blocks 110..116 down one to make room for com port management code.
+
+108 - GB Adjust block number 112 to be 110
+
+110 - GB Add dummy  !nam sport bps  for native IDE compatibility.  Reverse modem control register values 2,0 -> 0,2 for correct polarity of RTS used as reset.  Add a 1 bit to each so that DTR is high to power minimal RS232 interfaces.  Enlarge sdat from 16384 to 24576 for larger and multiple chips.
+
+112 - GB Load 3 blocks starting at 114 for windows serial
+
+114 - GB Remove +ser -ser ctl! and reset.
+
+116 - GB Strip down to just +ser -ser ctl! and reset.  Add code for manipulating COM port DCBs.  Add variable  bps .  Have  +ser  set baud rate & framing using  bps  for rate, defaulted to 115.2
+
+148 - CS Added 1242 load at top to make a boot demo stream. SPI flash testbed in now compiled starting at block 1244 and an interactive vocabulary is compiled starting at 1238.  CS Removed some comments. Commented out bootstream and SPI testbed. Move definition of /softsim lower so it can include "default", defined in block 1240.
+
+202 - GB Add a-bps and c-bps config parameters.
+
+206 - GB Set a-bps in bps for host.
+
+208 - GB Set c-bps in bps for target.
+
+250 - GB Set a-bps in bps for flash erase function.
+
+252 - GB Set a-bps in bps for flash writer 18-bit.
+
+258 - GB Set a-bps in bps for flash writer 8 bit.
+
+282 - CS Added definition for "file", namely block 294.
+
+294 - CS Stream to file. Opens a file named stream.bin and writes the bootstream out as a binary file.
+
+420 - GB Set a-bps in bps for pF IDE boot.
+
+660 - GB Set a-bps in bps for TB001 IDE pretest.
+
+670 - GB Set a-bps in bps for TB001 IDE creepers.
+
+708 - GB Set a-bps in bps for selftest, note a-bps is assumed!
+
+712 - GB Set a-bps in bps for autotest, note a-bps is assumed!
+
+844 - GB Set a-bps in bps for demo ide boot.
+
+852 - GB Delete code erroneously released.
+
+1140 - GB Set a-bps in bps for eforth IDE boot
+
+1238, 40 - CS Interactive vocabulary added to softsim.  CS Added "default" to set softsim display to a known initial state the first time you run softsim after a warm (or cold) boot.
+
+1242 - CS A boot stream is built for use as an example in softsim. It's the smtm compiled into node 0.
+
+1244 - CS SPI flash testbed points to where bootstreams are now built.
+
+1266 - CS Changed mask in "access" from x1ff to x3ff to allow having P9 set to enable add with carry. This was preventing add with carry from being executed in softsim.
+
+1268 - CS Added "?+*c" in order to properly add the carry in +* when P9 is set. Changed mask in ++abus from x7f to x37f so incrementing the address bus doesn't change P9 (or P8 for that matter).
+
+1272 - CS Added "18bit" to +*.
+
+1282 - CS Display of T changed to show state of carry bit to left of T as a . if set, nothing if clear.
+
+1284 - CS Added a couple of "x1ff and" so that the softsim display will colorize the memory dump properly when P9 is set.  CS - Removed "1ff and" twice. Changed "40 - and" to "240 - and" and "100 - and" to "900 - and". All this allows the memory dump to color the IP and PC addresses correctly even when P9 is set for add with carry.
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01b
+(against 01a):
+=============================
+
+18* - Version.  Add definition of  flush .
+
+24 - GB Expose +! to interpreter.
+
+46 - GB Deprecate "l" as loading and make it list the current block instead.  Add experimental  finish .
+
+80 - GB Add QX function.
+
+136 - GB Reset default path for all nodes RAM test to be 2.
+
+142 - GB Update bin number for all-nodes test.  Use explicit 2 path all places.
+
+144 - GB Load QX as resident.
+
+150 - GB Add all nodes test to compilation.
+
+206 - Comment canon load out of host
+
+208 - Comment canon load out of target
+
+1350 - GB Update all nodes test's final grey word value.
+
+1428 - CS/JR Add entry point  ibits .  Does not change ROM.
+
+==========================================
+==========================================
+CHANGES TO ARRAYFORTH for 01a
+(against 00z):
+=============================
+
+18* - Version.
+
+144 - GB Make ascii file name mechanism resident.
+
+146 - GB Put ' and h' under reclaim.
+
+150 - GB Remove DC tests, straighten load order out.  Default NOT to compile pF.
+
+200 - GB Put examples here.
+
+206 - GB Comment canon load out of host
+
+208 - GB Comment canon load out of target
+
+360 - GB Remove ' and h' from pF compilation.
+
+420 - GB Make pF IDE boot load block just do it.
+
+430 - GB Use ascii pathnames for pF IDE boot.
+
+476 - GB Use ascii pathnames for pF flash burn.
+
+1080 - GB Remove ' and h' from eForth compilation.
+
+1140 - GB Make eForth IDE boot load block just do it.
+
+1144 - GB Use ascii pathnames for eForth boot and burn.
+
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

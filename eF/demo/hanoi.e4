@@ -1,0 +1,138 @@
+CR .( Recursive Towers of Hanoi )
+\ ==============================================================
+\ todo
+\ ==============================================================
+
+[defined] m.hanoi 0= if\ m.hanoi
+marker m.hanoi
+decimal
+
+\ ==============================================================
+
+: DALLY ( -- ) nuf? if abort then ;
+
+VARIABLE DISKS \ number of disks
+  10 DISKS ! \ init default
+
+CHAR * CONSTANT _BASE \ base character
+CHAR | CONSTANT _POLE \ pole character
+
+CREATE POLE0
+   0 ,           \ size pointer
+  14 ,           \ horizontal position
+  15 CELLS ALLOT \ array of disk sizes  15 MAX
+
+CREATE POLE1  0 ,  40 ,  15 CELLS ALLOT
+CREATE POLE2  0 ,  66 ,  15 CELLS ALLOT
+
+\ horizontal & vertical position of the top disk
+
+: POLE>XY ( pole -- x y )
+  DUP >R CELL+ @ \ horizontal
+  [ 22 2 + ] LITERAL  R@ @ R> -
+  0 [ 1 CELLS ] LITERAL UM/MOD SWAP DROP - ; \ vertical
+
+\ decrement the number of src disks
+
+: -SRC ( src -- ) DUP @ [ 1 CELLS ] LITERAL - SWAP ! ;
+
+\ increment the number of dst disks and add new top size
+
+: +DST ( size dst -- ) DUP >R @ CELL+  DUP R> !  ! ;
+
+\ blank the top disk and redraw part of the pole
+
+: ERASEDISK ( size x y -- )
+  -1 + >R -1 +    \ size x    y
+  OVER - R> AT-XY \ size
+  DUP SPACES  _POLE EMIT  SPACES ;
+
+: DRAWDISK ( size x y -- )
+  -1 + >R -1 +    \ size x    y
+  OVER - R> AT-XY \ size
+  DUP DIGIT >R  ( 2* ) DUP +  1 + R> EMITS ;
+
+\ size of the top disk
+
+: TOPSIZE ( pole -- size ) @ @ ;
+
+: MOVEDISK ( dst src -- )
+  DALLY
+  DUP >R     \ dst src             src
+  TOPSIZE    \ dst size            src
+  SWAP OVER  \ size dst size       src
+  R@ POLE>XY \ size dst size x y   src
+  ERASEDISK  \ size dst            src
+  R> -SRC    \ size dst
+  2DUP +DST  \ size dst
+  POLE>XY    \ size x y
+  DRAWDISK ;
+
+VARIABLE RECURS \ number of recursions
+
+: TOWERS ( temp dst src n -- )
+  @RPDEPTH
+  1 RECURS +!  -1 + ?DUP  \ i d s n
+  IF
+    >R >R 2DUP SWAP       \ i d  d i       s n
+    R> R@ OVER >R         \ i d  d i s n   s n
+    ( === ) RECURSE ( === src to temp )
+    DUP R@                \ i d  d s       s n
+    MOVEDISK              \ i d            s n
+    SWAP R>               \ d i s          n
+    SWAP >R SWAP R> R>    \ s d i n
+    ( === ) RECURSE ( === temp to dst )
+    EXIT
+  THEN                    \ i d s
+  MOVEDISK DROP ;
+
+\ the following are used only during initialization
+
+: DRAWBASE ( -- ) 25 _BASE EMITS ;
+
+: DRAWPOLE ( x y -- )
+  DISKS @ - SWAP  -1 + SWAP  DISKS @
+  BEGIN DUP
+  WHILE >R  2DUP AT-XY _POLE EMIT  1 +  R> -1 +
+  REPEAT DROP 2DROP ;
+
+: DRAWPOLES ( -- )
+  22 \ base line
+   1 OVER AT-XY DRAWBASE \ draw 3 bases
+  27 OVER AT-XY DRAWBASE
+  53 OVER AT-XY DRAWBASE
+  POLE0 CELL+ @ OVER DRAWPOLE \ draw 3 poles
+  POLE1 CELL+ @ OVER DRAWPOLE
+  POLE2 CELL+ @ SWAP DRAWPOLE ;
+
+: INITPOLES ( -- ) \ initial disk positions
+  POLE2 CELL+ POLE2 !
+  POLE1 CELL+ POLE1 !
+  DISKS @ -1 +  DUP CELLS POLE0 CELL+ CELL+ +  POLE0 !
+  DISKS @
+  BEGIN DUP
+  WHILE -1 + >R  R@  OVER R@ - CELLS POLE0 CELL+ CELL+ +  !
+    DUP R@ -  14  22 R@ -  DRAWDISK  R>
+  REPEAT 2DROP ;
+
+: .HANOI ( -- )
+  CR    ." Towers of Hanoi for " DISKS ?
+        ."  disks, 0 to " DISKS @ -1 + .
+  CR CR ." Move a stack of disks from one pole to another"
+  CR CR ." without placing a larger disk on top of a smaller."
+  CR ;
+
+: HANOI ( -- ) \ recursions 1023, rdepth=31
+  BASE @ DECIMAL  PAGE 0 0 AT-XY .HANOI  0 RECURS !
+  DRAWPOLES  INITPOLES  !RPDEPTH
+  POLE2 POLE1 POLE0 DISKS @  13 MIN  ['] TOWERS CATCH
+  IF 2DROP 2DROP THEN  0 23 AT-XY  RECURS ?  ?RPDEPTH  BASE ! ;
+
+CR
+.( Type HANOI to run Towers of Hanoi)
+CR
+
+\ ==============================================================
+
+[DEFINED] SFILE 0= IF\ HAND
+

@@ -1,0 +1,46 @@
+CR .( eForth siobus multitasker example )
+\ ==============================================================
+\ todo
+\ ==============================================================
+
+[defined] m.ledtask 0= if\ m.ledtask
+marker m.ledtask
+decimal
+
+\ ==============================================================
+\ global variable
+CREATE V1  0 , 0 , ( double number counter )
+
+VARIABLE LOFF ( ms )  100 LOFF !
+VARIABLE LONN ( ms )  100 LONN !
+
+: !LED ( U -- ) 600 N! ;
+: +LED ( -- ) 1 !LED ;
+: -LED ( -- ) 0 !LED ;
+
+44 44 44 HAT LED ( allocate task table )
+
+LED BUILD
+
+: LEDGO ( -- ) ( define a new task )
+  0. V1 2! ( init counter )
+  LED ACTIVATE ( init task, it will run on next PAUSE )
+  BEGIN -LED  LOFF @ MS
+        +LED  LONN @ MS
+        V1 2@ 1. D+ V1 2! ( count up )
+  AGAIN ;
+
+: P ( -- ) V1 2@ D. ;
+
+CR .( Type LEDGO to start background task )
+CR .( Type LED SLEEP to stop the running task)
+CR .( Type LED AWAKE to restart the task)
+CR .( Type +LED to turn ON the led when the task is sleeping)
+CR .( Type -LED to turn OFF the led when the task is sleeping)
+CR .( Type P to see the current value of the counter)
+CR
+
+\ ==============================================================
+
+[DEFINED] SFILE 0= IF\ HAND
+

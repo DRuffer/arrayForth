@@ -1,0 +1,106 @@
+CR .( eForth DEMO library )
+\ ==============================================================
+\ todo
+\ ==============================================================
+
+[defined] m.lib 0= if\ m.lib
+marker m.lib
+decimal
+
+\ ==============================================================
+\ track recursion depth
+
+VARIABLE RPDEPTH
+: !RPDEPTH ( -- ) RP@ RPDEPTH ! ;
+: @RPDEPTH ( -- ) RP@ RPDEPTH @ U< IF RP@ RPDEPTH ! THEN ;
+: ?RPDEPTH ( -- ) RP@ RPDEPTH @ - CELL/ ." RDEPTH=" U. ;
+
+\ ==============================================================
+\ DO ?DO LOOP +LOOP LEAVE ?LEAVE UNLOOP I J
+
+\ [?]DO pushes the address of a1 to the
+\       Return Stack for [?]LEAVE and [+]LOOP
+\
+\          v-------------------<<
+\ [?]DO a1 ... [?]LEAVE ... [+]LOOP ...
+\       >>--------+>----------------^
+\
+\          v-------------------------------------<<
+\ [?]DO a1 ... IF a2 ... UNLOOP EXIT THEN ... [+]LOOP ...
+\                 >>----------------------^
+\       >>--------------------------------------------^
+\
+\          v-----------------<<
+\ [?]DO a1 ...WHILE a2 ...[+]LOOP ...ELSE a4 ...UNLOOP THEN ...
+\       >>------------------------^       >>----------------^
+\                   >>-----------------------^
+
+: _DO ( l i -- (R a -- a l i )
+  BEGIN  SWAP  R> CELL+  DUP >R  SWAP >R  SWAP >R  >R ;
+: _?DO ( l i -- (R a -- a l i ) 2DUP = UNTIL  2DROP  R> @ >R ;
+
+: _LOOP ( -- (R a l i  a -- a l i | )
+  R>  R> 1+ R>  OVER OVER XOR
+  IF R@  SWAP >R  SWAP >R  >R  DROP  EXIT
+  THEN 2DROP  R> DROP  >R ;
+
+: _+LOOP ( n -- (R a l i  a -- a l i | )
+  R> SWAP  DUP R@ +  SWAP
+  DUP  R> NEGATE R@ +  NEGATE UM+ >R DROP \ l i - n - save carry
+  INVERT 0< R> + \ overflow ? sign of n and carry
+  IF R> R@  SWAP >R  SWAP >R  >R  DROP  EXIT
+  THEN R> 2DROP  R> DROP  >R ;
+
+: DO ( -- a )( 6.1.1240 ( 0x17 )
+  ['] _DO  COMPILE,  MARK ; IMMEDIATE
+: ?DO ( -- a )( 6.2.0620 ( 0x18 )
+  ['] _?DO COMPILE,  MARK ; IMMEDIATE
+
+: LOOP ( a -- )( 6.1.1800 ( 0x15 )
+  ['] _LOOP  COMPILE,  [COMPILE] THEN ; IMMEDIATE
+: +LOOP ( a -- )( 6.1.0140 ( 0x16 )
+  ['] _+LOOP COMPILE,  [COMPILE] THEN ; IMMEDIATE
+
+: UNLOOP ( -- ( R: a l i  a -- )( 6.1.2380 ( 0x89 )
+  R>   R> R> 2DROP  R> DROP    >R ;
+: LEAVE ( -- (R a l i  a -- )( 6.1.1760 ( 0x1B )
+  R> DROP  R> R> 2DROP  R> CELL- @ >R ;
+: ?LEAVE ( f -- ) IF R> DROP LEAVE THEN ;
+
+[DEFINED] I IF\ : I ( -- n )( 6.1.1680 ( 0x19 ) R> R@ SWAP >R ;
+
+: J ( -- n )( 6.1.1730 ( 0x1A )
+  R>  R> R> R>  R@  SWAP >R  SWAP >R  SWAP >R  SWAP >R ;
+
+\ ==============================================================
+\ ansi color attributes
+
+: ALLATTOFF [CTRL] [ EMIT ." [0m" ;
+: CONCEALED [CTRL] [ EMIT ." [8m" ;
+
+: RED     [CTRL] [ EMIT ." [31m" ;
+: GREEN   [CTRL] [ EMIT ." [32m" ;
+: BLUE    [CTRL] [ EMIT ." [34m" ;
+
+: CYAN    [CTRL] [ EMIT ." [36m" ;
+: MAGENTA [CTRL] [ EMIT ." [35m" ;
+: YELLOW  [CTRL] [ EMIT ." [33m" ;
+
+\ ==============================================================
+\ random number generator, Leo Brodie 'Starting Forth'
+
+CREATE RND  HERE , ( seed )
+: RANDOM ( -- n ) RND @ 31421 * 6927 + DUP RND ! ;
+: CHOOSE ( n1 -- n2 ) RANDOM UM* NIP ; \ within 0 to n1
+
+\ ==============================================================
+\ ansForth version
+\ : ?user ( -- 0 | c c ) key? dup if drop  key dup then ;
+
+\ eForth version
+: ?user ( -- 0 | c c ) ?key dup if invert swap invert then ;
+
+\ ==============================================================
+
+[DEFINED] SFILE 0= IF\ HAND
+

@@ -1,0 +1,321 @@
+CR .( Tetris for terminals )
+\ ==============================================================
+\ todo
+\ ==============================================================
+\
+\ LANGUAGE    : ANS Forth with extensions
+\ PROJECT     : Forth Environments
+\ DESCRIPTION : Examples
+\ CATEGORY    : Games
+\ AUTHOR      : Dirk Uwe Zoller, April 5, 1994
+\ REVISED     : May 31, 1994, Marcel Hendrix
+\ REVISED     : February 27, 2004, Krishna Myneni [for kForth]
+\
+\ tetris.4th  Tetris for terminals, redone in ANSI-Forth.
+\  Written 05Apr94 by Dirk Uwe Zoller, e-mail:
+\    duz@roxi.rz.fht-mannheim.de.
+\  Look&feel stolen from Mike Taylor's "TETRIS FOR TERMINALS"
+\
+\  Please copy and share this program, modify it for your system
+\  and improve it as you like. But don't remove this notice.
+\ ==============================================================
+
+[defined] m.tetris 0= if\ m.tetris
+marker m.tetris
+decimal
+
+\ ==============================================================
+\ compatibility
+
+[DEFINED] 2*    IF\ : 2* ( n -- n ) DUP + ;
+[DEFINED] 2SWAP IF\ : 2SWAP ( d1 d2 -- d2 d1 ) ROT >R ROT R> ;
+[DEFINED] D0=   IF\ : D0= ( d -- f ) OR 0= ;
+[DEFINED] D-    IF\ : D-  ( d d -- d ) DNEGATE D+ ;
+[DEFINED] D=    IF\ : D=  ( d d -- f ) D- D0= ;
+[DEFINED] D<>   IF\ : D<> ( d d -- f ) D= INVERT ;
+
+\ ==============================================================
+\ Tetris
+
+\ keyboard right hand home row
+CHAR J CONSTANT left-key
+CHAR K CONSTANT rot-key
+CHAR L CONSTANT right-key
+CHAR ; CONSTANT pause-key
+    BL CONSTANT drop-key
+CHAR U CONSTANT refresh-key
+CHAR Q CONSTANT quit-key
+
+VARIABLE score    VARIABLE pieces
+VARIABLE levels   VARIABLE delay
+
+: empty-position ( -- c c ) BL DUP ;
+: 2EMIT ( c c -- ) EMIT EMIT ;
+: TEMIT ( c -- ) [CHAR] ' 2EMIT ;
+
+: at+xy ( col row -- ) 2 + >R  6 + R>  AT-XY ;
+
+24 CONSTANT HELPP \ starting column
+: SHOW-HELP ( -- )
+  HELPP
+  DUP  1 at+xy ." ***** T E T R I S *****"
+  DUP  2 at+xy ." ======================="
+  DUP  4 at+xy ." Use keys:"
+  DUP 2 +
+  DUP  5 at+xy left-key    TEMIT ." ' Move left"
+  DUP  6 at+xy rot-key     TEMIT ." ' Rotate"
+  DUP  7 at+xy right-key   TEMIT ." ' Move right"
+  DUP  8 at+xy drop-key    TEMIT ." ' Drop"
+  DUP  9 at+xy pause-key   TEMIT ." ' Pause"
+  DUP 10 at+xy refresh-key TEMIT ." ' Refresh"
+      11 at+xy quit-key    TEMIT ." ' Quit"
+  DUP 13 at+xy ." Score:"
+  DUP 14 at+xy ." Pieces:"
+  DUP 15 at+xy ." Levels:"
+  DUP 17 at+xy ." 1994 Dirk Uwe Zoller"
+      18 at+xy ." Copy it, port it, play it, enjoy it!" ;
+
+: UPDATE-SCORE ( -- ) \ display current score
+  [ HELPP 7 + ] LITERAL
+  DUP 13 at+xy score  @ 7 .R
+  DUP 14 at+xy pieces @ 7 .R
+      15 at+xy levels @ 7 .R ;
+
+\ Define pit where bricks fall
+
+: 2C@ ( a -- c c ) DUP CHAR+ C@  SWAP C@ ;
+: 2C! ( c c a -- ) DUP >R C! R> CHAR+ C! ;
+
+10 CONSTANT wide \ size of pit in brick positions
+20 CONSTANT deep
+
+CREATE PITT  wide deep * 2* CHARS ALLOT
+: PIT ( j i -- ) SWAP wide * + 2* CHARS PITT + ;
+
+: EMPTY-PIT ( -- )
+  deep 0 DO wide 0 DO  empty-position  J I PIT 2C!  LOOP LOOP ;
+
+: DRAW-LINE ( line -- )
+  0 OVER at+xy  wide 0 DO  DUP I PIT 2C@ 2EMIT  LOOP  DROP ;
+
+: DRAW-PIT ( -- ) \ draw the contents of the pit
+  deep 0 DO  I DRAW-LINE  LOOP ;
+
+: MOVE-LINE ( from to -- )
+  OVER 0 PIT  OVER 0 PIT  wide 2*  CHARS MOVE  DRAW-LINE
+  DUP 0 PIT  wide 2*  BL FILL  DRAW-LINE ;
+
+: LINE-FULL ( line-no -- flag )
+  -1  wide 0 DO OVER I PIT 2C@ empty-position D=
+    IF  DROP 0  LEAVE  THEN
+  LOOP NIP ;
+
+: REMOVE-LINES ( -- )
+  deep DUP
+  BEGIN >R
+    BEGIN  1 - DUP 0< IF  R> 2DROP EXIT  THEN  DUP LINE-FULL
+    WHILE  1 levels +!  10 score +!
+    REPEAT R> 1 -  2DUP XOR IF  2DUP MOVE-LINE  THEN
+  AGAIN ;
+
+\ Displaying
+
+: DRAW-BOTTOM ( -- ) \ redraw the bottom of the pit
+  -2 deep at+xy  [CHAR] + DUP  2DUP 2EMIT
+  wide 0 DO  [CHAR] = DUP 2EMIT  LOOP  2EMIT ;
+
+: BOTTOM-MSG ( addr cnt -- c ) \ output message to pit bottom
+  wide OVER 2 / - deep at+xy  TYPE
+  BEGIN RANDOM DROP  ?user UNTIL  DRAW-BOTTOM ;
+
+: DRAW-FRAME ( -- ) \ draw the border of the pit
+  deep 0 DO -2 I at+xy  [CHAR] | DUP
+    2DUP 2EMIT  wide 2* I at+xy  2EMIT
+  LOOP  DRAW-BOTTOM ;
+
+: REFRESH ( -- ) \ redraw everything on screen
+  PAGE DRAW-FRAME DRAW-PIT SHOW-HELP UPDATE-SCORE ;
+
+\ Define shapes of bricks
+
+: B" ( 'ccc'" -- )
+  [CHAR] " PARSE ( a u ) HERE SWAP CHARS  DUP ALLOT  MOVE ;
+
+CREATE BRICK1
+  B"         "
+  B" ######  "
+  B"   ##    "
+  B"         "
+CREATE BRICK2
+  B"         "
+  B" <><><><>"
+  B"         "
+  B"         "
+CREATE BRICK3
+  B"         "
+  B"   {}{}{}"
+  B"   {}    "
+  B"         "
+CREATE BRICK4
+  B"         "
+  B" ()()()  "
+  B"     ()  "
+  B"         "
+CREATE BRICK5
+  B"         "
+  B"   [][]  "
+  B"   [][]  "
+  B"         "
+CREATE BRICK6
+  B"         "
+  B" @@@@    "
+  B"   @@@@  "
+  B"         "
+CREATE BRICK7
+  B"         "
+  B"   %%%%  "
+  B" %%%%    "
+  B"         "
+CREATE BRICK0 \ working brick
+  B"         "
+  B"         "
+  B"         "
+  B"         "
+CREATE ROTATED \ rotated brick
+  B"         "
+  B"         "
+  B"         "
+  B"         "
+CREATE BRICKS ( -- a )
+  BRICK1 ,  BRICK2 ,  BRICK3 ,
+  BRICK4 ,  BRICK5 ,  BRICK6 ,  BRICK7 ,
+
+CREATE BRICK-VAL ( -- a )
+  1 C,  2 C,  3 C,  3 C,  4 C,  5 C,  5 C,
+
+: BRICK+ ( n n a -- a+ ) >R  2* 2* + 2* CHARS  R> + ;
+: BRICK2C@ ( i j -- c c ) BRICK0 BRICK+ 2C@ ;
+: IS-BRICK ( brick -- ) BRICK0 [ 32 CHARS ] LITERAL MOVE ;
+
+\ ==============================================================
+
+: NEW-BRICK ( -- ) \ select a new brick by random, count it
+  1 pieces +!  7 CHOOSE DUP
+  CELLS BRICKS + @ IS-BRICK
+  CHARS BRICK-VAL + C@ score +! ;
+
+: ROTLEFT ( -- )
+  4 0 DO 4 0 DO  I J BRICK2C@  J 3 I - ROTATED BRICK+ 2C!
+  LOOP LOOP  ROTATED IS-BRICK ;
+
+: ROTRIGHT ( -- )
+  4 0 DO 4 0 DO  I J BRICK2C@  3 J - I ROTATED BRICK+ 2C!
+  LOOP LOOP  ROTATED IS-BRICK ;
+
+: TEST-BRICK ( row col -- flag ) \ could the brick be there?
+  4 0 DO 4 0 DO  I J BRICK2C@ empty-position D<>
+    IF OVER J +  OVER I +
+       OVER DUP 0< SWAP deep < INVERT OR
+       OVER DUP 0< SWAP wide < INVERT OR
+       2SWAP  PIT 2C@ empty-position D<> OR
+       OR IF  UNLOOP UNLOOP  2DROP 0 EXIT  THEN
+    THEN
+  LOOP LOOP  2DROP -1 ;
+
+: PUT-BRICK ( row col -- ) \ put brick in pit
+  4 0 DO 4 0 DO  I J BRICK2C@ empty-position D<>
+    IF OVER J + OVER I + PIT  I J BRICK2C@ ROT 2C! THEN
+  LOOP LOOP  2DROP ;
+
+: REMOVE-BRICK ( row col -- ) \ remove brick from pit
+  4 0 DO 4 0 DO  I J BRICK2C@ empty-position D<>
+    IF OVER J + OVER I + PIT  empty-position ROT 2C! THEN
+  LOOP LOOP  2DROP ;
+
+: DRAW-BRICK ( row col -- ) \ draw brick to screen
+  4 0 DO 4 0 DO  I J BRICK2C@ empty-position D<>
+    IF OVER J + OVER I + 2* SWAP at+xy  I J BRICK2C@ 2EMIT
+    THEN
+  LOOP LOOP  2DROP ;
+
+: ERASE-BRICK ( row col -- ) \ erase brick from screen
+  4 0 DO 4 0 DO  I J BRICK2C@ empty-position D<>
+    IF OVER J + OVER I + 2* SWAP at+xy  empty-position 2EMIT
+    THEN
+  LOOP LOOP  2DROP ;
+
+\ user interaction
+
+CREATE CURRENT-POSITION  2 CELLS ALLOT
+
+: INSERT-BRICK ( row col -- flag ) \ introduce a new brick
+  2DUP TEST-BRICK
+  IF 2DUP CURRENT-POSITION 2!
+     2DUP DRAW-BRICK PUT-BRICK  -1 EXIT
+  THEN 2DROP 0 ;
+
+: MOVE-BRICK ( rows cols -- flag ) \ try to move the brick
+  CURRENT-POSITION 2@  2DUP REMOVE-BRICK  D+  2DUP TEST-BRICK
+  IF CURRENT-POSITION 2@ ERASE-BRICK  2DUP CURRENT-POSITION 2!
+    2DUP DRAW-BRICK PUT-BRICK  0 EXIT
+  THEN 2DROP  CURRENT-POSITION 2@ PUT-BRICK  -1 ;
+
+: ROTATE-BRICK ( flag -- flag ) \ left/right, success
+  >R  CURRENT-POSITION 2@
+  2DUP   REMOVE-BRICK R@ IF ROTRIGHT ELSE ROTLEFT  THEN
+  2DUP     TEST-BRICK R@ IF ROTLEFT  ELSE ROTRIGHT THEN
+  IF 2DUP ERASE-BRICK R> IF ROTRIGHT ELSE ROTLEFT  THEN
+     2DUP  DRAW-BRICK PUT-BRICK  -1 EXIT
+  THEN 2DROP  R> DROP  0 ;
+
+: DROP-BRICK ( -- ) \ move brick down fast
+  BEGIN  1 0 MOVE-BRICK  UNTIL ;
+
+: INTERACTION ( c -- flag )
+  UPPER  0 SWAP
+  DUP left-key    = IF DROP  0 -1 MOVE-BRICK DROP  EXIT THEN
+  DUP right-key   = IF DROP  0  1 MOVE-BRICK DROP  EXIT THEN
+  DUP rot-key     = IF DROP  0  ROTATE-BRICK DROP  EXIT THEN
+  DUP drop-key    = IF DROP       DROP-BRICK       EXIT THEN
+  DUP pause-key   = IF DROP  S"  Paused " BOTTOM-MSG DROP  EXIT THEN
+  DUP refresh-key = IF DROP  REFRESH               EXIT THEN
+      quit-key    = IF 0= THEN ;
+
+\ the game
+
+: ADJUST-DELAY ( -- ) \ make it faster with increasing score
+  levels @  DUP 50 <
+  IF 100 OVER -
+  ELSE DUP 100 <
+    IF 62 OVER 4 / -
+    ELSE DUP 500 < IF 31 OVER 16 / - ELSE 0 THEN
+    THEN
+  THEN  delay !  DROP ;
+
+: PLAY-GAME ( -- ) \ play one tetris game
+  BEGIN  NEW-BRICK  -1 3 INSERT-BRICK
+  WHILE
+    BEGIN   4 0
+      DO   delay @ MS   ?user
+        IF INTERACTION IF UNLOOP EXIT THEN THEN
+      LOOP  1 0 MOVE-BRICK
+    UNTIL  REMOVE-LINES  UPDATE-SCORE  ADJUST-DELAY
+  REPEAT ;
+
+: INITIALIZE ( -- ) \ prepare for playing
+  100 delay !  0 score !  0 pieces !  0 levels !
+  EMPTY-PIT  REFRESH ;
+
+: TETRIS ( -- ) \ play the tetris game
+  INITIALIZE  S"  Press any key =" BOTTOM-MSG DROP
+  BEGIN PLAY-GAME  S"  Again? " BOTTOM-MSG UPPER [CHAR] Y =
+  WHILE  INITIALIZE  REPEAT  CR ;
+
+CR
+.( Type TETRIS to play Tetris)
+CR
+
+\ ==============================================================
+
+[DEFINED] SFILE 0= IF\ HAND
+

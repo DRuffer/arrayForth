@@ -1,0 +1,3102 @@
+Changes to make polyFORTH/G144-01w
+Based upon pF/G144-01v
+With full history before that.
+==========================================
+
+VIRTUAL MACHINE TO DO:
+
+- Why does reclaim in 718 give bad grey word in 740?
+- Parameterize inverted RS232 output in 732.
+- Change John's keyboard buffer operation.
+- Try reducing from 10 to 6 nodes for UART.
+
+uCODE opportunities
+- ?DUP in stack node, put at 20:
+     : 'qdup  if
+     : 'dup   dup pshw ;
+     ...
+     : 'nop   then then ;
+- U<
+- Multiply/divide
+- Better /ba
+- Variable shift or by 8 or unsighed right shift
+- 2/MOD, byte ops argh
+- @+ !+ ?
+- next
+- ND! (OVER SWAP !)
+
+
+polyFORTH SYSTEM TO DO:
+
+- Make ['] explicitly NOT search IMMEDIATE words!?
+- Timeout on disk ops
+- Recode U< to use UM+  ( NEGATE UM+ SWAP DROP 0=)
+- Start on test runner
+- What is "remote" bit 4000 in a head? (DESCEND)
+- Refactor / remove args to INTERPRET
+- Add UNDO.
+- Silent disk error pass-thru
+
+==========================================
+
+MAJOR THINGS DONE / TO DOCUMENT:
+
+arrayForth/colorForth:
+
+- literal  is now usable while audit loaded.
+- ?ram and ?rom in IDE no longer clobber a in target node.
+
+VIRTUAL MACHINE:
+
+- Shortened poll latency in node 107 for SRAM services
+- Made idle response time deterministic
+- Shortened cycle lengths on reads and writes in node 007.
+- Redefined VM instruction set for optimal use of the four
+  adjacent coprocessor nodes.  Still not actually used, but
+  will be in 1c and that must happen almost instantly.
+- The primitives that had to be moved from bitsy and stack
+  nodes have been relocated to node 006.
+- Updated arrayForth with 3.5f changes.
+- Updated arrayForth with latest DC and ATS tests.
+- Reorganized code in 700ff as first step of
+  VM build cleanup.
+- Reorganized serial IDE load block and other mech to
+  facilitate factoring of customizations.  Re-did the
+  700 structure to be dead minimal, use same mechanism
+  in ATS structures.
+- Added & tested sync boot master for node 300, and
+  UUT was able to process a boot frame.
+- Added & tested sync bridge for both chips node 300.
+- Added & tested SRAM interface support for masking masters
+  and interchanging stimuli.
+- IDE booting procedure revamped completely to eliminate
+  fragility and enable loading whole chip.
+- Mastering I/O null pointers now zero vice -1.
+
+polyFORTH SYSTEM:
+
+- Faithful to memory model done for Novix.
+- Nucleus, 9 LOAD, Target Compiler and Testing utility complete.
+- 4 char typeahead in serial input
+- Caveat re typeahead on services & ^D to unlock
+- Serial input buffer problems are with drivers for Prolific
+  and ATEN units.  Use FTDI on Windows boxes.
+- Made 960kbit terminal usable for disk.
+- Charley's SPI flash boot installed and working for pF
+- Mem management pointer structures simplified.  MMPTR is now
+  double addresses and is found directly in low memory.
+- Snorkel and Ganglia now supported for memory master I/O.
+- SST25WFxxx SPI Flash disk now supported.
+
+ATS 
+
+- Tested TB001 master hardware and programmed the
+  pretest for opens and shorts on UUT power buses.
+- Added mechanism to run boot streams into UUT sync
+  node.
+- Added all the tests we used on 1 July (see ATS history)
+- Fixed notorious  load?  problem and probably the other
+  secondary anomalies.
+- Added more tests and converted one of Steven's crawlers.
+- Fixed assumption of b=io (current boot streams garbage B
+  on the way thru uninvolved nodes.)
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01w
+(against pF/G144.01v):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+Final cut changes to release candidate before posting:
+
+212 - GB Set default  P  to 0a9 and  B  to io.
+
+214 - CS Remove default for P from this code, let it be in the table.
+
+242 - GB Set default  P  to 0a9 and  B  to io.
+
+248 - CS Update  scrub  to default  b  to  io  (should use fresh to actually initialize it in next rev and to clean stack as well.)
+
+460 - GB Correct arithmetic to show precise length in bytes (words will be wrong so long as the display assumes 18 bits.)
+
+==========================================
+
+0..8 - Nucleus version
+
+9 - GB Pull RAM disk out, no benefit.  Take shadow from 8, combining boilerplate.
+
+*11 - GB Version, disk layout.  GB Move SYSTEM screen to block 29.  Move 8 here.
+
+28 - GB Remove MMPTR; it is now at location 2.  Reverse functions for mk!.  Remove functions moved to nucleus.  Replace with post nucleus snorkel facilities.
+
+*29 - GB Version.  GB Move SYSTEM screen here.
+
+48 - GB Enlarge nucleus in TESTING:  RAM sized for 9 blocks, SUCK and INSTALL 9 blocks, WHAM 4608 words.  Put  'reload @EXECUTE  in  WHAM to turn masters off.
+
+50 - GB Enlarge target comparison to 4608 words (9 blocks).
+
+53 - GB Say EVB001.  Add words left report.
+
+54 - GB Enlarge RAM to 4608 and erase all of it.  Wrap at 4608 in >T.  Save 9 blocks in FLUSH.
+
+*61 - GB Version.  Enlarge memory master pointer table from one word to four and default it to zero.  Increase #ROM to 1200.  Add display of words left.
+
+64 - GB Clean interpreter  0= NOT =  to use primitive 0=
+
+72 - GB Add system variable  'reload
+
+93 - GB Initialilze  'reload  with  reload
+
+94 - GB Add  'reload @EXECUTE  at start of  RELOAD .  Separate  RELOAD  from  Start .  Add  HOME in  HI .
+
+96..100 - GB Add snorkel-based memory mastering I/O and flash plus serial disk support.
+
+101 - GB Move no-arith dump to 113.
+
+110 - GB Move exper uCode from 111.
+
+111 - GB Move Rible serial from 96.
+
+112 - GB Move serial disk from 97.  Comment (BUFFER) and (BLOCK) for serial-only.
+
+113 - GB Move no-arith dump from 101.
+
+141..43 - GB TEMP additional test code for snorkel/ganglia.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w, for FINAL 01e generation
+(against 01d1):
+=============================
+
+210 - CS Added variable "root" to help avoid visiting the root node if it happens to be at the end of the path. In "ship" the active node, which is the root node at this point, is stored into "root" and the path is incremented. Commented "pause" has been moved to "deliver" in 214. Also hooking of the active path has been moved into "deliver", on 214.
+
+214 - CS "route" now leaves the root node as active, so that "ship" can copy it into "root". "deliver" now does the hooking, factoring it out of "body". A commented "pause" has been moved here for the same reason, factoring.
+
+240 - CS In "frame" removed the test for visiting the root node and inserted "exec" as the parameter to "head". Now we always visit the root node and there's no decision to be made concerning the concatenation address.
+
+452 - CS Removed extra node 10 from custom IDE path as a result of changes in 210 to allow visiting last node in list.
+
+466 - CS Removed the "exec" and "warm" parameters before "frame". A result of the changes in 240.
+
+846 - CS Template for loader. (Where does it actually belong?)
+
+848 - CS Template for flamer and flash burner. (Where does it actually belong?)
+
+1080 - CS Now using "sram load" to load module by name.
+
+1140 - CS Using "host load" instead of "serial load".
+
+1162 - CS Now using bin number instead of node numbers to load ram and mask changed from xa00 to x8a00.
+
+1174 - CS Specs for 705 and 108 have been moved here, the whole flash to sram bunch.
+
+1180 - CS Removed the "exec" and "warm" parameters before "frame". Replaced "path" with "entire course". Removed second "/root" since "frame" now takes care of that detail. Added "708 +node xaa /p" as in the polyFORTH version to keep 708 bootable for IDE just in case.
+
+1182 - CS Changed "node" to "+node" and "boot" to "/part".
+
+1190 - CS Added feedback, length of eforth image.
+
+1194 - CS Added feedback, length of boot stream.
+
+
+
+=============================
+CHANGES TO ARRAYFORTH for 01w, for REALLY real this time
+(against 111029 sent around):
+- Prelim module structure defined
+- sram cluster named
+- course  added as user vocab in  framer .
+- node deprecated in  framer  in favor of +node  
+- boot deprecated in  framer  in favor of  /part
+=============================
+
+*18 - Version (01d1)
+
+404 - GB Continue SPI code.  -select inline since that function is not actually available in ROM.
+
+406 - GB Add minimal but slower SPI code as a model.
+
+460 - GB Set  len  to 4607 for 9 block nucleus.
+
+462 - GB Increase size of nucleus boot file read from 8k to 9k.
+
+466 - CS Change  warm frame  to  exec frame  which allows the final frame, loading node 705, to be generated.
+
+1428 - GB Remove erroneous  -select .
+
+=============================
+CHANGES TO ARRAYFORTH for 01w, for real this time
+(against POST-CHARLEY):
+- Prelim module structure defined
+- sram cluster named
+- course  added as user vocab in  framer .
+- node deprecated in  framer  in favor of +node  
+- boot deprecated in  framer  in favor of  /part
+=============================
+
+210 - GB Make  ship  take argument which is path number to use for IDE loader.  Use  pth  in  ship  and  body .
+
+242 - GB Deprecate  node  and  boot  usage in  framer .
+
+244 - GB Add  course  as the formal way for selecting a path to use for stream loading.  Add  create .
+
+248 - GB Use +node .  Use /part
+
+262 - GB Rename  path  as  entire and simply a table.  Rename  thru  as  to .  Use  +node .
+
+264 - GB Move 268 here; first block of a module is its load block (for compilation).  Document cluster and its packaging.
+
+266 - GB Move 264 here; second block of a module is its boot.
+
+268 - GB Move 266 here; third block, if needed, of a module is the residual path.  Remove retention of async boot, belongs elsewhere.  Move IDE residual path here.
+
+360 - GB Load sram code by name.
+
+366-368 - GB Clean up ganglia
+
+370..2 - GB Delete ganglion test.  Move snorkel to 370.
+
+404 - GB Move SPI support here from 414.
+
+406,8 - GB Move SRAM loader mechanism.
+
+414 - GB Move SPI support to 404.
+
+416..8 - GB Remove unneeded test case.
+
+420..48 - GB Wipe the obsoleted IDE and flash loaders for pF.
+
+446..8 - GB Move sram loader f18 code here from 406,8.
+
+450..456 - GB Massively clean up and move pF IDE loader procedures here.
+
+460..468 - GB Massively clean up and move pF flash installation procedures here.
+
+470..478 - GB Reorganize pF boot descriptors and place them here, converted for usability with ide loader, flash streamer, and softsim.
+
+1180 - GB Load sram boot descriptor by name (sram 2 +) and path (sram 4 +).
+
+1380 - DS Make complete set of port call combinations.
+
+1400 - CM Delete "o" as both obsolete and broken.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w, for real this time
+(against pre-Charley):
+- loader utiity for ide booting using streamer descriptions
+- Procedure for loading external RAM cleaned up
+- Further changes toward common boot description language.
+=============================
+
+202 - GB Add defn of  loader  utility (using IDE).
+
+210 - CS Add ide  loader  scripting words using tables for configuration, similar to stream loader using same interface words.
+
+212 - CS Added configuration tables for ide load scripts.
+
+214 - CS Added routing and delivery for ide load scripts.
+
+240 - CS Changed "frame" to conditionally tack on an extra boot frame for loading the root node.
+
+242 - CS Added "/part" as synonym for "boot". "boot" is deprecated for the stream loader.
+
+264 - CS Removed node 108 from sram setup in the sram module.
+
+284 - CS Added display of stream length to feedback screen for flash burning.
+
+360 - CS Removed compiling of node 108 with generic code from the sram module. 108 is compiled along with the other image tranfer code now.
+
+406 - CS Removed node 208 as sram loader, replaced with 108 as sram loader. 108 (bin 1713) does double duty now for both ide and streamer.
+
+416 - CS Add temp example of IDE boot.
+
+434 - CS Removed "panel upd". There was no "pause" anyway so it was invisible, and it would hang when the hooked node stopped listening.
+
+450 - CS Added stream length display to feedback.
+
+454 - CS Node 208 has become just another wire node here. Bin 1712 is no longer used. Also moved specifications for nodes 108 and 705 here. Those are the endpoints of the sram loader.
+
+464 - CS Added "0 /p" to start up node 108, which is now the sram loader. Simplified specifications by eliminating "/root" for node 705 and moving the sram loader endpoints to 454. Removed a redundant use of "path".
+
+474 - CS Added stream length display to feedback.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w, for real this time
+(against 01v3 as in 01d aF release):
+- All unprogrammed nodes now contain ganglia.
+=============================
+
+18* - Version.
+
+*100 - TEMP Bin occupancy display
+
+*148 - TEMP Load 446 for softsim pf boot, disable smtm.
+
+*200 - TEMP load for sha256
+
+276 - GB Reverse codes for mk! zero is stim 1 is set-mask.  Clean up.
+
+360 - GB Load ganglia components as part of poly.  Clean up.  Load SPI support functions.
+
+366 - GB Compile ganglia and snorkel.
+
+368 - GB Add ganglion common.
+
+370 - GB Add ganglion test.
+
+372 - GB Add snorkel for node 108, for bin 1605.
+
+414 - GB Start work on node 705 for bin 1606.
+
+436 - GB Process load descriptors for all nodes.  Add ganglion loader.
+
+440..4 - GB Add default fill of app area for IDE.  Add loading of snorkel from 1605.  Add loading of node 705 from 1606.
+
+446 - GB Add temp mechanism for softsim boot.
+
+*900..824 - TEMP sha256 code
+
+*930..38 - TEMP grab Chuck's "sea" code
+
+*940 - TEMP Make "lake"
+
+1428 - GB Add documentation of SPI node pins.  Add entry point for -select.
+
+1438 - GB Put head on  warm  in null ROM so label always exists.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w late breaking!
+(against 01v2 as in 01c aF released:  This is 01d):
+- Changed method of displaying block number for editor
+- Added indicator of active editor mode
+- Defined  abuf  for audit and  cbuf  for compression.
+- Moved both buffers up significantly
+- Extended qx to show differences when audit is loaded.
+=============================
+
+Final Charley set for blue words in html:
+
+----
+
+180 CS - html utility, corrected spacing for new blue words.
+
+182 CS - Added new "simple" blue words.
+
+184 CS - Put ?simple before .blue.
+
+----
+
+18* - Version.  Clean up with new blue words.  Get rid of symbol for png utility's load block.  Add  abuf  and  cbuf , reset their positions from 3000 and 5000 to 10000 and 29000 respectively.
+
+30 - GB Use  cbuf  instead of 5000 for source decompression buffer.
+
+36 - GB Use  abuf  instead of  3000  for @cyls buffer.  Clean up.
+
+46 - GB Deprecate background watermark and huge numbers, replace with double size numbers over the hint area and animate color to indicate when HOT in editor.
+
+52 - GB Use  abuf  instead of  3000  in floppy check.
+
+74 - GB Mark block not to load on native systems.
+
+76 - GB Use  abuf  for text buffer used in writing index files.
+
+80 - GB Use  abuf  instead of 3000 for OX offset.  Split formatting functions into 82.  Add mechanism for extending to display differences in audit mode.
+
+82 - GB Split qx formatting into this block.
+
+84 - GB Use  cbuf  instead of 5000 for resident  save  compression buffer.
+
+90 - GB Use  cbuf  instead of 5000 for decompression buffer in audit util.  Use  abuf  instead of 3000 for audit comparison area.
+
+92 - GB Remove redundant  check  defn.  Use  abuf  instead of 3000 for audit comparison area.  Add mechanism to indicate differences in qx.
+
+144 - GB Put  exit  back at end of  -nat .  Get rid of symbol for png utility's load block.
+
+160 - GB Use  cbuf  instead of 5000 in Chuck's compare.  Use abuf instead of 3000 there too.
+
+176 - GB Use  abuf  for text buffer used in writing html files.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w all merged for 01d release.
+(against 01v2 as in 01c aF release):
+=============================
+
+18* - Version.  Load 5 blocks at 62 to include 70 for new blue word code.
+
+20 - GB Add  4@  as a macro.
+
+24 - GB Move  exit  here from 144 so it is usable early in the 18 load for testing.
+
+68 - GB Redesign blue word implementation for improved control over block display.  Move  exb  to block 70.  Add  blu  and  -blue  test.  Use  blu  in  -cr .  CS Fix typo in test for  ..  in blue.
+
+70 - GB Add a second block for blue/grey word implementation.  Move  exb  here from 68.  Test  -blue  in  exb .  Use  blu  in  br cr indent  to authorize their use.
+
+**100 - GB TEMP Add bin occupancy scan
+
+118 - GB Reassign IDE bin 800 to 1600.
+
+126 - GB Reassign IDE bins 802,3 to 1602,3
+
+135 - GB Use  blu  in  .s  .pth  .ram .
+
+142 - GB Reassign IDE bin 804 to 1604.
+
+144 - GB Move  exit  to 24.
+
+150 - GB Document bin assignments.  Swap compilation order of eforth and pF.  Always compile both.
+
+**202 - GB TEMP set ports and BPS for TB001
+
+250 - GB Reassign bin 813 to 1613.
+
+252 - GB Reassign bins 809,10 to 1609,10.
+
+258 - GB Reassign bin 811 to 1611.
+
+264 - GB Get code for SRAM from bins 1614..17
+
+270 - GB Put SRAM node 009 in bin 1617
+
+272 - GB Put SRAM node 008 in bin 1616
+
+274 - GB Put SRAM node 007 in bin 1615
+
+276 - GB Put SRAM interface in bin 1614.
+
+284 - CS Added "blu" to each of the display words for flash burning feedback, ".now", ".ask", ".at.", and ".res".
+
+288 - GB Reassign flash r/w funcs from 808ff to 1608ff.
+
+290 - GB Reassign bin 808 to 1608.
+
+360 - GB Assign pF serial wire to bin 1709.  Commit old SRAM interface to bin 1713.`  Re-order load sequence to permit more scope control.  Shorten flash-sram transfer to two blocks at 406.
+
+374 - GB Remove superfluous  exit .
+
+376 - GB Assign pF stack node to bin 1700.
+
+380 - GB Assign pF bitsy node to bin 1703.
+
+382 - GB Assign pF stack down to bin 1701.
+
+386 - GB Assign pF stack up to bin 1702.
+
+390 - GB Assign pF bitsy down to bin 1704.
+
+394 - GB Assign pF bitsy up to bin 1705.
+
+**398 - GB TEMP set maxim mode for UART.
+398 - GB Assign serial tx to bin 1706.
+
+400 - GB Assign serial rx to bin 1707.
+
+402 - GB Assign serial interface to bin 1708.
+
+406 - GB Copy 4 blocks to eForth 1170 for its own version.  Org this code at 0.  Assign node 208 sram loader to bin 1712.  Add code for sram loader wire nodes.
+
+408 - GB Org the wires at zero.  Delete obsolete code.  Move from 412.
+
+410 - GB Delete obsolete code.
+
+412 - GB Reassign bin 812 to 1612.  Now that this is pF specific store it in bin 1710 (eForth's is in 1612 for now.)  Move to 408.
+
+432 - GB Reassign bin 102 to 1709 in pF /wire for IDE boot.
+
+434 - GB Delete superfluous  exit .  Load 108 from bin 1713 instead of whatever has been compiled for 108 in the application.
+
+438 - GB Reassign bins in polyFORTH IDE boot.  Comment loading of serdes.
+
+454 - GB Org node 208 at 0.  Same for wire nodes.  Load node 208 from bin 1712.  GB Define /nwire to generate stream for wire nodes in the pF nucleus booting sequence.  Use to load 8 nodes with one node of object code.
+
+460 - GB Reassign bins in polyFORTH flash boot.  Get wire from 1709.
+
+462 - GB Reassign bins in polyFORTH flash boot.
+
+464 - GB Reassign bins 808,12 to 1608,12.  Get node 108 code from what was saved in bin 1713.  Load 705 from bin 1710 not 1612.
+
+466 - GB Wipe apocryphal code.
+
+480 - GB Document creeper bin reassignments.  Don't compile the SMTM or the ATS CS components.
+
+482..516 - GB Reassign creeper bins 900..17 to 2000.17
+
+518..540 - GB Reassign creeper bins 1000..11 to 2100..11
+
+560..72 - GB Move ATS/IDE components to 630ff.
+
+556..570 - GB Move creeper tests 2201..8 from 630ff here.
+
+576 - GB Decommission SMTM, move to 658.
+
+580..86 - GB Move ATS components to 648..54 for now.
+
+630..44 - GB Move creeper tests 2201..8 to 556ff.
+
+630..42 - GB Move ATS/IDE components here.  Reassign ATS/IDE bins 1200..6 to 1900..6.
+
+648..54 - GB Move ATS components here.
+
+658 - GB Move SMTM here from 576.
+
+660 - GB Reassign ats bin 1200 to 1900.
+
+666 - GB Use  blu  in  .pok .
+
+668 - GB Reassign ats bin 1201,2,3,4,5 to 1901,2,3,4,5.
+
+670 - GB Reassign creeper bins 902,7 to 2002,7
+
+672 - GB Reassign creeper bins 1000.11 to 2100..11
+
+682 - GB Reassign ats bin 1200 to 1900.
+
+692 - GB Use  blu  in  .pok .
+
+694 - GB Reassign creeper bin 911 to 2011
+
+696 - GB Reassign creeper bin 1000 to 2100; 913, 17 to 2013, 17.
+
+716 - GB Reassign ats bin 1201,2,3,4,5 to 1901,2,3,4,5.
+
+1080 - GB Load eForth version of sram boot components.  CS Add 1817 bin, remove 1176 load.
+
+**1124 - GB TEMP set maxim mode for UART.
+
+1170..6 - GB Copy 406ff here for eForth local version of kernel to SRAM.
+
+1170 - CS Added compile of node 605, 1815 bin. Added 1816 bin to compile of node 208.
+
+1172 - CS Move 8 bit flash code here from block 1176. Add 1814 bin.
+
+1174 - CS Copied wire setup here from polyFORTH and changed bin numbers.
+
+1176 - CS Deleted (moved to 1172).
+
+1180 - GB Reassign bins 808,12 to 1608,12.  CS Added a line to configure node 108 via bin 1817. Changed bin 1612 to 1814.
+
+1302 - GB Reassign flash r/w funcs from 808ff to 1608ff.
+
+1350 - GB Reassign IDE bin 804 to 1604
+
+1372..8 - GB Reassign IDE bins 800..3 to 1600.3
+
+=============================
+CHANGES TO ARRAYFORTH for 01w PRE as sent Charley CS3
+(against 01v2 as in 01c aF release with PRE sent CS2):
+=============================
+
+18* - Version.
+
+20 - GB Add  4@  as a macro.
+
+68 - GB Move  exb  to block 70.  Add  blu  and  -blue  test.  Use  blu  in  -cr .
+
+70 - GB Move  exb  here from 68.  Test  -blue  in  exb .  Use  blu  in  br cr indent  to authorize their use.
+
+135 - GB Use  blu  in  .s  .pth  .ram .
+
+264 - GB Get code for SRAM from bins 1614..17
+
+270 - GB Put SRAM node 009 in bin 1617
+
+272 - GB Put SRAM node 008 in bin 1616
+
+274 - GB Put SRAM node 007 in bin 1615
+
+276 - GB Put SRAM interface in bin 1614.
+
+666 - GB Use  blu  in  .pok .
+
+692 - GB Use  blu  in  .pok .
+
+1080 - CS Add 1817 bin, remove 1176 load.
+
+1170 - CS Added compile of node 605, 1815 bin. Added 1816 bin to compile of node 208.
+
+1172 - CS Move 8 bit flash code here from block 1176. Add 1814 bin.
+
+1174 - CS Copied wire setup here from polyFORTH and changed bin numbers.
+
+1176 - CS Deleted (moved to 1172).
+
+1180 - CS Added a line to configure node 108 via bin 1817. Changed bin 1612 to 1814.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w PRE as sent charley CS2
+(against 01v2 as in 01c aF release with PRE sent Charley changes):
+=============================
+
+18* - Version.
+
+360 - GB Shorten flash-sram transfer to two blocks at 406.
+
+406 - GB Add code for sram loader wire nodes.
+
+408 - GB Move from 412.
+
+410 - GB Delete obsolete code.
+
+412 - GB Move to 408.
+
+454 - GB Define /nwire to generate stream for wire nodes in the pF nucleus booting sequence.  Use to load 8 nodes with one node of object code.
+
+=============================
+CHANGES TO ARRAYFORTH for 01w PRE as sent Charley
+(against 01v2 as in 01c aF release):
+=============================
+
+18* - Version.  Load 5 blocks at 62 to include 70 for new blue word code.
+
+.24 - GB Move  exit  here from 144 so it is usable early in the 18 load for testing.
+
+.68 - GB Redesign blue word implementation for improved control over block display.
+
+.70 - GB Add a second block for blue/grey word implementation.
+
+**100 - GB TEMP Add bin occupancy scan
+
+118 - GB Reassign IDE bin 800 to 1600.
+
+126 - GB Reassign IDE bins 802,3 to 1602,3
+
+142 - GB Reassign IDE bin 804 to 1604.
+
+.144 - GB Move  exit  to 24.
+
+150 - GB Document bin assignments.  Swap compilation order of eforth and pF.
+
+**202 - GB TEMP set ports and BPS for TB001
+
+250 - GB Reassign bin 813 to 1613.
+
+252 - GB Reassign bins 809,10 to 1609,10.
+
+258 - GB Reassign bin 811 to 1611.
+
+288 - GB Reassign flash r/w funcs from 808ff to 1608ff.
+
+290 - GB Reassign bin 808 to 1608.
+
+360 - GB Assign pF serial wire to bin 1709.  Commit old SRAM interface to bin 1713.`  Re-order load sequence to permit more scope control.
+
+374 - GB Remove superfluous  exit .
+
+376 - GB Assign pF stack node to bin 1700.
+
+380 - GB Assign pF bitsy node to bin 1703.
+
+382 - GB Assign pF stack down to bin 1701.
+
+386 - GB Assign pF stack up to bin 1702.
+
+390 - GB Assign pF bitsy down to bin 1704.
+
+394 - GB Assign pF bitsy up to bin 1705.
+
+**398 - GB TEMP set maxim mode for UART.
+398 - GB Assign serial tx to bin 1706.
+
+400 - GB Assign serial rx to bin 1707.
+
+402 - GB Assign serial interface to bin 1708.
+
+406 - GB Copy 4 blocks to eForth 1170 for its own version.  Org this code at 0.  Assign node 208 sram loader to bin 1712.
+
+408 - GB Org the wires at zero.
+
+412 - GB Reassign bin 812 to 1612.  Now that this is pF specific store it in bin 1710 (eForth's is in 1612 for now.)
+
+432 - GB Reassign bin 102 to 1709 in pF /wire for IDE boot.
+
+434 - GB Delete superfluous  exit .  Load 108 from bin 1713 instead of whatever has been compiled for 108 in the application.
+
+438 - GB Reassign bins in polyFORTH IDE boot.  Comment loading of serdes.
+
+454 - GB Org node 208 at 0.  Same for wire nodes.  Load node 208 from bin 1712.
+
+460 - GB Reassign bins in polyFORTH flash boot.  Get wire from 1709.
+
+462 - GB Reassign bins in polyFORTH flash boot.
+
+464 - GB Reassign bins 808,12 to 1608,12.  Get node 108 code from what was saved in bin 1713.  Load 705 from bin 1710 not 1612.
+
+466 - GB Wipe apocryphal code.
+
+480 - GB Document creeper bin reassignments.  Don't compile the SMTM or the ATS CS components.
+
+482..516 - GB Reassign creeper bins 900..17 to 2000.17
+
+518..540 - GB Reassign creeper bins 1000..11 to 2100..11
+
+560..72 - GB Move ATS/IDE components to 630ff.
+
+576 - GB Decommission SMTM, move to 658.
+
+580 - GB Move ATS components to 648 for now.
+
+630..44 - GB Move creeper tests 2201..8 to 556ff.  Move ATS/IDE components here.  Reassign ATS/IDE bins 1200..6 to 1900..6.
+
+658 - GB Move SMTM here from 576.
+
+660 - GB Reassign ats bin 1200 to 1900.
+
+668 - GB Reassign ats bin 1201,2,3,4,5 to 1901,2,3,4,5.
+
+670 - GB Reassign creeper bins 902,7 to 2002,7
+
+672 - GB Reassign creeper bins 1000.11 to 2100..11
+
+682 - GB Reassign ats bin 1200 to 1900.
+
+694 - GB Reassign creeper bin 911 to 2011
+
+696 - GB Reassign creeper bin 1000 to 2100; 913, 17 to 2013, 17.
+
+716 - GB Reassign ats bin 1201,2,3,4,5 to 1901,2,3,4,5.
+
+1170..6 - GB Copy 406ff here for eForth local version of kernel to SRAM.
+
+1080 - GB Load eForth version of sram boot components.
+
+**1124 - GB TEMP set maxim mode for UART.
+
+1180 - GB Reassign bins 808,12 to 1608,12.
+
+1302 - GB Reassign flash r/w funcs from 808ff to 1608ff.
+
+1350 - GB Reassign IDE bin 804 to 1604
+
+1372..8 - GB Reassign IDE bins 800..3 to 1600.3
+
+=============================
+CHANGES TO ARRAYFORTH for 01v2 (01c)
+(against 01v+ as in 01b aF release):
+- Finish deprecating cased comments.
+- Add softsim interactive capability
+- New functions onamed and bnamed to override default
+  .cf filenames. (4.2a kernel required)
+- Softsim now has known state after boot.
+- Update SPI testbed
+- Code to write stream as a file
+- Fix softsim handling of extended arith mode
+- Add softsim display of carry latch
+- forths and macros now have heads (4.2a kernel required)
+- Add IDE baud rate & framing settings (4.2a kernel required)
+- Update native IDE for current systems and hardware conventions
+=============================
+
+18* - Version.
+
+34 - GB Change native  serial  to be 108 .
+
+36 - GB Change windows  serial  to be 112 .
+
+46 - GB Remove kludge defns of forths & macros .
+
+66 - GB De-implement obsolete tags 10 and 11 (cased comments) by removing from editor hint map and nullifying behaviors.  Change the hint for white to w.
+
+74 - GB Remove old example, update shadow.  Add onamed and bnamed for filename override.
+
+108..114 - GB Move blocks 110..116 down one to make room for com port management code.
+
+108 - GB Adjust block number 112 to be 110
+
+110 - GB Add dummy  !nam sport bps  for native IDE compatibility.  Reverse modem control register values 2,0 -> 0,2 for correct polarity of RTS used as reset.  Add a 1 bit to each so that DTR is high to power minimal RS232 interfaces.  Enlarge sdat from 16384 to 24576 for larger and multiple chips.
+
+112 - GB Load 3 blocks starting at 114 for windows serial
+
+114 - GB Remove +ser -ser ctl! and reset.
+
+116 - GB Strip down to just +ser -ser ctl! and reset.  Add code for manipulating COM port DCBs.  Add variable  bps .  Have  +ser  set baud rate & framing using  bps  for rate, defaulted to 115.2
+
+148 - CS Added 1242 load at top to make a boot demo stream. SPI flash testbed in now compiled starting at block 1244 and an interactive vocabulary is compiled starting at 1238.  CS Removed some comments. Commented out bootstream and SPI testbed. Move definition of /softsim lower so it can include "default", defined in block 1240.
+
+202 - GB Add a-bps and c-bps config parameters.
+
+206 - GB Set a-bps in bps for host.
+
+208 - GB Set c-bps in bps for target.
+
+250 - GB Set a-bps in bps for flash erase function.
+
+252 - GB Set a-bps in bps for flash writer 18-bit.
+
+258 - GB Set a-bps in bps for flash writer 8 bit.
+
+282 - CS Added definition for "file", namely block 294.
+
+294 - CS Stream to file. Opens a file named stream.bin and writes the bootstream out as a binary file.
+
+420 - GB Set a-bps in bps for pF IDE boot.
+
+660 - GB Set a-bps in bps for TB001 IDE pretest.
+
+670 - GB Set a-bps in bps for TB001 IDE creepers.
+
+708 - GB Set a-bps in bps for selftest, note a-bps is assumed!
+
+712 - GB Set a-bps in bps for autotest, note a-bps is assumed!
+
+844 - GB Set a-bps in bps for demo ide boot.
+
+1140 - GB Set a-bps in bps for eforth IDE boot
+
+1238, 40 - CS Interactive vocabulary added to softsim.  CS Added "default" to set softsim display to a known initial state the first time you run softsim after a warm (or cold) boot.
+
+1242 - CS A boot stream is built for use as an example in softsim. It's the smtm compiled into node 0.
+
+1244 - CS SPI flash testbed points to where bootstreams are now built.
+
+1266 CS - Changed mask in "access" from x1ff to x3ff to allow having P9 set to enable add with carry. This was preventing add with carry from being executed in softsim.
+
+1268 - CS Added "?+*c" in order to properly add the carry in +* when P9 is set. Changed mask in ++abus from x7f to x37f so incrementing the address bus doesn't change P9 (or P8 for that matter).
+
+1272 - CS Added "18bit" to +*.
+
+1282 - CS Display of T changed to show state of carry bit to left of T as a . if set, nothing if clear.
+
+1284 - CS Added a couple of "x1ff and" so that the softsim display will colorize the memory dump properly when P9 is set.  CS - Removed "1ff and" twice. Changed "40 - and" to "240 - and" and "100 - and" to "900 - and". All this allows the memory dump to color the IP and PC addresses correctly even when P9 is set for add with carry.
+
+=============================
+CHANGES TO ARRAYFORTH for 01v+ (in 01b aF release)
+(against 01v):
+- Add QX and friends.
+- Recharter "l" to list editor block
+- Add  finish
+- Add  flush
+- host & target default to no canonicals
+- updated all nodes RAM and power tests to current standards
+=============================
+
+18* - Version.  Add definition of  flush .
+
+24 - GB Expose +! to interpreter.
+
+46 - GB Deprecate "l" as loading and make it list the current block instead.  Add experimental  finish .
+
+80 - GB Add QX function.
+
+136 - GB Reset default path for all nodes RAM test to be 2.
+
+142 - GB Update bin number for all-nodes test.  Use explicit 2 path all places.
+
+144 - GB Load QX as resident.
+
+150 - GB Add all nodes test to compilation.
+
+206 - Comment canon load out of host
+
+208 - Comment canon load out of target
+
+1350 - GB Update all nodes test's final grey word value.
+
+1428 - CS/JR Add entry point  ibits .  Does not change ROM.
+
+==========================================
+sF/Win32 changes for 01w against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01v
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01v
+(against 01t):
+=============================
+
+18* - Version.
+
+144 - GB Make ascii file name mechanism resident.
+
+146 - GB Put ' and h' under reclaim.
+
+150 - GB Remove DC tests, straighten load order out.
+
+200 - GB Put examples here.
+
+360 - GB Remove ' and h' from pF compilation.
+
+420 - GB Make pF IDE boot load block just do it.
+
+430 - GB Use ascii pathnames for pF IDE boot.
+
+476 - GB Use ascii pathnames for pF flash burn.
+
+1080 - GB Remove ' and h' from eForth compilation.
+
+1140 - GB Make eForth IDE boot load block just do it.
+
+1144 - GB Use ascii pathnames for eForth boot and burn.
+
+==========================================
+sF/Win32 changes for 01v against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01u
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01u
+(against 01t):
+- Eight new test modules added
+- Practical Example added
+- floppy load, icons load, audit load, html load, index load
+- Much cleanup in low disk
+- sea now ser
+=============================
+
+18* - Version.  Make floppy, icons, audit, png, html, index be simple block numbers.
+
+34 - GB Update block number for native serial.
+
+36 - GB Windows serial block number to yellow.
+
+48 - GB f18 not g18
+
+50 - GB Update comment
+
+56 - GB Indent.
+
+58 - GB Deprecate obsolete "lan"
+
+62 - GB Clean up comment
+
+64 - GB Indent
+
+76 - GB Use  -nat  to protect index utility.
+
+78 - GB Indent.
+
+92 - GB Indent.
+
+94 - GB Move to 140
+
+96..8 - GB Move native IDE to 110..12
+
+100..112 - GB Remove support for onspec usb/scsi IDE.
+
+110..112 - GB Move native IDE here from 96..8 and update code to parallel windows IDE.  Relocate 94 to 140.  Rename +sea -sea insea tosea as "ser".
+
+112 - GB f18 not g18
+
+114 - GB Use  fh .  Remove definitions used in DC characterization.  Relocate 94 to 140.
+
+116..142 - GB Indent index for IDE.  Rename +sea -sea insea tosea as "ser".
+
+118 - GB  Rename +sea -sea insea tosea as "ser".
+
+140 - GB Deprecate no longer needed path extension.  Rename +sea -sea insea tosea as "ser".
+
+144 - GB Add  -nat  to punch out of a block on native systems.  Use  png load .
+
+146 - GB f18 not g18
+
+146 - GB f18 not g18
+
+152 - GB audit load in redaction.
+
+164 - GB Remove obsolete timing code.
+
+168 - GB Use  -nat  to protect png utility.
+
+170..174 - GB Indent.
+
+176 - GB Use  -nat  to protect html utility.
+
+178..188 - GB Indent.
+
+200 - Load "practical example" pwm code
+
+204 - GB Indent.
+
+206 - GB Add  compile  to  host .  Use  fh .
+
+208 - GB Add  compile  to  target .  Use  fh .
+
+268 - GB Cleanup.
+
+282 - GB Cleanup.
+
+420 - GB Add compile before serial load.
+
+480 - MS Load additional tests.
+
+554 - MS Replace 2200 addition test with different algorithm.
+
+630 - MS Temp placement 2201 r d stack test v2
+
+632 - MS Temp placement 2202 d stack test v2
+
+634 - MS Temp placement 2203 + v2
+
+636 - MS Temp placement 2204 and
+
+638 - MS Temp placement 2205 and v2
+
+640 - MS Temp placement 2206 or
+
+642 - MS Temp placement 2207 or v2
+
+644 - MS Temp placement 2208 -
+
+672 - MS Add tests for ATS
+
+840 - GB Comment on the stuff that follows.
+
+842 - DS Add PWM code for "practical example"
+
+844 - DS Add IDE boot for PWM.
+
+852 - GB Stash sha-256 circular shift here temporarily.
+
+960 - GB Comment on the stuff that follows.
+
+1140 - GB Add  compile  before  serial load .
+
+1198 - GB Add  load  after  index  and  html
+
+1400 - GB f18 not g18
+
+1402 - GB f18 not g18
+
+1404 - GB f18 not g18
+
+1408 - GB f18 not g18
+
+1412 - GB f18 not g18
+
+==========================================
+sF/Win32 changes for 01u against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01t
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01t
+(against 01s):
+- Rearrange disk to put tools and SRAM at 240ff,
+  pF at 360, ATS at 720, 1200 clear.
+- Give better feedback when IDE is unable to open its COM port.
+- Partially clean up factoring of streamer tools and sram module.
+=============================
+
+Wholesale moves before detailed edits:
+
+240 960 60 +blocks  240 360 obliterate
+720 300 30 +blocks  720 780 obliterate
+360 720 1 +blocks
+960 360 60 +blocks  960 1080 obliterate
+840 960 1 +blocks
+1200 240 22 +blocks  1200 1244 obliterate
+800 284 2 +blocks  800 804 obliterate
+
+18* - Version.
+
+110 - GB Have  talk  abort with "bad" visible on stack when not successful in opening the IDE com port.
+
+118 - GB Have  talk  abort with "bad" visible on stack when not successful in opening the IDE com port.
+
+150 - CS Load pF from 360 vice 240.
+
+200 - CS Change load blocks for flash boot components.  CS Removed flash erase/burn loads. Moved to block 288. Loads of same moved into applications that use them, namely pF and eF, blocks 360 and 1080. Same with load of SPI speedup.  GB Relabel block as "user code"
+
+202 - CS Load streamer from 282.
+
+208 - CS Change "206 orgn !" to "208 orgn !". It incorrectly referred to "host" rather than "target".
+
+240 - CS Use fh .
+
+250 - CS Relocate feedback.  CS Add comment "check a-com" after "talk" as an error message. When talk aborts the we end up in the editor with the cursor between "talk" and the commented error message.
+
+252 - CS Use fh, relocate feedback.  CS Add comment "check a-com" after "talk" as an error message. When talk aborts the we end up in the editor with the cursor between "talk" and the commented error message.
+
+258 - CS Use fh, relocate feedback.  CS Add comment "check a-com" after "talk" as an error message. When talk aborts the we end up in the editor with the cursor between "talk" and the commented error message.
+
+260 - CS Add pop before ; to leave a for next loop in check. Caused a trap.
+
+268 - CS Relocate, use fh .
+
+282 - CS Relocate, use fh .
+
+284 - CS Relocate, use fh .
+
+288 - CS Load block for flash code moved here from block 200.
+
+290 - CS SPI speedup code moved here from block 404.
+
+360 - CS Relocate SRAM components but don't make symbolic.  CS SPI speed and flash erase/burn code loaded from streamer area now.
+
+404 - CS Move to streamer area.
+
+412 - CS Added "705 node" and "812 bin" here instead of in the load block.
+
+420 - CS Use fh .
+
+434 - CS Relocate SRAM components but don't make symbolic.
+
+464 - CS Relocate SRAM components but don't make symbolic.
+
+1080 - CS Relocate SRAM components but don't make symbolic.
+
+1080 - CS Relocate SRAM components but don't make symbolic.  CS SPI speed and flash erase/burn code loaded from streamer area now.
+
+==========================================
+sF/Win32 changes for 01t against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01s
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01s
+(against 01r):
+- Update test parameters for EVB001
+- Add and use fh
+- Update flash writing
+- Prepare for final rearrangement
+=============================
+
+18* - Version.
+
+46 - GB Add  fh .
+
+240 - CS Use fh in poly load block.
+
+288 - CS Use fh
+
+300 - CS Use fh
+
+310 - CS Rename fh to ft
+
+316 - CS Use fh
+
+330 - CS Use fh and maintain loaded
+
+344 - CS Use fh
+
+354 - CS Use fh, maintain loaded, and automate nucleus writing.
+
+356 - CS Rename fh to ft
+
+544 - GB Increase dly by one unext; two dlys between lis's, mod3 testing.
+
+800..2 - CS Revamp flash utility feedback tools.
+
+1144 - CS Use fh
+
+1190 - CS Maintain loaded, and automate nucleus writing.
+
+1194 - CS Maintain loaded
+
+1200..8 - CS Block title
+
+1210 - CS Improve interaction with ers function
+
+1212 - CS Maintain feedback
+
+1214 - CS Maintain feedback
+
+1218 - CS Comment nores
+
+1220 - CS Maintain feedback
+
+1242 - CS Block title
+
+1245 - CS Cleanup
+
+==========================================
+sF/Win32 changes for 01s against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01r
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01r
+(against 01q):
+- Add selftests for eval board
+- Additional Mark tests
+- SERDES test between chips
+- Improve feedback in flash utils
+- Fix problem with flash "check"
+=============================
+
+18* - Version.
+
+54 - CS Add hex display of colorForth character code during icon editing.
+
+132 - GB Fix error made when adding ldata, causes trap in burn of pF nucleus.
+
+202 - GB Set Greg default ports.  Add  selftest  and  stp .
+
+480 - MS Load new tests 2115..17, 2200.
+
+498 - MS Improve test 908 to test another number.
+
+506 - MS Improve test 912 to test another number.  Fix a problem with error reporting crashing (two !bs)
+
+548 - MS Add 2115 test of 2*
+
+550 - MS Add 2116 test of 2/ on positive numbers.
+
+552 - MS Add 2117 another test of 2/ on negative numbers.
+
+554 - MS Add 2200 test of +
+
+670 - GB Refactor !p0 and !p1.
+
+672 - MS Add tests 2115, 6, 7, 2200 to normal z ATS series.
+
+680 - GB Add !p0, remove immediate override of paths.
+
+704 - GB Delete obsolete block.
+
+706 - GB Delete obsolete block.
+
+708 - GB Delete obsolete all-nodes runner.  Make this the common single chip selftest using IDE.
+
+710 - GB Delete unused block.  Make z for selftest modules.  Make path defns.
+
+712 - GB Move old Mark memory test to 776.  Make this the ats target test using IDE.
+
+714 - GB Move old mark memory test to 778.  Make paths for ATS tester.
+
+716 - GB Make bridge builder for selftest.
+
+718 - GB Make runner for ATS mode serdes test.
+
+776 - GB Move old Mark memory test from 712.
+
+778 - GB Move old mark memory test from 714.
+
+800 - CS TEMP place flash util feedback here.
+
+802 - CS TEMP place flash util feedback here.
+
+1210 - CS Improve feedback during flash erase.
+
+1212 - CS Improve feedback during 18 bit flash write.
+
+1214 - CS Improve feedback during 18 bit flash write.
+
+1216 - CS Fix flash read problem in check.
+
+1218 - CS Feedback, cleanup, add delay between burn/check.
+
+1220 - CS Feedback.
+
+1242 - CS Add chill and feedback mechanism.
+
+1364 - CS Add deselect at end of 18-bit flash write.
+
+1370 - CS Add deselect at end of 8-bit flash write.
+
+==========================================
+sF/Win32 changes for 01r against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01q
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01q
+(against 01p):
+- Analog & serdes tests as used in testing the 200
+  chips assigned to EVB001 s/n 0001 thru 0100.
+=============================
+
+18* - Version.
+
+150 - CS - Added line to compile eForth. polyFORTH compile commented out by default.  GB eforth commented out by default.
+
+200 - CS - New bin, 813, contains flash erasure code for node 705. Not finished yet.  GB TEMP load temp code
+
+202 - GB Set for "standard" ports COM1 and COM3.  CS Add "streamer", a named block number.
+
+240 - CS Target version of ' moved under reclaim. Sram and interface loaded from module area in 1200 blocks now.
+
+242-254 - CS Wiped. sram moved to library range in 1200s.
+
+312 - CS Added "/stack" to IDE, same as boot streams.
+
+314 - CS Sram setup moved to library range, block 1224.
+
+330 - CS Added streamer module syntax including named blocks local to streamer.
+
+332 - CS Wipe path definition. This has become part of the framer, starting at block 1200.
+
+334 - CS Comment line changed.
+
+336 - CS Wipe. Superceded.
+
+338 - CS Wipe. Superseded.
+
+344 - CS Sram driver setup has been moved to block 1224, default path is called out (path), and path to rest of chip is loaded from block 1226. Node 708 boots into address x0aa.
+
+354 - CS Script to burn pF nucleus into flash now includes "streamer" syntax, locally named blocks.
+
+356 - CS "fbuf" and "n-1" are stored into streamer-local variables "source" and "len".
+
+670 - GB Update creeper test sequencing
+
+700 - GB Update pass ranges for high and low a-d in.  Add a  pause  to 
+
+704 - GB Add TEMP target chip creeper tests
+
+706 - GB Reconfig TEMP host chip creeper tests
+
+**842 - GB TEMP test code
+
+**844 - GB TEMP test code
+
+1080-1200 - JR Massive eForth update.
+
+1200 - CS Overlay (from streamer) added. Dump utility removed. Default path added.
+
+1202 - CS +node added for compatibility with IDE.
+
+1210 - CS Dump utility removed, flash erase utility added.
+
+1212 - CS 18 bit flash writer utility fleshed out with "overlay" and automated.
+
+1214 - CS burn" and "check" modified to provide some feedback during automation.
+
+1216 - CS "check" is faster now, using r@ instead of "upd stak @".
+
+1218 - CS 16 bit flash writer utility fleshed out with "overlay" and automated.
+
+1220 - CS "burn" and "check" modified. Check is now faster.
+
+1222 - CS Default flash boot stream path is defined here, along with tools for easier path definition.
+
+1224 - CS Sram setup for boot stream is here now, as a library module. No longer part of the pF application.
+
+1226 - CS Path for all of chip except sram driver nodes defined here, using the new path syntax from 1222.
+
+1228 - CS Part of the sram module, load block for the sram driver nodes.
+
+1230-1242 CS Sram driver code here, part of the sram library module.
+
+1242 - CS Streamer utility. "overlay" is defined as a remember point and local names are given for the blocks used by the utility.
+
+1352 - CS Flash erasure code has been separated from the 18 bit and 16 bit flash burning code, as a separate module.
+
+1364 - JR "ers32" has been fixed here. This function has been moved to block 1352, but why leave buggy code here in 1364?
+
+1370 - CS "stash" added to help make check faster.
+
+==========================================
+sF/Win32 changes for 01q against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01p
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01p
+(against 01o):
+=============================
+
+18* - Version.
+
+94 - GB Clean up.  Add  vtest .
+
+132 - GB Add  ldata  for IDE environment.
+
+480 - GB Clean up obsolete comments, add loading of 542 and 544.  DS Add 546.
+
+542 - GB Add bin 2112 serdes 001 code.
+
+544 - GB Add bin 2113 serdes 701 code.
+
+546 - DS Add bin 2114 analog code.
+
+680 - GB Add path 1b for swapped serdes roles.
+
+698 - GB Add runner for serdes test.
+
+700 - GBDS Add runner for analog test.
+
+1410 - DS Clean up! and add  ldata .
+
+==========================================
+sF/Win32 changes for 01o against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01o
+(against pF/G144.01n):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01o
+(against 01n):
+=============================
+
+18* - Version.  GB Cleanup, keep documentation in shadows, add loading of tools.
+
+116 - GB Restore default sport to 1 or 10.
+
+152 - GB Document additional steps needed in redaction.
+
+190 - GB Enlarge  nnc  to 3 chips' worth
+
+200 - CS Removed "sram" and "resume" magic numbers.
+
+202 - GB Add ga app tools load block with definitions for a-com, c-com, host and target.
+
+204 - GB Add user app tools load block
+
+206 - GB Add serial IDE wrapper for EVB001 host.
+
+208 - GB Add serial IDE wrapper for EVB001 target.
+
+278 - GB Select dumb instead of maxim for EVB001.
+
+286 - CS Loop no longer uses "magic" number to load sram. Instead uses the length of file incoded in first word.
+
+290 - CS Wire nodes also get word count in first word of "file".
+
+292 - CS The magic number "resume" has been removed, replaced by a variable kept in the first word before the boot stream buffer. Two passes are needed to ensure that the address to "resume" the boot is correct. Also the loop counter is now the first word of the "file".  CS Mask off large number to avoid truncation traps in */ .
+
+300 - GB Set pF IDE boot to use a-com for sport.
+
+330 - CS The stream is built now at block 344, so that we can easily make two passes here to get the "resume" address right.
+
+344 - CS Some speculative code has been moved to block 346, replaced here by the polyFORTH stream builder so that it can easily be done in two passes.
+
+346 - CS Prospective code from 344 moved here.
+
+354 - CS Now specific to polyFORTH nucleus. Reads the file into a buffer and passes the source, destination, and length on to the generic flash byte writer.
+
+356 - CS "fbuf", the file buffer, is now in high memory shared with the stream buffer so it will survive an empty.
+
+660 - GB Set TB001 IDE pretest to use a-com for sport.
+
+670 - GB Set TB001 IDE creeper runner to use a-com for sport.
+
+706 - GB Set selftest creeper runner to use a-com for sport.
+
+1200 - CS "frame" no longer keeps the word count on the stack while building a stream. This can be calculated from the current position in the stream and the starting position in the stream, which are known.
+
+1202 - CS Confusingly commented out numbers removed.
+
+1204 - CS Added "stream" and "strlen". "stream" returns the base address of the stream buffer and it's word count. "strlen" returns just the words count. Room is left at the beginning of the stream to remember where the "resume" point is, after copying flash to sram.
+
+1208 - CS "adjust" now uses "strlen" to pad the stream up to an 8 byte boundary instead of using a count on the stack. "/root" doesn't return a count anymore, relies on "strlen" instead.
+
+1212 - CS Instead of the variable "addr" for source, now we use "source" and "dest" along with "len" when writing 18 bit words into flash.  GB Set boot flash writer to use a-com for sport.
+
+1214 - CS IDE code for writing 18 bit words into flash now accepts "source dest len" as parameters. The "source" is an 18 bit word address in the stream buffer. "dest" is a byte address in the flash. "len" is an 18 bit word count. "read" has been changed to allow starting at any 20 bit byte address.
+
+1216 - CS "reading" takes address low and high as parameters instead of assuming an application specific address.
+
+1218 - CS The generic 8 bit flash writer now has variables called "source", "dest", and "len" and these parameters are passed when this block is loaded. The variables are used by the IDE code to erase, burn, and check the right area. The nucleus is read into a buffer before this block is loaded now.    GB Set nucleus burner to use a-com for sport.
+
+1220 - CS The IDE code for erasing, burning, and checking flash in 8 bit chunks has been generalized to use the variables "source", "dest", and "len" to address the right part of flash. The stack is cleaned up now after a burn or a check, except for the flag left by check. Added r18 in order to read 18 bit words as well as 16 bit words. The address passed to "read" is a 20 bit byte address.
+
+==========================================
+sF/Win32 changes for 01o against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01n
+(against pF/G144.01m):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.
+
+=============================
+CHANGES TO ARRAYFORTH for 01n
+(against 01m):
+=============================
+
+18* - Version.
+
+150 - GB Load creepers from 480 now.  Load 200 instead of 1302.
+
+200 - GB Designate as user/application code load block, populate with stuff from 1302 that will be cleaned up.
+
+330..50 - GB Move pF stream maker (and i/o pin setter) to pF area.
+
+354 - GB Add write nucleus to flash
+
+356 - GB Move 522 here for dragging in nucleus.
+
+480-600 - GB Move ats packages down from 840ff.
+
+480 - GB Update block numbers for moved index page.
+
+500..12 - CS Move to 1200ff.
+
+514 - CS Delete after updating 1364.
+
+516 - CS Move to 1370.
+
+518 - CS Delete/obsolete.
+
+520 - CS Move to 1218
+
+522 - GB Move to 356.
+
+526 - CS Move to 1220
+
+540 - CS Delete/obsolete.
+
+570 - CS Moved to 1212
+
+572 - CS Move to 1216
+
+574 - CS Moved to 1214
+
+672 - MS Adjust full series of creeper tests.
+
+840 - MS Adjust set of f18 creepers compiled.
+
+840-960 - GB Move ats packages to 480ff.
+f
+898 - MS Update test 1010
+
+900 - MS Update test 1011
+
+902 - MS Delete test 1012.
+
+1040 - CS Start cleanup of applic use of stream loader.
+
+1040..50 - GB Move pF stream generator to 330ff.
+
+1200..1214 - CS Move stream builder & 18 bit flash writer from 500ff
+
+1214 - CS Rename prog as burn
+
+1218 - CS Move 8bit flash writer from 520, load flash commands from 1220.  Load pf nuc finder from 354.  burn in comment.
+
+1220 - CS Move 8bit flash writer from 526.  Rename prog as burn.
+
+1302 - CS Load 18 bit flash writer from 1364, 8 bit from 1370, 18 bit addl flash writer from 1216.  Copy down to 200 and deprecate this one.
+
+1364 - CS First round upgrade of  ers  function in 18 bit flash writing f18 code.
+
+1370 - CS Move 8 bit flash writer here from 516.
+
+=====
+FINAL CHANGES FOR RENUMBERING BINS
+=====
+
+803 -> 809:  1212, 1302.
+804 -> 810:  1212, 1302.
+805 -> 811:  1218, 1302.
+806 -> 812:  330, 1302.
+807 -> 808:  330, 1302.
+
+=====
+And for the IDE:
+=====
+
+110 - Get node 300 code from bin 801.
+
+118 - Get node 708 code from bin 800.
+
+126 - Get wire code from bin 802.  Get last guy from 803.
+
+150 - Change load sequence per below.  Simplify loading and reclaim.
+
+1300 - Change load sequence per below.  Simplify loading and reclaim.
+
+1372 - Document as bin 800, put there.
+
+1374 - Document as bin 801, put there.
+
+1376 - Document as bin 802, put there.
+
+1378 - Document as bin 803, put there.
+
+1350 - Document as bin 804, put there.
+
+==========================================
+sF/Win32 changes for 01n against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01m
+(against pF/G144.01l):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version.  Document low memory.  Allocate location 2 for address of memory master pointer table.
+
+=============================
+CHANGES TO ARRAYFORTH for 01m
+(against 01l):
+=============================
+
+18* - Version.  Add qwerty seeb.
+
+144 - GB Remove default blue words, no longer needed.  Correct doc of first.  Move cur to 148.  Move orgn and recompile from 148.  Move exit tbl xqt assign from 148.  Load 148 after PNG.  Move cuco testb and dh here from 648.  Move compile from 648.  Move ntbl nil and uatbl to 148.  Move softsim here from 900.  Stop loading 148, renumber it as 198.  Change compile to load 146, softsim to load 148.
+
+146 - GB Move 940 here for  compile .  change load from 1300 to 150.
+
+148 - GB Move 942 here for  softsim .
+
+148 - GB Delete.
+
+150 - GB Move redaction to 152.  Move 1300 here.  Trim stuff that is not critically relevant.
+
+152 - GB Simplify redaction to cover 196 to 1244.
+
+190 - GB Copy 890 here
+
+192 - GB Copy 892 here
+
+194 - GB Copy 894 here
+
+648..52 - GB Wipe as redacted.
+
+890..4 - GB Move to 190..4 and wipe.
+
+900 - GB Wipe as redacted.
+
+940 - GB Move to 146
+
+942 - GB Move to 148
+
+1300 - GB Mark as unused.
+
+MASS MOVEMENTS MADE AFTER THE ABOVE
+===================================
+
+300 840 54 +blocks  - move creeper test packages out of way
+202 - add 540 to each load:  302 338 396 380 400 
+                     become  842 878 936 920 940
+300 408 obliterate
+----
+700 1080 97 bloks - Temp get pF out of way
+150 - Turn off compilation of same
+1302 - Turn off compilation of Charley stuff that needs sram
+700 798 obliterate
+----
+600 720 48 bloks - Move DC characterization to final place.
+600 648 obliterate
+1302 Change 602/644 to 722/764
+----
+248 660 42 bloks - Move IDE creeper ops to final place.
+Swap 248 and 250.
+660 - Change 250 to 660, 252 to 664, 262 to 674, 248 to 662
+692 - Change 280 to 692, 282 to 694.
+694 - Change 282 to 694.
+700 - Change 250 to 660, 282 to 694.
+18 - Change 280 to 692.
+248 290 obliterate
+----
+660 600 42 bloks
+660 702 obliterate
+632 660 10 bloks
+600 670 28 bloks
+660 - change 692 to 660, 694 to 662
+662 - change 694 to 662
+668 - change 694 to 662, 660 to 670.
+670 - change 660 to 670, 664 to 674, 674 to 684, 662 to 672.
+18 - change 692 to 660.
+600 660 obliterate
+----
+218 718 1 +blocks
+220 706 10 bloks
+706 - change 218 to 718, 222 to 708, 220 to 706
+712 - change 226 to 712
+714 - change 228 to 714
+18 - change 220 to 706
+218 232 obliterate
+----
+Arrange pF code newly:
+1110 240 1 +blocks
+1112 1114 obliterate (old bitsy startup)
+1114 242 10 bloks  1114 1124 obliterate
+1134 252 1 +blocks  1134 1136 obliterate
+240 - Update block numbers for pF parts.  Changes for 742 now 250:
+  240 - change 742 to 250.
+1166 1168 obliterate delete serdes.
+1142 254 24 bloks 1142 1166 obliterate
+240 - Update block numbers for stack & bitsy parts.
+1124 1126 obliterate - obsolete serial wire
+1126 278 6 bloks 1126 1132 obliterate
+1132 284 1 +blocks  1132 1134 obliterate
+1170 286 4 +blocks  1170 1178 obliterate
+240 - Update block numbers for other pieces.
+288 - Change 794 to 290.
+150 - Change 730 to 240 and try it.
+1302 - Enable Charley stuff.  Change 796 to 292, 752 to 284.
+
+1080 300 10 +blocks  1080 1100 obliterate
+
+200 360 2 +blocks  200 204 obliterate
+
+Make 840 load block for packages, wipe 362.
+Have 1302 load 840.  Pull the main stuff down to 150 from 1302,
+  prep to deprecating 1302.
+300 - change block numbers
+316 - change block number.
+
+==========================================
+sF/Win32 changes for 01m against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01l
+(against pF/G144.01k):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+9 - Load mem mastering I/O support.
+
+*11 - Version
+
+28 - Add memory master I/O underpinnings including 'reload and friends.
+
+*61 - GB Version.  Document low memory.  Allocate location 2 for address of memory master pointer table.
+
+111 - Move experimental microcode here.
+
+120..3 - Delete experimental microcode.  Start work on ATS.
+
+
+=============================
+CHANGES TO ARRAYFORTH for 01l
+(against 01k):
+* New 2 path
+* Boot background with it
+* Boot sram first
+* Add serial to it
+* Add pF to it
+* Eliminate use of 0 path
+* Assorted improvements from John.
+=============================
+
+18* - Version.
+
+30 - JR rename  literal  to  number  to avoid hiding the editor's  literal  when the  audit  app is running.
+
+136 - JR preserve the target's a register during ?ram and ?rom execution. 
+
+182 - JR Reduce html listings indent to 3 spaces
+
+202 - MS Load new test 1012
+
+248 - MS Add commented test 1012 to z list (doesn't work).
+
+362 - MS Add new test 1012
+
+400 - Make ats n108 cs master
+
+402 - Make ats cs wire
+
+404 - Make ats cs digital
+
+406 - Make ats cs analog
+
+408..14 - Clear out.
+
+520 - JR moved compiled code to 526 so ef can use it without the pf-based yellow words.
+
+522 - JR define fbuf as string (returns byte address).  Add  n-1  naming the file length
+
+524 - JR change the file display so that the 16-bit values and addresses are displayed appropriately.
+
+526 - JR 520's code moved here.  Replaced 4095/4096 values with n-1 and next with -next as appropriate (fbuf returns byte address).
+
+570 - JR move code definitions to 574 so both pf and ef can use them.
+
+574 - JR 570's code moved here.  Fixed bug in  erased .
+
+700 - Update IDE boot procedure.
+
+704 - Make copy of Charley's 2 path, name it pfp2.  Move path 1 here too.  Shorten default path 0.
+
+706 - Make copy of Charley's 2 path
+
+708 - Indentation
+
+710 - Indentation
+
+712 - Indentation.  Make stream-like boot specifiers for IDE.
+
+714 - Add IDE boot and init for SRAM only as first phase.
+
+716 - Add new pF boot and init
+
+718 - Add recast IDE load for whole pF corner.
+
+720..726 - Delete obsolete scripts.
+
+740 - Correct hame of mk! in shadow.
+
+940 - shadow brought up-to-date
+
+1054 - GB Add cs mastering I/O
+
+1408 - shadow brought up-to-date
+
+==========================================
+sF/Win32 changes for 01l against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01k
+(against pF/G144.01j):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0..7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+106 - Add f18 labels for 'mk! and 'sus.
+
+108 - Move extended memory ops to 109.
+
+109 - Move extended memory ops from 108.  Add MK! and SUSPEND.
+
+120 - Add test ucode for 'mk! and make MK! there.
+
+
+=============================
+CHANGES TO ARRAYFORTH for 01k
+(against 01j):
+- Added more tests per Mark
+=============================
+
+18* - Version.
+
+24 - GB Add interpretable version of  and .
+
+126 - GB Add  foc  and  unfoc  to enable  -hook  to leave ripped wire focused back on the IDE boot node.
+
+200 - GB Document new allocations.
+
+202 - MS Include test 1003 in compilation.  GB Move Steven to 396.  Add bin 1400ff sequence from 400ff.  MS Include tests 1010,11.
+
+248 - Include Mark's test 1003 in sequence.  Include 1004..9.  MS Include 1010 and 1011.
+
+344 - MS Add test 1003.  MS Update 1003.
+
+346..356 - MS Add tests 1004, 5, 6, 7, 8, 9.
+
+356 - MS Make 1000 be decimal in  chk .
+
+358 - MS Add test 1010 p-r (1 of 2)
+
+360 - MS Add test 1011 p-r (2 of 2)
+
+396 - GB Move Stephen smtm test here from 400.
+
+400..4xx - GB Add pF ATS code for bins 14xx.
+
+724 - GB Simplify startup procedure for SRAM cluster.  Initialize B and T for node 107.
+
+730 - GB Add option to load degenerate node 107.
+
+734 - GB Clean up white space and shadows.
+
+736 - GB Clean up white space and shadows.
+
+738 - GB Clean up white space and shadows.
+
+740 - JR Reorganize node 107 for mask change op.  GB Put default mask back to 8A00, reorganize and clean up as basis for stimulus mechanism.  Reorganize further for entry at zero.  Remove  start  and reorganize for compactness.  Add command processing for mask and stimulus setting.  Add stimulus delivery to poll loop.
+
+742 - GB Document x! as mk!.  Standardize stack effects.  Remove test code.
+
+754 - GB Make degenerate interface 107.
+
+770 - GB Add 'mk! for the MK! function and 'sus for SUSPEND.
+
+1042 - GB Update stream build for new init and start address in the sram interface node.
+
+1046 - GB Note in shadow that nodes 706, 7, 8 are excluded from this stream path too.
+
+==========================================
+sF/Win32 changes for 01k against 01j:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01j
+(against pF/G144.01f):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+120 - GB Update experimental microcode block to include -N205 and -N206.  Remove previous / obsolete test code.
+
+=============================
+CHANGES TO ARRAYFORTH for 01j
+(against 01i):
+- Add more ATS tests from Mark
+- Clean up stack comments to match pF manual
+- Major flash boot stream update from Charley
+=============================
+
+18* - Version.
+
+116 - TEMP CHANGE SPORT.
+
+202 - Clarify documentation in terms of bin numbers.  Load Mark's tests 1001 and 1002.
+
+248 - Enable tests 1001 and 1002.
+
+250 - Enable test t913.  Rename t918 as ta00.
+
+266 - Remove l1, and u1, for 217, 517, 715 which were setting wrong bits in iom table for those nodes' IO latch tests.
+
+274 - Rename n/t918 as n/ta00, bin 918 to 1000
+
+338 - Correct bin number ID for parallel port pin test from 918 to 1000.
+
+340 - Add Mark test 1001 for @b & !b
+
+342 - Add Mark test 1002 for T->B integrity.
+
+500 - CS Throw away some crap and change a couple things.
+
+502 - CS Throw away some crap and change a couple things.
+
+504 - CS Throw away some crap
+
+506 - CS Postamble changes.
+
+508 - CS Throw away some crap, consolidate stack stuff
+
+540 - CS Change scope of load block and maybe op procedures too.
+
+730 - CS Remove load of old flash boot stream component in 732.
+
+766 - Correct stack comments on 'lit .
+
+768 - Correct stack comments on 'if .
+
+774 - Clean up Stack up node.
+
+782 - Clean up Bitsy up node.
+
+790 - CS Simplify SRAM loader node 208 code.
+
+792 - CS Change entry points per JR
+
+796 - CS Arrange for pF nucleus transfer to continue into processing of the second boot stream.
+
+1040..1052 - CS Update entire stream loader.
+
+1054, 1056 - CS Wipe obsolete code.
+
+1302 - CS Patch resume for concatenation of streams.
+
+==========================================
+sF/Win32 changes for 01j against 01f:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+*522 - SERIAL port and speed settilngs
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01i
+(against pF/G144.01f):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+=============================
+CHANGES TO ARRAYFORTH for 01i
+(against 01h):
+=============================
+
+18* - Version.
+
+382 - GB Add io b! in "off" to compensate for boot stream's having left b pointed at a port.
+
+500..508 - CS Add stream components.
+
+512 - CS Dump object output.
+
+514 - CS maybe different flash code?  No... is code from 1364 with longer write delay and sector not everything erase.  FIX THAT UP LATER.  GB SET DELAY FROM 20 TO 5.
+
+516 - CS Add 8 bit flash code.  GB SET DELAY FROM 20 TO 5.
+
+518 - CS OLD SCRIPT CODE FOR WRITING FLASH, see 570 for current stuff.
+
+520 - CS Script for writing the pF image at 32k and erasing whole flash.  GB remove canoncals.
+
+522 - CS Add stuff for reading pF image from file.
+
+524 - CS Dump buffer into which pF nucleus is read.
+
+540 - CS Test access to SRAM driver standalone.
+
+570 - CS Add code to write boot stream to flash.  GB remove canonicals.
+
+572 - CS Add code for 706 as helper for 705 writing 18 bit data.
+
+730 - CS Define h' and make ' be exclusively target '.  Load additional code  from 790ff for flash loading, inline for serial wire nodes, and 732 for starter.
+
+732 - CS Add bitsy starter procedure to run in node 207.
+
+752 - CS Add code for speeding up SPI boot.
+
+782 - GB Change "next" to "exit" in yellow.  Fixes garbage in stream.
+
+790 - CS Add SRAM loader for node 208.
+
+792 - CS Add code to compile flash to sram wires
+
+794 - CS Add generic wire for sram loading.
+
+796 - CS Add code for node 705 8 bit flash ops on SRAM initialization.  GB SET DELAY FROM 20 TO 5.
+
+1040 - CS Add stream loser build mechanism
+
+1042..56 - CS Add stream mechanism
+
+1058 - CS Temporary stuff for io register setting
+
+1060 - CS Temporary stuff for perimeter path
+
+1302 - CS TEMP KLUDGE LOAD FLASH SPI AND SRAM PARTS
+
+==========================================
+sF/Win32 changes for 01i against 01f:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01h
+(against pF/G144.01f):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+=============================
+CHANGES TO ARRAYFORTH for 01h
+(against 01g):
+=============================
+
+18* - Version.  Update example of z for testing.  Leave commented out.
+
+136 - Chanage  one  in IDE tester to use path 0 so the RAM tests may be run into the UUT on TB001.
+
+200 - Document Steven test at 400.
+
+202 - Add more creeper tests.  Load Steven's random mem test.
+
+248 - Overflow z from 250 till reorganized.
+
+250 - GB Clean up, automate -pwr at end of test.  Initialize parallel buses with IDE to eliminate huge current drain.  Add defn of phase -1.  Include test 918 in run.
+
+260 - GB Add -pwr so we remember to assert RESET- otherwise chip is being powered by the reset line!
+
+262 - GB Factor 'arg out of runall to make specialized runners.
+
+264 - GB Fix bug in adv.
+
+266 - GB Conserve blackspace.  Change or to +or in iom!??
+
+270 - GB Add -buses function to eliminate huge current draw through node 7 and 9 buses driving each other with different values.
+
+272 - GB Add GPIO pin test 911 runner.  Fix for reasonable values.  Remove spurious a911 test!
+
+274 - GB Add ROM checksum runner.  Use ecch to get vval set.  Make use of new factoring in runall to eliminate code.  Add very special runner for parallel port tests.
+
+280 - GB automate talk and pre
+
+282 - GB Improve instructions.
+
+286 - GB Add -serdes functions.
+
+288 - GB Add semicolon to force jump to load from pre.  This fixes the load? problem in creeper tests.
+
+324 - GB Enable !b at end of start to return result.
+
+332 - MS add 915 @p test
+
+334 - DS Add 916 i-ad & r-ad tests.
+
+336 - JR Add 917 ROM xorative checksum
+
+338 - JR Add 918 parallel pin test.  GB Modify to take end io setting as argument (simply add drop !b before dup or return ;)
+
+400 - GB Add Steven mem-random test
+
+940 - GB Argument to eras is now in words not blocks.
+
+1400 - GB Argument to eras is now in words not blocks.
+
+==========================================
+sF/Win32 changes for 01h against 01f:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01g
+(against pF/G144.01f):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+=============================
+CHANGES TO ARRAYFORTH for 01g
+(against 01f):
+=============================
+
+18* - Version.
+
+94 - GB Add zfocus to simulate tfocus in ide.
+
+122 - Enable multichip IDE:  Add  'wall , rename  wall  as  swall  and define   wall  as vectored thru  'wall .
+
+126 - Mod node number by 1000 in avail.
+
+200 - Document allocation at 250 for ATS IDE creepers
+
+202 - Load additional creeper tests
+
+250 - Add ATS IDE creeper for TB001.  Have it run full suite all ports all nodes at 1.8v then run two RAM tests at 1.475v.  Add stuff for displaying status.
+
+252 - Add multichip IDE extensions and paths.
+
+254..8 - Add more paths.
+
+260 - Add control signal manipulations.
+
+262 - Add local version of creeper runner.
+
+264 - Add incremental creeper runner parts.
+
+266 - JR Add io w/r bit table for G144A12
+
+268 - JR Add table of ROM checksums for G144A12
+
+270 - Add results display.
+
+282 - Add vval for validity display in .pok and update instructions.
+
+286 - Have .pok display "busy" if not valid yet.  Move pre to 288.
+
+288 - Move  pre  here and have it include  setup  and unhooking of all paths.  Have  pre  transition to the creeper tests at 1.8v.
+
+270 - Add status display for creeper tests
+
+302 - cleanup.
+
+314 - Update 906 return stack test
+
+318 - MS Update stack test
+
+320 - Take 909 +* shift test
+
+322 - Take 910 t,s,a,r data path tests
+
+324 - Add 911 GPIO pin test
+
+326 - 912 Take t s a r data path test
+
+328 - CS 913 io data path tests, need special runner.
+
+330 - DS 914 set/clear carry test
+
+382 - DS Cleanup
+
+388 - Replace conservative 400 with designed 40 count in bridge timing.  DS Optimize timing in idl.
+
+==========================================
+sF/Win32 changes for 01g against 01f:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01f
+(against pF/G144.01e:
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+Cleaned up mechanism for extending IDE
+Added ability to boot the ATS UUT and added
+working port bridge over sync from 300 to
+300.  Ready to upgrade IDE for 2 chips.
+==========================================
+
+7 - Nucleus version
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+=============================
+CHANGES TO ARRAYFORTH for 01f
+(against 01e):
+=============================
+
+18* - Version.  New convention for line 0 comments.
+
+114 - Load  canon  by name.
+
+128 - Add 'pths for address of paths list.
+
+132 - Add @b @a !a for IDE remote ops.  Add  canon .
+
+138 - Add a  remember  called  -canon  that deletes the canonical IDE words.  
+
+148 - Clean up and document.
+
+200 - Document allocations for ats master code and scripts in IDE mode.
+
+202 - Load ats master code in 380ff.
+
+280 - Add ats prepowerup ide scripts.
+
+282 - Add pre-powerup tests.
+
+284 - Add tests for opens and shorts.
+
+286 - Add results determination and display
+
+288 - Add code for booting port simulator bridge
+
+380 - Add code for ATS analog nodes.
+
+382 - DS Add code for ATS synch boot master node 300.
+
+384 - Add minimal test boot frame to drive 200.17 high.
+
+386 - Add test frame to drive the line low.
+
+388 - DS Add code for ATS sync bridge both chips.  GB Adapt to compile as a boot frame.
+
+390 - TEMP UUT side bridge debug
+
+392 - TEMP Tester side bridge debug
+
+700 - Recast for factored use of serial.  Unhook from 206 after starting the program so that IDE may be reloaded with different paths.
+
+702 - Rename paths.
+
+704 - Remove now redundant @b @a !a from pF IDE.  Wipe whole block as now redundant.
+
+722 - Line 0 indent.
+
+724 - Line 0 indent.
+
+726 - Line 0 indent.
+
+736 - Line 0 indent.
+
+738 - Line 0 indent.
+
+740 - Line 0 indent.
+
+742 - Line 0 indent.
+
+746 - Line 0 indent.
+
+748 - Line 0 indent.
+
+750 - Line 0 indent.
+
+764 - Line 0 indent.
+
+768 - Line 0 indent.
+
+940 - Correct node to actually erase memory.
+
+1302 - Enable compilation of ATS f18 code.
+
+1398 - Add address grey words for divide
+
+1400 - Factor node's out of memory.  Fix incorrect stack diagram in eras (takes block number, not address).
+
+==========================================
+sF/Win32 changes for 01f:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01e
+(against pF/G144.01d:
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+- Updated arrayForth with 3.5f changes.
+- Updated arrayForth with latest DC and ATS tests.
+- Made 960kbit terminal usable for disk.
+- Reorganized code in 700ff as first step of
+  VM build cleanup.
+==========================================
+
+0..7 - Nucleus
+
+*8 - GB Version, disk layout.
+
+*11 - Version
+
+*61 - GB Version
+
+97 - GB Optimize <pc for read speed with current primitives so that blocks may be read at 960 Kbaud.
+
+253 - GB Add disk read loop timing, overhead only.
+
+=============================
+CHANGES TO ARRAYFORTH for 01e
+(against 01d):
+=============================
+
+18* - Version.  Include commented ATS runner.
+
+94 - CS Update for 14 word creeper.  GB UNCOMMENT DROP'S AFTER CREEP AND RIP.
+
+114 - TEMP add commented test aid defns.
+
+136 - GB Clean up.
+
+200 - GB Document ats code disk usage
+
+202 - GB Prime load block for ats f18 code
+
+218 - GB Add suspended power setup
+
+220 - GB Prime load block for creeper control scripts
+
+222 - GB Generic all-nodes creeper runner
+
+224 - CS Creeper runner
+
+226 - GB Mark's all nodes memory test
+
+228 - GB Mark's burn on one weak node memory test
+
+300 - GB f18 test code and doc area
+
+302..314 - CS Charley and Jeff tests
+
+316 - MS Mark's NEW memory test?
+
+318 - MS Mark's NEW stack test?
+
+600..636 - GB Add DC characterization support code, present only in redacted systems.
+
+602 - GB adjust DC test routine content.  Add temp measurement pulse generator.
+
+638 - GB Add SRAM test bd quiet load block
+
+640 - GB Add single node no boot load block
+
+642 - GB Add node 705 unext with no boot load block
+
+644 - GB Add instruction timing study cases.
+
+
+--- First round 700ff:  Wipe unused code. ----
+
+738 - Wipe unused testing code.
+748 - Wipe listing block.
+750..58 - Wipe unused testing code.
+
+--- Second round 700ff:  Move f18 code up.  ---
+
+Move 740..46 to 790..96 (bitsy & stack)
+Move 730..36 to 744..50 (serial)
+Move 720..28 to 734..42 (sram)
+Move 718 to 730 (compile load)
+Move 712 to 732 (compile load continued)
+
+Move 704 to 720 (boot main)
+Move 708 to 722 (background)
+Move 714 to 724 (sram)
+Move 716 to 726 (serial)
+
+Move 760..68 to 708..16
+Move 790..96 to 762..68
+
+--- Third round 700ff:  Update load blocks
+    in this group to reflect above relocations.
+
+--- Fourth round 700ff:  Eliminate more unused code.
+
+700 - Remove loading of 714 and 716.  Remove re4th.  Rename e4go as pfgo.  Remove reload.  Define pf which is typed after loading 700.  This will allow  compile  to be used once again.  Continue normalizing this code.
+
+702 - Include ONLY the redefined paths.
+704 - Copy the remote instrs and include only extensions.
+706 - Delete old redundant remote ops.
+710 - Rename !e4th as !pf
+712 - Remove serial test from latter part of block.
+714 - Delete terminal test code.
+716 - Delete stack node stepper
+730 - Get rid of anticipatory load of 732
+732 - Wipe unused load block
+
+890 - GB Increase NNC to full double size (16x18) and assign rows 9 and onward to test code.
+
+942 - CS Show commented loading of interactive softsim.  Correct examples at end.
+
+1292 - CS Fix bug (use !inode instead of !node in nod!)
+
+1300 - Change load block for pF from 718 to 730.
+
+1302 - GB Select DC test or ATS tests
+
+1330 - GB Begin work on Async ATS interface routine.
+
+1344 - CS Remove one more word from creeper (now is 14 words).  GB Arrange for normal loc counter start of 4 not 44 in test.
+
+==========================================
+sF/Win32 changes for 01e:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*139 - Version of base file.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01d
+(against pF/G144.01c:
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+* Test coprocessors of bitsy node
+* Integrate John's cached top of return stack
+==========================================
+
+0..7 - Nucleus
+
+*8 - GB Version, disk layout.
+
+9 - GB Remove KLUDGE comment.
+
+*11 - Version
+
+57 - GB Add regular target version of  NEXT .
+
+*61 - GB Version
+
+65 - GB Comment  next  and  NEXT .
+
+106 - GB Clean up.
+
+107 - GB Remove KLUDGE comment.  Delete unused f18 labels.  Rename labels to correspond with new names in bitsy source.  Update addresses for R caching version of bitsy.  Clean up naming.  Add 'next in node 5.
+
+108 - GB Remove KLUDGE comment.  Rename labels to correspond with new names in bitsy source.  Add  next .
+
+=============================
+CHANGES TO ARRAYFORTH for 01d
+(against 01b):
+=============================
+
+18* - Version
+
+704 - Initialize one more word on bitsy stack.
+
+740 - Get rid of 'au@.
+
+744 - Rename rp+ and ip+ as inc, 'ip@ as bx@, rp- as dec.  Merge John's caching of I.
+
+746 - Rename rp+ and ip+ as inc, 'ip@ as bx@, rp- as dec.  Merge John's caching of I.
+
+770 - Remove unused code.
+
+778 - Add provisional 'next to bitsy down.  Works.  Rename rp+ and ip+ as inc, 'ip@ as bx@.  Convert 'next for cached I, amazingly space inefficient.
+
+782 - TEMPORARY add code to prove bitsy up works.
+
+==========================================
+sF/Win32 changes for 01d:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO polyFORTH DISK for 01c
+(against exF/G144.01b:
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+* Activate and test coprocessor mechanism
+* Reactivate 'S
+* Reactivate ext mem ops
+==========================================
+
+0..7 - Nucleus
+
+*8 - GB Version, disk layout.  Add slot for arrayForth x01a.  Document where RAM disk falls.  Update notices.
+
+9 - GB Enable RAM disk again.
+
+*11 - Version
+
+*61 - GB Version
+
+84 - GB Delete temp defn of 'S.
+
+106 - GB Add ''s for node 006.  Add 'ex@ 'ex! 'cx? too.
+
+107 - GB Remove old b'sp@ reference.
+
+108 - GB Use ''s for "S .  Use 'ex@ 'ex! 'cx? as well.
+
+107 - GB Delete ~b'sp@
+
+120 - GB Temp code for experimental uCode routines.
+
+=============================
+CHANGES TO ARRAYFORTH for 01c
+(against 01b):
+=============================
+
+18* - Version
+
+68 - Reduce indent to 3
+
+88 - GB FIX BUG IN REMEMBER have to add 15 to H for saved value!!!!  In addition the call should be jmp to !dict, we do in fact return and it does in fact crap out.
+
+704 - Load "background" nodes.  Add starts for coprocessors.
+
+708 - Make load block for "Background".  Enable inits of them now that idle routines exist.
+
+712 - Make "compile other stuff" load block
+
+718 - recover  before compiling VM and compile coprocessors.
+
+762 - Change !e4th file name from exforth.blk to pfdisk.blk
+
+770 - Make stack down code.  Add idle routine.  Add ''s.  Add 'ex@ 'ex! 'cx? which had been in stack node.  Cost same here as where they had been plus two words.
+
+774 - Make stack up code.  Add idle routine.  Add test cases.  Add experimental "free" to escape for debugging.
+
+778 - Make bitsy down code  Add idle routine.  Add ID code.
+
+782 - Make bitsy up code  Add idle routine.  Add ID code.
+
+786 - Make serdes code.
+
+940 - GB Reduce amount moved by  bin  to 64 words (just RAM).  Erase RAM image in  node .  Erase one block in  node  for clean memory on multiple compiles.
+
+==========================================
+sF/Win32 changes for 01c:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+139 - Update disk mapping table.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO exFORTH DISK for 01b
+(against exF/G144.01a:
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+==========================================
+
+0-7 - GB Nucleus for production use
+
+*8 - GB Version, disk layout.  Add slot for arrayForth x01a.  Document where RAM disk falls.  Update notices.
+
+9 - GB Load RAM disk.  TEMPORARY DISABLE RAM DISK.
+
+*11 - Version
+
+16 - GB Add high level D2/
+
+21 - GB Convert & enable 32-bit output.
+
+23 - GB Update documentation on WFILL.
+
+39 - GB Cut default HEAD for DISKING down to 300 blocks.
+
+44 - GB Add !ATTR and !MARK for controlling display colors.
+
+45 - GB Add RAM blocks
+
+46 - GB Add RAM blocks
+
+*61 - GB Version
+
+71 - GB Make FILL safe for zero length.
+
+84 - **TEMPORARY**  Make a kludge defn of 'S
+
+97 - GB Change names of tell, ask, sts to >pc, <pc, <st and put heads on so ramdisk etc may easily be added in 9 LOAD.
+
+107 - **TEMPORARY**  Comment ~b'sp@ .  Rename bitsy as run .  Update addresses for run thru .tx?
+
+108 - **TEMPORARY**  Comment 'S
+
+261,2 - GB Create extended memory test.
+
+270..3 - GB Began work on colorForth display.
+
+4740 - GB Clean block.
+
+=============================
+CHANGES TO ARRAYFORTH for 01a
+(against 00f):
+=============================
+
+18* - Version
+
+116 - Change serial port numbers
+
+704 - Update bitsy start from 11428 to 11430.
+
+732 - Merge generalizations for inverting serial xmit thru maxims.  Drive line in idle state at start.  Stop setting weak pulldown at end character, instead leave it driven at stop bit state after sending a character.
+
+740 - Comment ex@, !, cx? (8 words) and org so following stuff does not move.  Add definition of sco here (5 words)
+
+746 - Redo xxt for full decode.  This added 10 words which is one more than we have even when deleting b'sp@.  Went instead with +8 bitsy decode; moved the  sco  decode to stack node for a cost of 5 words there instead of 4.  Comment b'sp@ .
+
+==========================================
+sF/Win32 changes for 01b:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+*181 - Version.
+
+==========================================
+==========================================
+CHANGES TO exFORTH DISK for 01a
+(against exF/G144.00f):
+   arrayForth changes for VM next
+   sF/Win32 changes last.
+* Get terminal cursor back.
+* Need cursor control directly by exF.
+* TESTING utility
+==========================================
+
+0-7 - Nucleus
+
+*8 - Version, disk layout.
+
+9 - Use  VPT  personality.
+
+10 - Rename VIEWPOINT as VPT
+
+*11 - Version
+
+44 - Remove extra sequence from VPT PAGE.  Use .MOVE in (MARK) to stop hosing the emulator!  Add bastard controls for enable and disable visible cursor; this works very well with new emulator.
+
+48 - Convert TESTING
+
+49 - Update TESTING Help screen
+
+*61 - Version
+
+=============================
+CHANGES TO ARRAYFORTH for 01a
+(against 00f):
+=============================
+
+18* - Version
+
+36 - Change sharing flags on  fopen  from 0 (none) to 3 (read&write) in an attempt to enable opening of the exforth.blk file while sF is running.  This appears to work.
+
+762 - Use file  exforth.blk  instead of  exforth.bin  thus taking the latest nucleus compiled and INSTALLed by exforth itself.
+
+==========================================
+sF/Win32 changes for 01a:
+==========================================
+
+*8 - Versions.
+
+*82 - Version.
+
+106 - Try a version of ?KEY that does not trust the number it gets to see if that is where the wonkiness is coming from.  That was not it, put back as was.
+
+138 - Remove unneeded files from map.
+
+139 - Remove unneeded files from map.
+
+*181 - Version.
+
+522 - Add stack display to "who" and reset default baud to 115200.
+
+528 - Add cursor management logic
+
+529 - Add cursor management logic.
+
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+==========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

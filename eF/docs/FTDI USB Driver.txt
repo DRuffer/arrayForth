@@ -1,0 +1,50 @@
+FTDI website
+http://www.ftdichip.com/Drivers/VCP.htm
+
+Windows XP
+==========
+
+Not necessary to upgrade.
+See below to change 'Latency Timer' setting.
+
+20110827 current driver
+http://www.ftdichip.com/Drivers/CDM/CDM20814_WHQL_Certified.zip
+
+20110827 current installation guides
+http://www.ftdichip.com/Support/Documents/AppNotes/AN_104_FTDI_Drivers_Installation_Guide_for_WindowsXP(FT_000093).pdf
+http://www.ftdichip.com/Support/Documents/AppNotes/AN_119_FTDI_Drivers_Installation_Guide_for_Windows7.pdf
+
+Change the Latency Timer value of the driver.
+There are several ways to get to the setting:
+
++ Start (menu)
++ Settings
++ Control Panel
++ System
++ Hardware
++ Device Manager
++ Ports
++ USB serial port
++ Port settings
++ Advanced
+= Latency Timer: 1
+
+--OR--
+
+! assuming 'My Computer' is on the Windows desktop
++ Right click My Computer
++ Manage
++ Device Manager
++ Ports
++ USB serial port
++ Port settings
++ Advanced
+= Latency Timer: 1
+
+Linux
+=====
+
+Included in 2.6.31 kernel and later
+
+No changes needed.
+

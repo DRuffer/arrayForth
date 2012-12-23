@@ -1,0 +1,8 @@
+Greetings!
+
+The code in this directory is a working polyFORTH(R) system for the GA144.  It is included in this arrayForth(R) release as a sort of dress rehearsal; this software is NOT supported at this time.  You are welcome to explore it but please do not call Customer Support until we have made formal release with complete documentation.
+
+THIS SOFTWARE IS SUBJECT TO CHANGE OR WITHDRAWAL WITHOUT NOTICE.
+
+
+

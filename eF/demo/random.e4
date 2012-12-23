@@ -1,0 +1,47 @@
+CR .( eForth ansi terminal test )
+\ ==============================================================
+\ todo
+\ ==============================================================
+
+[defined] m.random 0= if\ m.random
+marker m.random
+decimal
+
+\ ==============================================================
+\ 40x20 grid random display
+
+CREATE SIDE   40 ,
+CREATE BOTTOM 20 ,
+: CENTER ( -- ) SIDE @ 2/ ;
+
+: ATT ( -- ) PAUSE  SIDE @ CHOOSE  BOTTOM @ CHOOSE  AT-XY ;
+
+: BUMP ( ud -- ud )
+  ALLATTOFF  CENTER BOTTOM @ AT-XY  1. D+  2DUP <# #S #> TYPE ;
+
+CREATE COLOR[]
+  ' RED       ,
+  ' GREEN     ,
+  ' BLUE      ,
+  ' CYAN      ,
+  ' MAGENTA   ,
+  ' YELLOW    ,
+  ' ALLATTOFF ,
+  ' CONCEALED ,
+HERE COLOR[] - 1 CELLS / CONSTANT #COLORS
+: C? ( -- ) #COLORS CHOOSE  CELLS  COLOR[] + @EXECUTE ;
+: L? ( -- ) 26 CHOOSE [CHAR] A + EMIT ;
+
+: RACO ( -- )
+  PAGE  0 0 ( init count )
+  BEGIN ATT C? L?  BUMP  NUF?
+  UNTIL 2DROP ;
+
+CR
+.( Type RACO to run Random Color Demo)
+CR
+
+\ ==============================================================
+
+[DEFINED] SFILE 0= IF\ HAND
+
