@@ -1,8 +1,23 @@
 Greetings!
 
-The code in this directory is a working polyFORTH(R) system for the GA144.  It is included in this arrayForth(R) release as a sort of dress rehearsal; this software is NOT supported at this time.  You are welcome to explore it but please do not call Customer Support until we have made formal release with complete documentation.
+The code in this directory is a working polyFORTH(R) system for the GA144.  It is now documented, released, and fully supported by GreenArrays.
 
-THIS SOFTWARE IS SUBJECT TO CHANGE OR WITHDRAWAL WITHOUT NOTICE.
+This software is made available under our Standard Terms and Conditions of Delivery for Free Software, as follow:
+
+--------------------
+
+Standard Terms and Conditions of Delivery for Free Software
+
+
+GreenArrays software is made available to you for the express purpose of facilitating your successful use of our chips. By accepting it, you agree that we make no warranty of suitability or correctness, no guarantee of future maintenance, and no guarantee of upward compatibility; and you agree that you will use it at your own risk. You also agree that if you make any changes to the software, or derivative works based on the software, you will clearly identify it as being altered or derived; you must identify and label any such software by names of your choice other than our trademarked names such as arrayForth®. Additional restrictions may apply to third party software included in our releases. Unless specifically noted otherwise in the documentation accompanying any software distributed in our releases, that software may only be used with chips manufactured by GreenArrays.
+
+Otherwise, you may make as many copies of the software as you wish, and you may distribute it without any changes whatsoever to whomever you wish. Any changes you might make to the software, any works you may derive from it, and any software you develop for our chips using it, are entirely your property to do with as you please so long as you respect our trademarks and use them only with our chips as noted above, and so long as you require those to whom you sell or deliver your software to agree with these same terms. For example, if you create an enhanced version of arrayForth and wish to market it under your own name as a different product, that is your right. If on the other hand you have or make chips or FPGAs that run an instruction set like ours, you are prohibited from using our software on your chips without our written permission.
+
+polyForth® was ported to the G144A12 by GreenArrays, Inc. and we have been granted permission by FORTH, Inc. for use of its Registered Trademark as well as for making its model available publicly. You are authorized to use polyFORTH as a development tool for systems and applications that run on our chips. You are not authorized to use this software with other chips than ours, nor to port it to other computers than the F18A, without a polyFORTH license from FORTH, Inc.
+
+Do Not Use this software unless you understand and agree with these terms and conditions!
+
+--------------------
 
 
 
