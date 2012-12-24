@@ -1,0 +1,6327 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\begin_preamble
+\usepackage[dvips]{graphics}\usepackage{longtable}\usepackage{times}
+\usepackage{comment}\usepackage{lastpage}
+\usepackage{microtype}\DisableLigatures[-]{}
+\end_preamble
+\use_default_options true
+\begin_modules
+customHeadersFooters
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding latin1
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 10
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\rightmargin 2cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip smallskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Initial PWM Test
+\end_layout
+
+\begin_layout Author
+Dennis Ruffer
+\end_layout
+
+\begin_layout Date
+18 May 2012
+\end_layout
+
+\begin_layout Abstract
+These are some notes from my 1st experiences on Green Array's Evaluation
+ Board (EVB001 rev 0.1.1).
+ I will try to explain things precisely, so that others can follow after
+ me.
+ Although I have worked with earlier versions of Chuck's chip, I have not
+ used the ColorForth IDE.
+ This means that I am learning just about as much as most readers of this
+ document and, as they recommend in the arrayForth User’s Manual (DB004
+ Revised 12/23/11), I will be making small changes, saving often and testing
+ every change.
+\end_layout
+
+\begin_layout Abstract
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Setup
+\end_layout
+
+\begin_layout Standard
+I have already soldered all the extra parts to the board and bought some
+ additional 1-up pins, so that I can connect female patch wires to just
+ about anything on the board.
+ I have executed the 
+\family typewriter
+\series bold
+selftest
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+autotest
+\family default
+\series default
+ commands from the Getting Started Application Note (AN004 rev 09/02/11),
+ so I know my board is working.
+ I have setup my Win7 computer to talk to the target chip on USB port C,
+ so I don't have to worry too much about interfering with any other IDE
+ features, nor do I have to actually use many of them.
+\end_layout
+
+\begin_layout Section
+Practical Example
+\end_layout
+
+\begin_layout Standard
+The example that is delivered with the EVB001 uses the host chip, so it
+ must be changed to work on the target chip.
+ This is easy enough, just use the colorForth editor to change block 844
+ to use 
+\family typewriter
+\series bold
+\color yellow
+c-com
+\family default
+\series default
+\color inherit
+ rather than 
+\family typewriter
+\series bold
+\color yellow
+a-com
+\family default
+\series default
+\color inherit
+ and 
+\family typewriter
+\series bold
+\color yellow
+c-bps
+\family default
+\series default
+\color inherit
+ rather than 
+\family typewriter
+\series bold
+\color yellow
+a-bps
+\family default
+\series default
+\color inherit
+.
+ This is a good time to start learning the editor and there are ample tutorials
+ for doing that, so I will not go into it here.
+ Once done, you can follow Section 9 Practical Example of the User's Manual
+ and see pin 600.17 light up on the target chip.
+ Make sure you figure out how to 
+\family typewriter
+\series bold
+save
+\family default
+\series default
+ those changes, unless you really like to do these changes every time you
+ boot.
+ You will need to know this as we move forward.
+\end_layout
+
+\begin_layout Standard
+Additionally, figure out how to backup the 
+\family typewriter
+\series bold
+OkadWork.cf
+\family default
+\series default
+ file frequently.
+ Invariably, you will end up making some change that causes colorForth to
+ no longer boot, as I just did.
+ I didn't have a backup, so I had to type my code back in and get it back
+ to the point I was working on.
+ This served a valuable purpose to review the code and fix some typos, but
+ it's painful, and you may not be writing down everything that you are doing
+ as I am right now.
+ So, do yourself a favor and backup your work!
+\end_layout
+
+\begin_layout Section
+Color Blindness
+\end_layout
+
+\begin_layout Standard
+Before I start to put much more ColorForth code into this document, I should
+ explain that I am red/green color blind.
+ This means that I do not see, or react to color like most people do.
+ 7% of males have this condition, as well as other people who do not perceive
+ color the same way as others do.
+ I use a program called eyePilot (Version 1.0.12 from Tenebraex) so I can
+ figure out what colors ColorForth is using.
+ I don't always need it, but frequently, 
+\family typewriter
+\series bold
+\color yellow
+yellow
+\family default
+\series default
+\color inherit
+ and 
+\family typewriter
+\series bold
+\color green
+green
+\family default
+\series default
+\color inherit
+ look far to much alike and on the block I will be using in a few moments,
+ I see that the green component can have an RGB value of 192 or 255.
+ I see that the User's manual explains that these are HEX numbers, but this
+ does not make using colorForth any easier for me.
+\end_layout
+
+\begin_layout Standard
+Additionally, tools that I tend to rely on in my programming, have not caught
+ up with the use of color in source code.
+ HTML editors are getting closer, and colorForth even has an HTML listing
+ utility, but I have not found them good enough yet.
+ Most explicitly, the use of Literate Programming that I will be using in
+ this documentation can not be done with color attributes yet.
+ Some day, the rest of us might catch up with where Chuck wants us to be,
+ but at the moment, I am not there yet.
+\end_layout
+
+\begin_layout Standard
+Therefore, for the rest of this document, I will be using an ASCII translation
+ of the syntax used by colorForth.
+ This makes the code look very similar to ANS Forth, but do not be mistaken,
+ it will not run in any other version of Forth that I know about.
+ Here is the translation matrix:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="2">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+colorForth
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ASCII translation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color red
+red
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+: red
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color white
+white
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+( white )
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color green
+green
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+: ...
+ green ...
+ ;
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color yellow
+yellow
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+[ yellow ]
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color magenta
+magenta
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+:# magenta
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color blue
+blue
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+{ blue }
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color cyan
+cyan
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+POSTPONE cyan
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\series bold
+\color black
+grey
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+< grey >
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Numbers will be preceded by the base operator that they are in (e.g.
+ D# or H#, but B# and O# can not be translated back).
+\end_layout
+
+\begin_layout Standard
+Notice that cyan and grey doesn't show up properly under the colors that
+ LyX uses and I pity the person who is reading this with a black and white
+ ebook reader.
+ Hopefully, I will be able to automate this translation someday, but today,
+ I haven't found a way to import code into colorForth yet anyway.
+\end_layout
+
+\begin_layout Section
+PWM Test
+\end_layout
+
+\begin_layout Standard
+The PWM Demo code in block 842 is a good example, that would be useful,
+ with a few modifications, in some code that I want to port to the GA144.
+ I also have need of a potentiometer, and from what I remember about previous
+ generations of Chuck's chip, it shouldn't be too difficult to connect a
+ pot to the PWM so that it controls the intensity of the LED that it is
+ connected to.
+\end_layout
+
+\begin_layout Subsection
+PWM Node
+\end_layout
+
+\begin_layout Standard
+Copy the PWM code and shadow from 842 to 852 so we can start modifying it
+ to look like this:
+\end_layout
+
+\begin_layout Scrap
+<<pwm>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 852 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm ) [ d# 500 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 < 0 > !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 18000 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This should be the shadow for the PWM:
+\end_layout
+
+\begin_layout Scrap
+<<pwm-shadow>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 853 shadow{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm for target node 500 ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol ( checks for ide inputs and calls ) right { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( when noticed.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: rtn ( is the return point from a ) right ( call ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( and is used by ) [ upd ] ( as an re-entry point.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: cyc ( begins the actual pwm code.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: upd ( is the ide entry point for initial ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( start or output update.
+ )
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We also need to update block 200 to 
+\family typewriter
+\series bold
+compile
+\family default
+\series default
+ this new code.
+ We are going to revisit this code every time we add another block of target
+ code, so we will number each version:
+\end_layout
+
+\begin_layout Scrap
+<<compile1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test of pwm code ) [ reclaim d# 852 load ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now, when I load the PWM Demo in block 844 and 
+\family typewriter
+\series bold
+run
+\family default
+\series default
+ it, the LED connected to 500.17 glows dimly.
+ Just like 600.17 does when I 
+\family typewriter
+\series bold
+seed
+\family default
+\series default
+ it with a 0.
+ This implies that it is never picking up the 1800 that I put into block
+ 852.
+ Without the support of 
+\family typewriter
+\series bold
+run
+\family default
+\series default
+, my new 
+\family typewriter
+\series bold
+upd
+\family default
+\series default
+ never gets called.
+ There are certainly ways, like 
+\family typewriter
+\series bold
+run
+\family default
+\series default
+, to execute 
+\family typewriter
+\series bold
+upd
+\family default
+\series default
+ manually, but the purpose of this exercise is to make this happen automatically
+, from the next node.
+\end_layout
+
+\begin_layout Subsection
+Feed Node
+\end_layout
+
+\begin_layout Standard
+So, just what is being transferred to the target when 
+\family typewriter
+\series bold
+seed
+\family default
+\series default
+ is executed on the host? We can see that pol is looking at the 
+\family typewriter
+\series bold
+right
+\family default
+\series default
+ port and that it is using 
+\family typewriter
+\series bold
+ex
+\family default
+\series default
+ to execute the data that it receives.
+ So, we can make a simple experiment in block 854 like this:
+\end_layout
+
+\begin_layout Scrap
+<<feed>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 854 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( feed ) [ d# 501 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: feed right b! .
+ .
+ @p !b .
+ .
+ ( / ) h# 12 end { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) begin end
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We need to go back to block 200 and load this block too, which I forgot,
+ at first, and wondered why nothing changed.
+\end_layout
+
+\begin_layout Scrap
+<<compile2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test of pwm code ) [ reclaim d# 852 2 loads ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+But still nothing is changing.
+ I see that other code puts 
+\family typewriter
+\series bold
+( / )
+\family default
+\series default
+ between the local code and what is being picked up with 
+\family typewriter
+\series bold
+@p
+\family default
+\series default
+, but that isn't helping either.
+ Using 
+\family typewriter
+\series bold
+so
+\family default
+\series default
+, I can see the decompile of the node, reminding me to put in the 
+\family typewriter
+\series bold
+.
+\family default
+\series default
+'s to align the words.
+ But wait, that's only on the simulator.
+ What's on the target chip after all of this?
+\end_layout
+
+\begin_layout Standard
+I'm using the IDE to start up the PWM Demo, so I used that to see that nothing
+ had been loaded into nodes 500 and 501.
+ In fact, node 501 is not even accessible on the 0th path that we are using
+ and the directions are wrong if I use the 2nd path.
+ I need to rethink this problem a bit.
+\end_layout
+
+\begin_layout Subsection
+PWM Demo Extended
+\end_layout
+
+\begin_layout Standard
+You can find the IDE paths on block 120, and see that the 0th path goes
+ around the exterior nodes in a counter-clockwise direction.
+ For the sake of this experiment, that is good enough.
+ Looking at the chip layout poster, node 500 is the mirror image of 600
+ and nodes 200 and 100 replicate this pattern.
+ So I can just use those patterns to check out the 3 other LED connections:
+\end_layout
+
+\begin_layout Standard
+Copy the PWM code and shadow from 842 to 852 so we can start modifying it
+ to look like this:
+\end_layout
+
+\begin_layout Scrap
+<<pwm1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 852 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm ) [ d# 500 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 200 ( uw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) up b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 < 0 > !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 1100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This should be the shadow for the PWM1:
+\end_layout
+
+\begin_layout Scrap
+<<pwm1-shadow>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 853 shadow{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm for target node 500 ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol ( checks for ide inputs and calls ) up { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( when noticed.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: rtn ( is the return point from a ) up ( call ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( and is used by ) [ upd ] ( as an re-entry point.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: cyc ( begins the actual pwm code.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: upd ( is the ide entry point for initial ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( start or output update.
+ )
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Copy the PWM code and shadow from 842 to 854 so we can start modifying it
+ to look like this:
+\end_layout
+
+\begin_layout Scrap
+<<pwm2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 854 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm ) [ d# 200 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 2000 ( dw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) down b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 < 0 > !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 8100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This should be the shadow for PWM2:
+\end_layout
+
+\begin_layout Scrap
+<<pwm2-shadow>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 855 shadow{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm for target node 200 ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol ( checks for ide inputs and calls ) down { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( when noticed.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: rtn ( is the return point from a ) down ( call ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( and is used by ) [ upd ] ( as an re-entry point.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: cyc ( begins the actual pwm code.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: upd ( is the ide entry point for initial ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( start or output update.
+ )
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Copy the PWM1 code and shadow from 852 to 856 so we can start modifying
+ it to look like this:
+\end_layout
+
+\begin_layout Scrap
+<<pwm3>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 856 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm ) [ d# 100 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 200 ( uw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) up b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 < 0 > !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 10100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This should be the shadow for the PWM3:
+\end_layout
+
+\begin_layout Scrap
+<<pwm3-shadow>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 857 shadow{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm for target node 100 ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol ( checks for ide inputs and calls ) up { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( when noticed.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: rtn ( is the return point from a ) up ( call ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( and is used by ) [ upd ] ( as an re-entry point.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: cyc ( begins the actual pwm code.
+ )
+\begin_inset Newline newline
+\end_inset
+
+: upd ( is the ide entry point for initial ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( start or output update.
+ )
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We need to go back to block 200 and load all 3 blocks.
+\end_layout
+
+\begin_layout Scrap
+<<compile2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test of pwm code ) [ reclaim d# 852 3 loads ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Then we need a way to load all of them at once, by modifying the template
+ in block 846:
+\end_layout
+
+\begin_layout Scrap
+<<loader1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 846 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( loader template ) [ host load ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+: seed ( n ) h# 13 r! h# 12 call upd ; { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ [ loader load ] { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( using default ide paths ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( kill boots ) [ d# 0 d# 708 hook d# 0 -hook ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( setup application ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( visit whole chip ) [ d# 2 ship panel upd ?ram ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Be patient when loading this block.
+ At first, I thought it had crashed, and changed the 
+\family typewriter
+\series bold
+ship
+\family default
+\series default
+ to use path 0, which works faster.
+ However, path 2 just takes longer, because it visits every node on the
+ chip, as the comment indicates.
+ Once the 
+\family typewriter
+\series bold
+panel
+\family default
+\series default
+ does come up, you will see that all 4 LEDs reflect the values that we put
+ into their 
+\family typewriter
+\series bold
+upd
+\family default
+\series default
+ routines.
+ Everyone is executing, but when you 
+\family typewriter
+\series bold
+hook
+\family default
+\series default
+ into a specific node so that you change change its 
+\family typewriter
+\series bold
+seed
+\family default
+\series default
+, the nodes that come before it stop executing so they can participate in
+ the communication path.
+ I haven't figured out how to let it know that those nodes really are still
+ participating in path 0, by design.
+ Someday, I may know how to do that, but for now, I can move on.
+\end_layout
+
+\begin_layout Subsection
+Potentiometer Node
+\end_layout
+
+\begin_layout Standard
+The analog nodes of the GA144 have both a DAC and an ADC, and I see that
+ the 
+\family typewriter
+\series bold
+target
+\family default
+\series default
+ load block contains a definition for for setting the 
+\family typewriter
+\series bold
+dac
+\family default
+\series default
+.
+ Because the ADC drives a VCO, reading it is not so simple.
+ Technically, you have to write to the 
+\family typewriter
+\series bold
+data
+\family default
+\series default
+ port, to stop the VCO before you read it, but if you try just reading it
+ when 
+\family typewriter
+\series bold
+hook
+\family default
+\series default
+ed to node 709 you will see that the returned values are not moving.
+ According to the F18 Technical Reference manual (DB001 Revision 12 April
+ 2011), you need to set the A/D Mode to High Impedance ADC input.
+ You can try to figure out how to do an Alt write to the 
+\family typewriter
+\series bold
+i/o
+\family default
+\series default
+ port, or just send a 0 to the 
+\family typewriter
+\series bold
+dac
+\family default
+\series default
+ and see what happens.
+ The 
+\family typewriter
+\series bold
+data
+\family default
+\series default
+ values start moving, which doesn't tell you which of the other modes it
+ is in, but you do know that the counter is no longer disabled.
+\end_layout
+
+\begin_layout Standard
+Now we need a little bit of target code to read the VCO difference after
+ a fixed time interval, like this:
+\end_layout
+
+\begin_layout Scrap
+<<pot1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) data b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( read -v ) dup !b @b push { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) h# 1FF for next { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) dup !b @b pop - .
+ + { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) pol ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We again need to go back to block 200 and load this block too.
+\end_layout
+
+\begin_layout Scrap
+<<compile4>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test pwm code ) [ reclaim d# 852 3 loads ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial potentiometer ) [ reclaim d# 858 load ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We also need to update the load block 846:
+\end_layout
+
+\begin_layout Scrap
+<<loader2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 846 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( loader template ) [ host load ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+: seed ( n ) h# 13 r! h# 12 call upd ; { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ [ loader load ] { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( using default ide paths ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( kill boots ) [ d# 0 d# 708 hook d# 0 -hook ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( setup application ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 709 +node d# 709 /ram d# 0 d# /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( visit whole chip ) [ d# 2 ship panel upd ?ram ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+I forgot the 
+\family typewriter
+\series bold
+/p
+\family default
+\series default
+ at first, and wondered why nothing was changed, except the RAM dump.
+ I also read the docs closer to learn that the VCO is a down counter.
+ Now, I can tune the scaling so I produce a wide range of values.
+ I see that it is noisy, but it should serve the purpose well enough for
+ this exercise:
+\end_layout
+
+\begin_layout Scrap
+<<pot2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) data b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( read -v ) dup !b @b { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) d# 500 for next dup !b @b - .
+ + { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) h# 3c900 .
+ + d# 9 for 2* unext { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) pol ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+I can see a mistake here, 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ should be looking at the left port and register 
+\family typewriter
+\series bold
+b
+\family default
+\series default
+ needs to point to 
+\family typewriter
+\series bold
+io
+\family default
+\series default
+ before returning to 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+, but that causes this not to load? The LEDs light up properly, so the nodes
+ have code and they are executing, but the panel never comes up until I
+ unplug the USB cable.
+ Leaving it until later.
+\end_layout
+
+\begin_layout Standard
+Now, how am I going to get these values from node 709 all the way over to
+ the PWM nodes?
+\end_layout
+
+\begin_layout Subsection
+Wire nodes
+\end_layout
+
+\begin_layout Standard
+A wire node just passes data from one neighbor to another, so the code is
+ trivial, as long as I ignore the IDE paths.
+ Since the path I've chosen uses only interior nodes, this is the quickest
+ thing to do right now.
+ The tedious part is that there are 9 nodes on the horizontal and 1 node
+ vertical for every row below 600 that I want to talk to.
+ We'll start with targeting node 500, which would look like this:
+\end_layout
+
+\begin_layout Scrap
+<<wire>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 860 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( wire code ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 609 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass -d-- b! ---u a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 509 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass ---u b! r--- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 508 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass r--- b! --l- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 507 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass --l- b! r--- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 506 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass r--- b! --l- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 505 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass --l- b! r--- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 504 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass r--- b! --l- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 503 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass --l- b! r--- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 502 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass r--- b! --l- a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 501 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass --l- b! r--- a! begin @b ! end ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We again need to go back to block 200 and load this block too.
+\end_layout
+
+\begin_layout Scrap
+<<compile5>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test pwm code ) [ reclaim d# 852 3 loads ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial potentiometer ) [ reclaim d# 858 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial wire code ) [ reclaim d# 860 load ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We also need to update the load block 846:
+\end_layout
+
+\begin_layout Scrap
+<<loader2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 846 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( loader template ) [ host load ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+: seed ( n ) h# 13 r! h# 12 call upd ; { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ [ loader load d# 0 d# 708 hook d# 0 -hook ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( setup application ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 709 +node d# 709 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 609 +node d# 609 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 509 +node d# 509 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 508 +node d# 508 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 507 +node d# 507 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 506 +node d# 506 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 505 +node d# 505 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 504 +node d# 504 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 503 +node d# 503 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 502 +node d# 502 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 501 +node d# 501 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 2 ship panel upd ?ram ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Note that we removed some of the comments because the block is getting crowded.
+ However, we've probably got enough nodes involved now to complete this
+ experiment.
+\end_layout
+
+\begin_layout Subsection
+Connecting the Wires
+\end_layout
+
+\begin_layout Standard
+Now we need to connect the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+ and the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ to the neighboring wire nodes that we just created:
+\end_layout
+
+\begin_layout Scrap
+<<pwm4>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 852 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm ) [ d# 500 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 200 ( uw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) up b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > [ h# 16 ] end { cr }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: cyc < 09 > ( ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 < 0 > !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 1100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: chk < 16 > ( xex- ) drop push @b h# 8000 ( rw ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 18 > and if drop drop right .
+ { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 1b > ( ...
+ ) b! @b dup io b! then { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 1e > drop pop ( ie- ) cyc ; < 20 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Note that I hacked this new definition 
+\family typewriter
+\series bold
+chk
+\family default
+\series default
+ into this code so that I could maintain the addresses used by 
+\family typewriter
+\series bold
+seed
+\family default
+\series default
+, but I thought it might be useful to show how to do this trick.
+ It's ugly, but sometimes, it's better than screwing with code that you've
+ already finalized.
+ Forward references would make this hack look better, but as with most other
+ Forths, colorForth's one pass compiler doesn't allow them.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ code doesn't need this hack, because the 
+\family typewriter
+\series bold
+check
+\family default
+\series default
+ can be done at the end of the loop.
+\end_layout
+
+\begin_layout Scrap
+<<pot3>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) data b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( read -v ) dup !b @b { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) d# 500 for next dup !b @b - .
+ + { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) h# 3c900 .
+ + d# 9 for 2* unext { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( check ) io a! @ h# 4000 ( dr ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) down a! over ! then { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) drop pol ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Note that I had to use the 
+\family typewriter
+\series bold
+a
+\family default
+\series default
+ register to get this to load and show the panel.
+ This feels like the same problem I observed earlier and, since the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ is not controlling the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+, maybe I have to figure out the root cause now.
+\end_layout
+
+\begin_layout Section
+Debugging
+\end_layout
+
+\begin_layout Standard
+Now, the tedious job of debugging nodes that you can only see indirectly.
+ The IDE relies on paths that it puts into the code, which is part of the
+ problem I have observed earlier.
+ The 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+ code assumes that the 0th path is active, but the 2nd path is needed to
+ fill the interior nodes, which block 846 uses.
+ So, the 
+\family typewriter
+\series bold
+seed
+\family default
+\series default
+ word I put on 846 won't work properly.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+\series bold
+softsim
+\family default
+\series default
+ (
+\family typewriter
+\series bold
+so
+\family default
+\series default
+) display has an easy way to disassemble code, and I noticed that the wire
+ nodes were not correctly compiled.
+ I saw that 
+\family typewriter
+\series bold
+reclaim
+\family default
+\series default
+ was used in block 366, where multiple nodes use the same names, but that
+ didn't make them compile properly.
+ I then tried switching 
+\family typewriter
+\series bold
+r---
+\family default
+\series default
+ to 
+\family typewriter
+\series bold
+right
+\family default
+\series default
+ and that compiled better, so I switched them all.
+ You should learn from this mistake.
+ Double check your code.
+\end_layout
+
+\begin_layout Scrap
+<<wire1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 860 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( wire code ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 609 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass down b! up a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 509 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass up b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 508 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 507 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 506 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 505 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 504 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 503 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 502 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 501 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+To limit the scope of what I need to look at, I simply changed the 
+\family typewriter
+\series bold
+@b
+\family default
+\series default
+ in node 501 to a 
+\family typewriter
+\series bold
+h# 18000
+\family default
+\series default
+ to see if I could just pass that to the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+ in 500, but still no joy.
+ Then again, I used 
+\family typewriter
+\series bold
+h# 1800
+\family default
+\series default
+ and didn't notice a change.
+ When I actually used 
+\family typewriter
+\series bold
+h# 18000
+\family default
+\series default
+, I can see that it is working.
+ However, switching back to 
+\family typewriter
+\series bold
+@b
+\family default
+\series default
+ still didn't give me 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ control of the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+The next step, then, is to move the literal back one node at a time.
+ 502 works, but reloads do not always work.
+ Sometimes hitting reset helps.
+ Sometimes I have to pull the USB cable.
+ This worked until I got back to node 609.
+ Then the literal made the load not finish, but the LEDs say that the literal
+ got through.
+ So, whatever is wrong, it's got to be in node 709.
+\end_layout
+
+\begin_layout Standard
+So, I might be able to use not being able to reload as a test.
+ If I reset register 
+\family typewriter
+\series bold
+b
+\family default
+\series default
+ to 
+\family typewriter
+\series bold
+io
+\family default
+\series default
+, rather than 
+\family typewriter
+\series bold
+data
+\family default
+\series default
+ and jump to 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ at the end of that line, I can reload as many times as I want to.
+ I can switch all of the other access to use register 
+\family typewriter
+\series bold
+a
+\family default
+\series default
+, but that makes it not reload again.
+ So, let's just try moving the jump back to 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ further into the code, until it doesn't reload.
+ It stops reloading when the jump is after the 
+\family typewriter
+\series bold
+next
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+It's interesting that when I change the 
+\family typewriter
+\series bold
+next
+\family default
+\series default
+ to a 
+\family typewriter
+\series bold
+unext
+\family default
+\series default
+, it reloads fine.
+ Since 
+\family typewriter
+\series bold
+next
+\family default
+\series default
+ is about 2 times slower than 
+\family typewriter
+\series bold
+unext
+\family default
+\series default
+, maybe there's a timing limit that the loop is exceeding.
+ Dropping the loop count from 
+\family typewriter
+\series bold
+500
+\family default
+\series default
+ to 
+\family typewriter
+\series bold
+200
+\family default
+\series default
+ and leaving the 
+\family typewriter
+\series bold
+next
+\family default
+\series default
+ in also fixes the reload problem.
+ However, the data has gone away, so I have to back out the other changes.
+ Then recalibrate the scaling.
+\end_layout
+
+\begin_layout Standard
+However, the data is no longer changing with potentiometer position.
+ I can usually reload with a loop count of 430, but the longer it runs,
+ the slower it gets, so 400 should be safe.
+ Block 546 has code for basic analog checks, and I see that it writes to
+ io with the mode.
+ It also fixes the subtract properly, so it's worth showing here:
+\end_layout
+
+\begin_layout Scrap
+<<pot4>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: adc ( mode ) h# 0 < h# 2000 h# 4000 h# 6000 > !b { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) data b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( read -v ) dup !b @b dup d# 400 for next { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) !b @b - d# 1 .
+ + .
+ + h# 1FFFF and { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ h# 3c900 .
+ + d# 9 for 2* unext ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( check ) io b! @b h# 4000 ( dr ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) down b! over !b then { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) drop io b! pol ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Note also here that I have simply commented out the scaling portion.
+ In colorForth, that is extremely easy by simply changing the color of the
+ words to white using your left pinky finger.
+ However, I see that the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ values are still not moving as I adjust the potentiometer, and that the
+ LED is not reflecting the 
+\family typewriter
+\series bold
+h# 1fd55
+\family default
+\series default
+ values that I am getting.
+ Going back to the earlier experiment, of forcing a value into the 
+\family typewriter
+\series bold
+wire
+\family default
+\series default
+ nodes, I see that changing 609 still causes the system to not reload, but
+ that changing 509 works fine.
+ So, the code in 709 is still not right.
+ Even with a loop count of 200, it still won't reload without the read in
+ 609.
+ Further, a forced value in 609 (in addition to a read from 709) does not
+ make it out to the LED.
+ But wait, adding the literal, without removing the 
+\family typewriter
+\series bold
+@b
+\family default
+\series default
+ doesn't even work in node 501, even after adding an extra noop so the jump
+ doesn't fall in slot 3.
+\end_layout
+
+\begin_layout Standard
+With my deadline to get this working approaching, and frustration setting
+ in, I sent this document and cf file to Green Arrays, asking for help.
+ Then I walked away for a bit, which I have found to always be the best
+ debugging aid.
+ When I came back, I accepted the fact that a rewrite of the pot node was
+ necessary.
+ The IDE can't tolerate the delay in between VCO readings, so it's time
+ to fix that.
+ As I did that, I also realized that the algorithm needs to scale the results
+ automatically, since every code change changes the scale factors.
+ Then, as I went to sleep, I realized that the data passing problem was
+ caused by the read flags being inverted from the writes.
+ This morning I proved that is true, but I still need to finish the rewrite.
+\end_layout
+
+\begin_layout Standard
+I had emailed a follow up to Green Arrays when I saw some pot movement in
+ an early rewrite and I received a response from Greg Bailey, President
+ of Green Arrays last night, with assurance that he would have time later
+ in the week, if I still needed help.
+ Despite the fact that I have known Greg for many years, and I know that
+ Green Arrays is manned by a small core of dedicated volunteers, the fact
+ that they are willing to help is reassuring.
+ Sometimes, this assurance makes all the difference.
+\end_layout
+
+\begin_layout Subsection
+Potentiometer redesign
+\end_layout
+
+\begin_layout Standard
+The goals of this redesign are to only read the ADC once around each polling
+ loop and to scale the results automatically.
+ My initial findings toward the 1st goal show that the polling overhead
+ provides sufficient time between readings and that the potentiometer I
+ am using is giving me less than 16 counts of difference.
+ I may have to investigate why I am getting such a small range, at some
+ point, but for now, I can take advantage of this knowledge in the scaling
+ algorithm.
+\end_layout
+
+\begin_layout Scrap
+<<pot5>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: adc ( mode ) h# 0 !b { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ initial ) data a! dup ! @ push { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ reduction ) d# 0
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) io b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( r-vr ) data a! dup ! @ dup a! { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) - d# 1 .
+ + pop .
+ + h# 1ffff and { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ -rd ) over over - push .
+ + ( -rf ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust lo ) drop drop pop dup push d# 3 .
+ + d# 2 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then dup - d# 18 .
+ + ( -rfo ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust hi ) drop drop drop pop dup push { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) d# 16 .
+ + d# 15 d# 0 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pop drop a push if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) h# 3ffff .
+ + push 1 begin 2* unext { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( swap ) then a! push a pop ( -vr ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( vr-vr ) io b! @b - h# 4000 ( dr ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) down a! push over ! pop { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pol ; <39>
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now, you will notice that the 
+\family typewriter
+\series bold
+read
+\family default
+\series default
+ routine is unreadable, if you will forgive the pun, and I have to admit
+ that it is also impossible to debug in this form.
+ There are ways to mitigate this problem, but I'm out of time and patience.
+ So, knowing that the stack is, at least, functioning properly, let me just
+ rewrite the logic in pseudo code and inject the literals manually.
+\end_layout
+
+\begin_layout Standard
+The loop that runs around this node doesn't factor out any subroutines,
+ at the moment, but it does assume that the previous 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ reading is on top of the return stack and that a 
+\family typewriter
+\series bold
+reduction
+\family default
+\series default
+ value (
+\family typewriter
+\series bold
+r
+\family default
+\series default
+) is on top of the data stack.
+ The 
+\family typewriter
+\series bold
+read
+\family default
+\series default
+ routine may update 
+\family typewriter
+\series bold
+r
+\family default
+\series default
+, but its main purpose is to add a new pot value (
+\family typewriter
+\series bold
+v
+\family default
+\series default
+) to the stack.
+ You may notice the 
+\family typewriter
+\series bold
+swap
+\family default
+\series default
+ equivalent at the end of the read routine to keep 
+\family typewriter
+\series bold
+r
+\family default
+\series default
+ on top of the stack.
+\end_layout
+
+\begin_layout Standard
+The basic processing in 
+\family typewriter
+\series bold
+read
+\family default
+\series default
+ gets a new 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ value, saving it to replace the previous value on the return stack.
+ It computes the delta between the 2 values by adding the negation of the
+ new reading.
+ Sometimes, you can get away with just using the inversion (
+\family typewriter
+\series bold
+-
+\family default
+\series default
+), but for the sake of precision, I am adding 
+\family typewriter
+\series bold
+1
+\family default
+\series default
+ to produce the true negation.
+ It then reduces the delta by 
+\family typewriter
+\series bold
+r
+\family default
+\series default
+ to give a factored value (
+\family typewriter
+\series bold
+f
+\family default
+\series default
+) and adjusts for variations so we can use this as a power of 2 for the
+ value (
+\family typewriter
+\series bold
+v
+\family default
+\series default
+) we will pass on to the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+ node.
+\end_layout
+
+\begin_layout Standard
+We need to allow for some noise, so if the new delta (
+\family typewriter
+\series bold
+x
+\family default
+\series default
+) is less than the old delta (
+\family typewriter
+\series bold
+y
+\family default
+\series default
+), the 
+\family typewriter
+\series bold
+adjust lo
+\family default
+\series default
+ portion needs to replace the old delta with the new, and reduce it by 2
+ counts.
+ Since we are again using the negation, we can combine the 2 negations into
+ 1 sequence as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+-(x-2) = -x+2 = x - 1 .
+ + 2 .
+ + = x - 3 .
+ +
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If the new delta (
+\family typewriter
+\series bold
+x
+\family default
+\series default
+) is greater than the old delta (
+\family typewriter
+\series bold
+y
+\family default
+\series default
+) by more than 17, then we won't be able to use it as a power of 2 and the
+ 
+\family typewriter
+\series bold
+adjust hi
+\family default
+\series default
+ portion needs to replace the old delta with the new, reduced by 15.
+ Again, this simplifies as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+-(x-15) = -x+15 = x - 1 .
+ + 15 .
+ + = x - 16 .
+ +
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This can then be factored further to put the negate (
+\family typewriter
+\series bold
+-
+\family default
+\series default
+) before both 
+\family typewriter
+\series bold
+-if
+\family default
+\series default
+ conditionals.
+\end_layout
+
+\begin_layout Standard
+The same trick can be used when comparing with 17, as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+x>17 = 17<x = 17-x<0 = -x+17<0 = x - 1 .
+ + 17 .
+ + = x - 18 .
+ +
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+However, even after all of these mathematical gymnastics, the values are
+ not settling down.
+ The only thing I can think of is the fact that I have not balanced the
+ false conditionals.
+ Each of the 
+\family typewriter
+\series bold
+if
+\family default
+\series default
+ cases do enough processing to throw the counts off on the next cycle.
+ The readings seem to indicate that the values are bouncing from one end
+ to the other, which I would expect, as I think about this flaw in my logic.
+\end_layout
+
+\begin_layout Standard
+Some of you may also notice the grey number at the end of this block.
+ This is a hex number that indicates the amount of memory used in this node.
+ Since we only have 64 words, and only 6 words left, I will have to split
+ it up into multiple blocks to do this balancing.
+ However, we have now seen just about the limit to what can be put into
+ one node.
+ Obviously, I can't even recommending doing this much.
+\end_layout
+
+\begin_layout Section
+Balancing act
+\end_layout
+
+\begin_layout Standard
+Now, let's see if I can balance everything that needs to be done before
+ the Maker Faire this Saturday.
+ It is 9 pm Tuesday night and I have to setup the SVFIG table at 9 am Saturday
+ morning.
+ We'll see how much I can get done.
+\end_layout
+
+\begin_layout Standard
+Since I have no more room in node 709, I have to move the scaling logic
+ out, which also means that I don't need to balance the conditionals, since
+ they no longer influence the 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ readings.
+ The 
+\family typewriter
+\series bold
+read
+\family default
+\series default
+ algorithm becomes much less complex:
+\end_layout
+
+\begin_layout Scrap
+<<pot6>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: adc ( mode ) h# 0 !b { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ initial ) data a! dup ! @ push { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) io b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( -v ) data a! dup ! @ dup a! { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) - d# 1 .
+ + pop .
+ + h# 1ffff and { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) a push { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( v-v ) io b! @b - h# 4000 ( dr ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) down a! over ! { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pol ; <20>
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Then, the scaling algorithm can stand on its own.
+ At first, I put it into node 609, but then I realized than I can't see
+ what it is doing there.
+ The LED is now a steady bright, but does not respond to the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Scrap
+<<scaler>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 862 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( scaling code ) [ d# 609 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: adc ( -r ) down a! @ { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 800 ( lw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) left b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) io b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( r-vr ) @ over over - push .
+ + ( -rf ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust lo ) drop drop pop dup push d# 3 .
+ + d# 2 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then dup - d# 18 .
+ + ( -rfo ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust hi ) drop drop drop pop dup push { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) d# 16 .
+ + d# 15 d# 0 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pop drop if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) h# 3ffff .
+ + push 1 begin 2* unext { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( swap ) then a! push a pop ( -vr ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( vr-vr ) io b! @b - h# 400 ( ur ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) up a! push over ! pop { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pol ; <2e>
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+I commented out the code for node 609 in block 860 and changed block 200
+ to load this block.
+\end_layout
+
+\begin_layout Scrap
+<<compile6>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test pwm code ) [ reclaim d# 852 3 loads ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial potentiometer ) [ reclaim d# 858 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial wire code ) [ reclaim d# 860 load ]
+\begin_inset Newline newline
+\end_inset
+
+ ( initial scaler ) [ reclaim d# 862 load ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+After changing node 100 to 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ the 
+\family typewriter
+\series bold
+down
+\family default
+\series default
+ port, node 200 to 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ the 
+\family typewriter
+\series bold
+right
+\family default
+\series default
+ port and node 500 to 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ the 
+\family typewriter
+\series bold
+down
+\family default
+\series default
+ port, I can examine them and use 
+\family typewriter
+\series bold
+seed
+\family default
+\series default
+ to change their LED intensities.
+ I left node 600 alone, so that it could still work with the original IDE
+ demo in block 844.
+ Yet, node 609 is still unreachable, because I did not put the 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ routine into the 
+\family typewriter
+\series bold
+wire
+\family default
+\series default
+ nodes.
+\end_layout
+
+\begin_layout Standard
+On the other hand, it no longer matters where the 
+\family typewriter
+\series bold
+scaler
+\family default
+\series default
+ is located along the wire path.
+ I can easily move it over to node 501, where I should be able to examine
+ it with the IDE.
+ I also noticed a problem that would certainly prevent it from working properly,
+ so crossing my fingers for the next tests.
+\end_layout
+
+\begin_layout Standard
+Well, I think I stepped backwards, somehow.
+ Not only can I not 
+\family typewriter
+\series bold
+hook
+\family default
+\series default
+ into node 501, but my 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ measurement are bouncing worse than I've seen before.
+ I'm getting every other reading toggling all the way up to bit 7.
+ Arg! If I don't load my new scaler, the 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ settles right down.
+\end_layout
+
+\begin_layout Standard
+But of course, you can't have two nodes polling for each other to do something.
+ The 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ polls to send data to its neighbor, but the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+ polls to get data from its neighbor.
+ The scaler in node 609 can't poll the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ and it can't poll the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+ in node 501.
+ It has to be rewritten.
+\end_layout
+
+\begin_layout Scrap
+<<scaler1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 862 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( scaling code ) [ d# 501 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( reduction ) d# 0 { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) io b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( -n ) @b - h# 800 ( lw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) left a! push @ { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( rn-vr ) over over - push .
+ + ( -rf ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust lo ) drop drop pop dup push d# 3 .
+ + d# 2 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then dup - d# 18 .
+ + ( -rfo ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust hi ) drop drop drop pop dup push { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) d# 16 .
+ + d# 15 d# 0 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pop drop if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) h# 3ffff .
+ + push 1 begin 2* unext { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( swap ) then a! push a pop ( -vr ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) right a! over ! pop { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pol ; <2e>
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Ah, this produces some success.
+ I can 
+\family typewriter
+\series bold
+hook
+\family default
+\series default
+ into node 501, but it doesn't appear to be doing anything.
+ Perhaps this is because 
+\family typewriter
+\series bold
+hook
+\family default
+\series default
+ takes over, which would explain why all except node 600's LED has turned
+ off.
+ At least I get a snapshot of its stack, which looks ok.
+ This is the problem with the IDE.
+ It's like Schrödinger's cat.
+ Using it affects the way the nodes work.
+\end_layout
+
+\begin_layout Section
+Softsim integration
+\end_layout
+
+\begin_layout Standard
+Let's see if we can get this working in softsim (so) to help figure out
+ what is going on:
+\end_layout
+
+\begin_layout Scrap
+<<softsim>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 216 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim configuration ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( spi boot testbed d# 1244 d# 2 loads ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( sync boot testbed 'addr,len' d# 1230 load ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( smtm ) [ d# 0 +node d# 0 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } ( d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 709 +node d# 709 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 609 +node d# 609 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 509 +node d# 509 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 508 +node d# 508 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 507 +node d# 507 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 506 +node d# 506 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 505 +node d# 505 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 504 +node d# 504 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 503 +node d# 503 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 502 +node d# 502 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 501 +node d# 501 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ( /command test ) [ d# 400 +node d# 0 /ram h# 25 /a h# 12 /b ] { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 9 d# 8 d# 7 d# 6 d# 5 d# 4 d# 3 d# 2 d# 1 h# 12345 d# 10 /stack h#
+ A9 /p ] { , }
+\begin_inset Newline newline
+\end_inset
+
+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( rom write test d# 200 +node h# 13 /p ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( d# 0 h# 32 d# 103 break ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( d# 0 h# be d# 300 break )
+\begin_inset Newline newline
+\end_inset
+
+}block 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+That makes for an over full block, and I kept node 100 commented out to
+ not interfere with the crawler demo, but now I can see that the 
+\family typewriter
+\series bold
+scaler
+\family default
+\series default
+ is delivering the 1st 2 values to the 
+\family typewriter
+\series bold
+pwm
+\family default
+\series default
+, but then the 
+\family typewriter
+\series bold
+wire
+\family default
+\series default
+ nodes start backing up.
+ I forgot to remove the 
+\family typewriter
+\series bold
+-
+\family default
+\series default
+ in 
+\family typewriter
+\series bold
+check
+\family default
+\series default
+ when I changed it from looking for reads to writes.
+ That now makes the simulator behave, but I'm back to getting the 8 bit
+ variations in 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ values.
+ The simulator also showed me that I can certainly afford to slow down the
+ 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ readings, since the wire is still being filled up with them.
+ So, let's see what happens if I throw some code back into the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+First, let me try just balancing the conditionals:
+\end_layout
+
+\begin_layout Scrap
+<<pot7>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) right b! @b push ex io b! drop ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then .
+ .
+ drop ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( v-v ) io b! @b - h# 4000 ( dr ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) down a! drop ! ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then .
+ .
+ d ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: adc < 12 > ( mode ) h# 0 !b { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ initial ) data a! dup ! @ push { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( -v ) pol data a! dup ! @ dup a! { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) - d# 1 .
+ + pop .
+ + h# 1ffff and { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) a push check read ; <23>
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This just gets us started and after changing the start address in both of
+ the load blocks, I can test it and see that I still have some adjusting
+ to do.
+ For 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+, we have an time when executing the stream, but we can go through the exercise
+ for what we do know.
+ Using so, I can find the instruction layout:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+word
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fetch
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@p b! @b .
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3500
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3200
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+push ex
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5200
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@p b! drop ;
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5200
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That makes 34,100 pS.
+ The duplicated drop before each ; fit within the instruction words and
+ allow me to use + in slot 3 to consume the numbers I add with @p (one of
+ the slow instructions).
+ So, I can balance the time with the following:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+word
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fetch
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@p + @p +
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3200
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@p + .
+ .
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1200
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.
+ drop ;
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5200
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That gives me 34,400 pS which is probably ok since we are not covering the
+ 
+\family typewriter
+\series bold
+ex
+\family default
+\series default
+ in 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ anyway, but not for 
+\family typewriter
+\series bold
+check
+\family default
+\series default
+, where I have the following to balance:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+word
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fetch
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@p a! over .
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1200
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+! drop ;
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3500
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5200
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That is 20,500 pS, which is going to need this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+word
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fetch
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@p + drop .
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1200
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+@b drop ;
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3500
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1400
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5200
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note how both sides here are balanced, but not as efficient as they could
+ be without having to balance them.
+ Its interesting that now the variations have a range of about 4 or 5.
+ It got slightly better by adding a @b + to the 
+\family typewriter
+\series bold
+pol
+\family default
+\series default
+ routine, but it's difficult to measure or adjust it much closer.
+ Now I get sporatic movement on the LED, which might just be good enough.
+\end_layout
+
+\begin_layout Section
+Smoothing buffer
+\end_layout
+
+\begin_layout Standard
+I am way too much of a perfectionist to leave good enough alone, so let's
+ see how quickly I can throw in a buffer to average the variation in the
+ values.
+ As I watch the values through the IDE, which, of course, changes their
+ values, I see that they only get up to about 
+\family typewriter
+\series bold
+h# 3ac
+\family default
+\series default
+ when the 
+\family typewriter
+\series bold
+pot
+\family default
+\series default
+ is turned up all the way.
+ That means I can safely sum 16 or 32 values without overflowing.
+ So, taking the next wire node, I can turn it into an averaging buffer like
+ this:
+\end_layout
+
+\begin_layout Scrap
+<<avg>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 864 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( averaging buffer code ) [ d# 502 node d# 0 org ]
+\begin_inset Newline newline
+\end_inset
+
+: pass h# 30 a! d# 15 for { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) right b! @b !+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) a push h# 30 a! @+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) d# 14 for @+ + 2/ unext { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) pop a! left b! !b { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) next pass ; < 11 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Once I remembered to scale the sum back down before shipping it out, it
+ appeared to work pretty good, except when I used 
+\family typewriter
+\series bold
+watch
+\family default
+\series default
+ to monitor the 
+\family typewriter
+\series bold
+adc
+\family default
+\series default
+ valued.
+ I could also see that I had room for 32 values, which makes it work better
+ under 
+\family typewriter
+\series bold
+watch
+\family default
+\series default
+, but not completely.
+ Again, good enough.
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+This is obviously, way too much code to just replace a wire between the
+ LED and the potentiometer, but I've learned a lot about the GA144 and the
+ GreenArray's IDE.
+ I would now do this differently, which is the fate of most throw away code,
+ and I should look at the voltage feeding the potentiometer, to see if I
+ can give it more range.
+ However, I can close this tutorial knowing that I completed what I set
+ out to do.
+\end_layout
+
+\begin_layout Standard
+Most of the source blocks have been touched in the last thrashing, so here
+ they all are in their final form:
+\end_layout
+
+\begin_layout Scrap
+<<final-compile>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 200 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( user f18 code ) [ reclaim ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial test pwm code ) [ reclaim d# 852 d# 3 loads ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial potentiometer ) [ reclaim d# 858 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial wire code ) [ reclaim d# 860 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( initial scaler ) [ reclaim d# 862 load ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( averaging code ) [ reclaim d# 864 load ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-softsim>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 216 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( softsim configuration ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( spi boot testbed 1244 2 loads ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( sync boot testbed 'addr,len' 1230 load ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( smtm ) [ d# 0 +node d# 0 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } ( d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 709 +node d# 709 /ram h# 19 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 609 +node d# 609 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 509 +node d# 509 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 508 +node d# 508 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 507 +node d# 507 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 506 +node d# 506 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 505 +node d# 505 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 504 +node d# 504 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 503 +node d# 503 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 502 +node d# 502 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 501 +node d# 501 /ram d# 0 /p ] { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( /command test ) [ d# 400 +node d# 0 /ram h# 25 /a h# 12 /b ] { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 9 d# 8 d# 7 d# 6 d# 5 d# 4 d# 3 d# 2 d# 1 h# 12345 d# 10 /stack h#
+ A9 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( rom write test { 0000190F } +node { 0000027F } /p ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( d# 0 h# 32 d# 103 break ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( d# 0 h# be d# 300 break )
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<original-pwm>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 842 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm demo ) [ d# 600 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 2000 ( dw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) down b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 ( h# 0 ) !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-example>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 844 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( demo ide boot ) [ empty compile serial load ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( customize ) [ -canon d# 0 fh orgn ! ] { cr }
+\begin_inset Newline newline
+\end_inset
+
+ [ c-com sport ! c-bps bps ! !nam ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: seed ( n ) h# 13 r! h# 12 call upd ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: run talk d# 0 d# 600 hook d# 0 d# 64 d# 600 boot { indent }
+\begin_inset Newline newline
+\end_inset
+
+   upd ?ram panel d# 0 lit h# 00018000 seed ;
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<loader2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 846 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( loader template ) [ target load ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+: seed ( n ) h# 13 r! h# 12 call upd ; { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ [ loader load d# 0 d# 708 hook d# 0 -hook ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ ( setup application ) { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 709 +node d# 709 /ram h# 19 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 609 +node d# 609 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 509 +node d# 509 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 508 +node d# 508 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 507 +node d# 507 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 506 +node d# 506 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 505 +node d# 505 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 504 +node d# 504 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 503 +node d# 503 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 502 +node d# 502 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ ...
+ } [ d# 501 +node d# 501 /ram d# 0 /p ] { ,
+\begin_inset Newline newline
+\end_inset
+
+ , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 2 ship panel upd ?ram ]
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-pwm1>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 852 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm demo ) [ d# 500 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 2000 ( dw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) down b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > [ h# 16 ] end { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: cyc < 09 > ( ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 ( h# 0 ) !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 1100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 > { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: chk < 16 > ( xex- ) drop push @b h# 8000 ( rw ) { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 18 > and if drop drop right .
+ { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 1b > ( ...
+ ) b! @b dup io b! then { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 1e > drop pop ( ie- ) cyc ; < 20 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-pwm2>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 854 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm demo ) [ d# 200 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 ( h# 0 ) !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 8100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-pwm3>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 856 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( pwm demo ) [ d# 100 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol < 00 > @b h# 2000 ( dw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 03 > ( ...
+ ) down b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+: rtn < 06 > ( ...
+ ) io b! then < 08 > drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( cyc ie- ) h# 1FFFF and over .
+ + -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0c > ( ...
+ ) h# 20000 !b pol ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 0f > then h# 10000 ( h# 0 ) !b pol ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: upd < 12 > ( xex- ) drop push drop h# 10100 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) < 14 > pop pop ( iex- ) rtn ; < 16 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-pot>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 858 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) right b! @b push ex io b! drop ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then d# 0 + d# 0 + d# 0 + @b + .
+ drop ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( v-v ) io b! @b - h# 4000 ( dr ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) down a! over ! drop ; { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then d# 0 + drop .
+ @b drop ; { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: adc < 19 > ( mode ) h# 0 !b { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ initial ) data a! dup ! @ push { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( -v ) pol data a! dup ! @ dup a! { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) - d# 1 .
+ + pop .
+ + h# 1FFFF and { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) a push check read ; < 29 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-wire>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 860 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( wire code ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 609 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass down b! up a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 509 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass up b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 508 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 507 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 506 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 505 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 504 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass right b! left a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 503 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass left b! right a! begin @b ! end ; { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 502 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass ( right b! left a! begin @b ! end ; ) { , }
+\begin_inset Newline newline
+\end_inset
+
+ [ d# 501 node d# 0 org reclaim ]
+\begin_inset Newline newline
+\end_inset
+
+: pass ( left b! right a! begin @b ! end ; )
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-scaler>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 862 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( scaling code ) [ d# 501 node d# 0 org ] { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( reduction ) d# 0 { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: pol @b h# 8000 ( rw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) right b! @b push ex { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) io b! then drop { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: check ( -n ) @b h# 800 ( lw ) and if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) left a! push @ { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: read ( rn-vr ) over over - push .
+ + ( -rf ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust lo ) drop drop pop dup push d# 3 .
+ + d# 2 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then dup - d# 18 .
+ + ( -rfo ) -if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( adjust hi ) drop drop drop pop dup push { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) d# 16 .
+ + d# 15 d# 0 { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pop drop if { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) h# 3FFFF .
+ + push d# 1 begin 2* unext { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( swap ) then a! push a pop ( -vr ) { br }
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) right a! over ! pop { cr }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) then drop pol ; < 2e >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<final-avg>>=
+\begin_inset Newline newline
+\end_inset
+
+D# 864 code{
+\begin_inset Newline newline
+\end_inset
+
+ ( averaging buffer code ) [ d# 502 node d# 0 org ]
+\begin_inset Newline newline
+\end_inset
+
+: pass h# 20 a! d# 31 for { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) right b! @b !+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) a push h# 20 a! @+ { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) d# 30 for @+ + 2/ unext { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ...
+ ) pop a! left b! !b { , }
+\begin_inset Newline newline
+\end_inset
+
+ ( ...
+ ) next pass ; < 11 >
+\begin_inset Newline newline
+\end_inset
+
+}block
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\end_body
+\end_document

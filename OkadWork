@@ -1,0 +1,2 @@
+gforth cfasdis.frt -e "cfdis OkadWork bye" > OkadWork.dsm
+gforth cfasdis.frt -e "cfas OkadWork bye" 

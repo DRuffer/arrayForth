@@ -1,0 +1,457 @@
+.\" $Id: cul.5,v 1.13 2009/03/25 09:46:30 albert Exp $
+.TH cul "5" "May 2009" "cul 0.2.0" DFW
+.SH "NAME"
+cul \- consult file format for
+computer intelligence
+disassembler 386
+.SH "DESCRIPTION"
+\fBcul\fR files are consulted by \fBcidis\fR.
+They contain a prescription of how the file that has been
+fetched (hencetoforth called \fIbinary image\fR) is to be disassembled.
+.br
+On top of the user commands described in this page,
+the full assembler is available after the command \fBASSEMBLER\fR and
+the full Forth language is available after the command \fBFORTH\fR .
+The Forth library is available after suitable installation.
+.\"
+.SH "SYNTAX"
+These command may reside in the cul file,
+but they can be used interactively too.
+.\"
+.SH "COMMENT"
+A backslash \fB\\\fR followed by a space ignores the remainder of a line.
+An open bracket \fB(\fR followed by a space ignores the remainder of the file
+until a closing bracket (so don't use in expressions!).
+Comment signs are not recognized within strings.
+The string symbol \fB"\fR is not recognized within comment.
+.\"
+.SH "EXPRESSIONS"
+An atom can be a number, a character, a label or a flag.
+The default number base is hexadecimal,
+but this can be overruled by the \fB#\fR prefix for decimal.
+.br
+A character is denoted by a \fB&\fR prefix.
+.br
+A label must be previously defined by an \fBEQU\fR,
+\fBLABELED\fR or \fBLABEL\fR statement.
+.br
+Hexadecimal numbers can start in a letter,
+and labels can be fully numeric,
+but both practices are discouraged.
+.br
+A flag contains either all 0's or all 1' in number base 2.
+.br
+A string is delimited by double quotes: \fB"\fR .
+It may contain embedded new lines.
+It can contain double quotes,
+by doubling them.
+The representation is an address and the number of characters.
+Those two atoms can be manipulated individually, but some commands
+operate on strings.
+
+.br
+Atoms are untyped.
+.br
+A simple expression consists of one or two atoms followed by a unary
+or binary operator,
+in a \fIpostfix\fR fashion.
+A compound expression results from replacing one or both of the atoms
+by an expression.
+.br
+Brackets are not allowed.
+They are not needed,
+because an unlimited number of atoms can be retained,
+e.g. ``\fI12<((4+5)*(8+9))\fR'' becomes
+``\fI\ \ \ 12\ 4\ 5\ +\ \ \ 8\ 9\ +\ \ \ *\ \ \ <\fR''.
+.br
+.\"verbose
+All operators, despite suggestive naming, are allowed on all data.
+Inappropriate use of operators may yield unwanted results.
+.br
+An arithmetic expression combines atom's or other expressions
+by the binary operators
+\fB+ - / * MOD\fR and the unary operator \fBNEGATE\fR.
+.br
+Arithmetic expressions can be combined using the binary operators
+\fB= <> < > <= >=\fR yielding a flag.
+.br
+A logical expression combines atom's by the bitwise binary operators
+\fBOR AND XOR\fR  and the unary operator \fBINVERT\fR ,
+again in postfix fashion.
+.br
+Equality of strings is established by \fB$=\fR working on two strings
+(4 atoms) and yielding a flag.
+.br
+A range consist of two atoms, representing addressing in the
+host space,
+i.e. such as seen during execution.
+Ranges are exclusive, but they are always expanded to contain
+at least one byte.
+.br
+A name cannot contains spaces.
+.SH "SECTIONS"
+The word \fBsection\fR is used in the sense traditional for
+assembly programming: a range of memory that is addressed in a
+contiguous way.
+Normally the data of a section is specified
+in the binary file that is being analysed.
+If so, it must occupy a contiguous range there too,
+starting at the \fBfile-offset\fR in the file.
+Sections may overlap, in particular if ranges of memory are
+moved around.
+In those cases more than one memory address is
+associated with the same data, at different times during execution.
+A part of a section that is contiguous and of the same type
+(e.g. all code, or all string) is called \fBrange\fR.
+So a range can be disassembled by a single command.
+
+.SH "KEYWORDS"
+Keywords (or words in Forth parlance) apply to one or more
+preceeding expressions.
+They may also scan ahead,
+mostly for a name that is hence-to-forth known, e.g. as a label.
+.TP
+\fBFETCH\fR \fI<name>\fR
+.br
+Fetch the binary image \fI<name>\fR to the code buffer.
+.TP
+\fBCONSULT\fR \fI<name>\fR
+.br
+Get the information from file \fI<name>\fR.
+It presumedly refers to the current codebuffer and is used to analyse its
+content.
+.TP
+\fI<expr>\fR \fBLABEL\fR \fI<name>\fR
+.br
+Add a label to the plain labels with name \fI<name>\fR with value \fI<expr>\fR.
+.TP
+\fI<expr>\fR \fI<string>\fR \fBLABELED\fR
+.br
+Add a label to the plain labels with value \fI<expr>\fR and the
+name in \fI<string>\fR.
+This is useful if the string is extracted from
+the binary image.
+.TP
+\fI<expr>\fR \fBEQU\fR \fI<name>\fR
+.br
+Add \fI<name>\fR to the plain labels with value \fI<expr>\fR.
+.TP
+\fI<expr>\fR \fB.LABEL/.\fR
+.br
+If \fIexpr\fR is known as a plain label print the label,
+otherwise print its value in hex.
+.TP
+\fI<expr1>\ <expr2>\fR \fB-dn:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is to be disassembled as uninitialised space.
+.TP
+\fI<expr1>\ <expr2>\fR \fB-db:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is to be disassembled as byte values.
+.TP
+\fI<expr1>\ <expr2>\fR \fB-dw:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is to be disassembled as word (16-bit)
+values.
+.TP
+\fI<expr1>\ <expr2>\fR \fB-dl:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is to be disassembled as long (32-bit) values.
+They are printed as symbolic names,
+if they occur as a plain label.
+.TP
+\fI<expr1>\ <expr2>\fR \fB-d$:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is to be disassembled as strings.
+This means it will be shown (in order of preference):
+.TP
+in the form \fI"<letters>"\fR for consequitive ASCII characters
+.TP
+in the form \fI&<char>\fR for isolated ASCII characters
+.TP
+in the form \fI^<char>\fR for some expected control characters
+.TP
+in the form \fI[<hex>]<hex>\fR for other numbers.
+.br
+All this is acceptable by the \fBd$\fR directive of the assembler.
+.br
+.TP
+\fI<expr1>\ <expr2>\fR \fB-dc:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is to be disassembled as a normal code range.
+For the Intel 80386 this means a 32-bit code range.
+.TP
+\fI<expr1>\ <expr2>\fR \fI<string>\fR \fB[-dn|-db|-bw|-dl|-dc|-d$]\fR
+These commands are equivalent to \fB-dn: -db: -dw: -dl: -dc: -d$: \fR but the
+ranges get their names from \fI<string>\fR.
+.TP
+\fI<expr1>\ <expr2>\fR \fB[-dn-|-db-|-bw-|-dl-|-dc-|-d$-]\fR
+These commands are equivalent to \fB-dn: -db: -dw: -dl: -dc: -d$: \fR but the
+ranges are anonymous.
+.TP
+\fI<expr>\fR \fBORG\fR
+.br
+Clear the code buffer and associate its start with the target address
+\fI<expr>\fR.
+.TP
+\fI<expr>\fR \fB-ORG-\fR
+.br
+The start of the code buffer is associated with the target address
+\fI<expr>\fR without affecting its content.
+(\fBNote:\fR this is messy and will probably be replaced by assembly sections
+and one \fB-ORG-\fR per section.)
+.TP
+\fI<string>\fR \fI<expr>\fR \fBDIRECTIVE\fR
+.br
+The string is a directive associated with the target address
+\fI<expr>\fR.
+It will be a separate line or lines in front of the disassembly.
+.br
+\fBNote:\fR
+This can be a multiple-line-comment,
+provided it is laid out as comment.
+.TP
+\fI<expr>\fR \fBCOMMENT:\fR "comment"
+.br
+The remainder of the line is a comment associated with the target address
+\fI<expr>\fR.
+It will be printed after the disassembly on the same line.
+.TP
+\fBDISASSEMBLE-ALL\fR
+.br
+Disassemble the code buffer using all available information.
+.TP
+\fBSORT-ALL\fR
+.br
+Sort all available information on the addresses it applies to.
+This is mandatory for \fBDISASSEMBLE-ALL\fR and recommended for \fBMAKE-CUL\fR.
+.TP
+\fBMAKE-CUL\fR
+.br
+Output all available information to standard output.
+This includes all information added interactively.
+.TP
+\fBINCLUDE\fR \fI<name>\fR
+.br
+Read in the file named \fI<name>\fR and execute all commands there in.
+.TP
+\fB[PLAIN-LABELS|RANGE-LABELS]\ REMOVE:\fR \fI<name>\fR
+.br
+Select the plain labels or the ranges labels class and
+remove the label \fI<name>\fR from it.
+Removal of several labels in the same class need not repeat
+the selection.
+.br
+When redefining a label is intended,
+the old label must be removed first.
+.TP
+ \fB[PLAIN-LABELS|SECTION-LABELS]\fR \fI<expr>\fR \fBREMOVED\fR
+.br
+Like REMOVE: but the label is identified by its address in \fI<expr>\fR.
+.TP
+\fI<expr>\fR \fBCRAWL\fR
+.br
+Use the information that \fI<expr>\fR is a target code address.
+Heuristically find as much code as possible by disassembling
+from this address up till an unconditional transfer of control,
+and assuming jumps refer to more code addresses.
+Add new knowledge to the labeled ranges,
+then combine any anonymous ranges.
+.TP
+\fI<expr>\fR \fBCRAWL!\fR
+.br
+Add the information that \fI<expr>\fR is a target code address.
+It will be taken into account at the next invocation of CRAWL .
+
+.SH "FETCHING FROM BINARY"
+Extracting label names from the binary is a vital capability.
+Also especially in headers, there are addresses to be fetched from
+the binary.
+Note that the keywords in this paragraph are operators,
+in the sense that they leave a result for further processing.
+The string operators work on addresses in the host space (unlike \fBL@\fR e.a.),
+so they are normally preceeded by \fBTARGET>HOST\fR.
+.TP
+\fI<addr>\fR \fB[B@|W@|L@]\fR
+Get an 8 bit, 16 bit or 32 bit value from target address \fI<addr>\fR,
+in a big-endian (Intel) fashion.
+.br
+Note that in 4.x lina there is a conflict with the built-in \fBL@\fR .
+The old \fBL@\fR is available under the name \fBFAR@\fR.
+(No more in 5.x lina)
+.TP
+\fI<addr>\fR \fBTARGET>HOST\fR
+Transform the target address to a host address.
+It may be abbreviated to \fBth\fR.
+.TP
+\fI<addr>\fR \fBCOUNT\fR
+Get a string expression from address \fI<addr>\fR,
+assuming its first byte is the character count.
+.TP
+\fI<addr>\fR \fB$@\fR
+Get a string expression from address \fI<addr>\fR,
+assuming its first long-word (32 bits) is the character count.
+.TP
+\fI<addr>\fR \fBZ$@\fR
+Get a string expression from address \fI<addr>\fR,
+assuming it ends in an ASCII zero (c-style).
+.SH "ADVANCED"
+A modest skill in the Forth language can increase the usefulness
+of \fBcidis\fR considerably.
+.br
+You can get pretty far by making a customized script.
+The source contains many commands that are occasionally
+useful.
+All commands in the source are documented using the Stallman convention.
+.br
+With the Forth commands \fBDUP SWAP OVER 2DUP 2SWAP 2OVER\fR
+writing down the same expression repeatedly can be avoided.
+See lina(1) if installed.
+.br
+A sequence of commands can be combined into a macro in the following
+fashion (regular Forth practice):
+.br
+.TP
+\fB:\ \fI<name> <sequence> \fB;\fR
+.br
+Using \fI<name>\fR will result in the execution of the commands
+in \fI<sequence>\fR.
+If \fI<sequence>\fR contains commands that scan ahead (e.g. \fI-db:\fR)
+the scanning will be done when \fI<name>\fR is invoked;
+this can be confusing for novices.
+.TP
+\fBLABEL-STRUCT\fR
+This command can be used to add a new class of labels.
+All classes of labels are registered automatically.
+See the source \fBlabeldis.frt\fR.
+.TP
+\fBSHOW-REGISTER\fR
+.br
+List the names of all registered classes of labels.
+A class can be made current by typing its name
+and then its content can be
+printed using \fB.LABELS\fR.
+.TP
+\fI<expr>\fR \fI<string>\fR \fB?ABORT\fR
+.br
+If \fI<expr>\fR\ is not zero,
+output the string on the error channel and exit
+\fBcidis\fR with an error code of 2.
+.\"
+.SH "INTEL 386 SPECIFIC"
+.TP
+\fI<expr1>\ <expr2>\fR \fB-dc16:\fR \fI<name>\fR
+.br
+The range \fI<expr1>\ <expr2>\fR is hence-to-forth known by
+\fI<name>\fR and is a range to be disassembled as a 16-bit code range.
+This command is specific to the Intel 80386.
+As are the corresponding \fB[-dc16|-dc16-]\fR commands.
+.\"
+.TP
+\fI<expr>\fR \fBCRAWL16\fR
+.br
+This command is like \fBCRAWL16\fR but applies to 16 bits code sections
+and generates \fB-dc16\fR family directives.
+\fBCRAWL!\fR is recognized for start addresses.
+.SH "COMMAND"
+After the command \fBASSEMBLER\fR ,
+all assembler commands can be tried
+out interactively (see lina(1)).
+
+After the command \fBFORTH\fR
+you have a full Forth environment available (see lina(1))
+
+A \fBBYE\fR command ends an interactive session.
+
+.\"
+.SH "AVAILABILITY"
+\fBcias / cdis\fR is based on \fBciforth\fR.
+.br
+The underlying Forth system can be fetched from
+.IP
+\fI http://home.hccnet.nl/a.w.m.van.der.horst/ciforth.html\fR
+.PP
+The binary distribution of
+\fBcias / cdis\fR
+is for Intel-Linux,
+so not for the
+MS-DOS, "windows" , stand alone and Alpha Linux versions
+of \fBciforth\fR.
+.\"
+.SH "EXAMPLE"
+A typical consult file to disassemble
+a c-program could contain:
+.br
+ \ \ \ 100 148 -   -ORG-
+.br
+ \ \ \ 0 148 -db: header
+.br
+ \ \ \ 148 COMMENT: entry point
+.br
+ \ \ \ 148 2008 -db: text
+.br
+ \ \ \ "Data area" 2008 COMMENT
+.br
+ \ \ \ 2008 4804 -dc: data
+.br
+ \ \ \ DISASSEMBLE-ALL
+.br
+ \ \ \ BYE
+.br
+The actual command to disassemble is:
+.br
+ \ \ \ cidis freecell.exe freecell.cul > freecell.asm
+
+.br
+A reusable file to be included if disassembling
+MS-DOS \fB.exe\fR files could contain:
+.br
+\ \ \ \ ...
+.br
+\ \ \ \ 0
+.br
+\ \ \ \ DUP\ LABEL\ exSignature\ \ \ \ \ \ \ \ 2 +
+.br
+\ \ \ exSignature 2 "MZ" $=
+.br
+\ \ \ \ \ 0 = "Fatal, not an exe header!" ?ABORT
+.br
+\ \ \ DUP\ LABEL\ exExtrabytes\ \ \ \ \ \ \ 2 +
+.br
+\ \ \ DUP\ LABEL\ exPagesture\ \ \ \ \ \ \ \ 2 +
+.br
+\ \ \ \ ...
+.br
+The \fBDUP\fR leaves a duplicate of the labels value and \fB2 +\fR turns it
+into the next label,
+a technique similar
+to that used in assembler files:
+.br
+\ \ \ \ exSignature     EQU 0
+.br
+\ \ \ \ exExtrabytes    EQU exSignature + 2
+.\"
+.SH "SEE ALSO"
+
+cias(1) computer_intelligence_assembler_386
+.br
+cidis(1) computer_intelligence_disassembler_386
+.br
+lina(1) Linux Native version of ciforth.
+.\"
+.SH "CAVEAT"
+Mistakes in Forth mode can easily crash \fBcias / cidis\fR.
+
+\fBcias / cdis\fR is case sensitive.
+.SH "AUTHOR"
+Copyright \(co 2004
+Albert van der Horst \fI albert@spenarnc.xs4all.nl\fR.
+\fBcias / cidis\fR
+are made available under the GNU Public License:
+quality, but NO warranty.

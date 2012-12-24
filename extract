@@ -1,0 +1,5 @@
+echo "Extract script $1 from cfasdis.lyx..."
+rm -f cfasdis.nw
+lyx -e literate cfasdis.lyx
+notangle -R$1 cfasdis.nw > $1
+chmod a+x $1

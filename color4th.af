@@ -1,0 +1,3162 @@
+\ color4th.af
+
+   18 code{ 
+:# ns -258
+:# nblk 1440
+:# nc 8 { cr }
+ ( colorforth v3.4k1+ g144/1.10 chuck moore ) { cr }
+ [ d# 20 load d# 22 load d# 24 load ] ( colors ) [ d# 28 load ] { cr }
+ ( decompress ) [ mark d# 30 load restore empt ]
+: env [ d# 34 ] winver 2* + ; [ env ] ( ironmental ) [ load d# 46 load
+   d# 62 d# 4 loads d# 88 load ] { br }
+: dump d# 48 load ; ( background dump )
+: floppy d# 52 load ; ( format, archive, set video )
+: icons d# 54 load ; ( edit chars )
+: c-a-c d# 70 ; ( ascii )
+: audit d# 90 load ; ( disk audit utility )
+: png d# 168 load ; ( png file format )
+: html d# 176 load ; ( html file write ) { br }
+ ( blocks 0-143 are public domain software ) { cr }
+ [ mark empty ] ( arrayforth ) [ d# 144 load ] }block
+
+   19 shadow{  ( compile x86 colorforth )
+: ns ( number of sectors compressed if neg, ) { cr }
+ ( last compressed if pos. )
+: nblk ( number of uncompressed blocks. )
+: nc ( no. of compressed cylinders, deprecated ) { cr }
+ [ these vars must be first things in block! ] { br }
+: dump ( compile memory display background task )
+: icons ( compile icon editor )
+: png ( screen image to file )
+: ---
+: editor
+: sct [ yrg* ] ( all-caps cap lower-case yellow red green * toggles shadow
+   comment block )
+: fj [ ludr ] ( find jump left up down right )
+: .. [ -mc+ ] ( dec-block magenta cyan inc-block )
+: x.i ( delete exit insert )
+: . ( jump jumps between -edited- blocks )
+: f ( finds next word from ) [ find word ] }block
+
+   20 code{  [ macro ]
+: swap h# 168B 2, H# C28B0689 , ;
+: 0 < ?dup > h# C031 2, ;
+: if h# 74 2, here ;
+: -if h# 79 2, here ;
+: while ( n-nn ) < if > swap ;
+: -while ( n-nn ) < -if > swap ;
+: a < ?dup > h# C28B 2, ;
+: a! ?lit if h# BA 1, , ; then h# D08B 2, < drop > ;
+: 2* h# E0D1 2, ; [ forth ]
+: a, 2* 2* , ; [ macro ]
+: @ ?lit if < ?dup > h# 58B 2, a, ; then h# 85048B 3, 0 , ;
+: ! ?lit if ?lit if h# 5C7 2, swap a, , ; then h# 589 2, a, < drop > ;
+   then < a! > h# 950489 3, 0 , < drop > ;
+: nip h# 4768D 3, ;
+: + ?lit if h# 5 1, , ; then h# 603 2, < nip > ;
+: or h# 633
+: binary ?lit if swap d# 2 + 1, , ; then 2, < nip > ;
+: and h# 623 < binary > ;
+: u+ ?lit if h# 681 2, , ; then h# 44601 3, < drop > ;
+: ? ?lit h# A9 1, , ;
+: over < ?dup > h# 4468B 3, ; }block
+
+   21 shadow{  ( pentium macros' 1, 2, 3, , compile 1-4 bytes )
+: drop ( lodsd, flags unchanged, why sp is in esi - in kernel )
+: then ( fix address - in kernel )
+: swap ( sp xchg )
+: 0 ( 0 0 xor, macro 0 identical to number 0 )
+: if ( jz, flags set, max 127 bytes, leave address )
+: -if ( jns, same )
+: a ( 2 0 mov, never used? )
+: a! ( 0 2 mov, unoptimized )
+: 2* ( shift left )
+: a, ( compile word address )
+: @/! ( fetch/store from/to word address, or eax )
+: nip swap drop
+: +/or/and ( number or sp with eax )
+: u+ ( add to 2nd number, number or sp )
+: ? ( test bits, set flags, literal only! )
+: over ( sp 4 + @ ) }block
+
+   22 code{  ( macros )
+: push ?lit if h# 68 1, , ; then h# 50 1, < drop > ;
+: pop < ?dup > h# 58 1, ;
+: - h# D0F7 2, ;
+: *end swap
+: end h# EB
+: loop 1, here - + 1, ;
+: until h# 74 < loop > ;
+: -until h# 79 < loop > ;
+: for < push begin > ;
+: *next swap
+: next H# 75240CFF
+: 0next , here - + 1, h# 4C483 3, ;
+: -next H# 79240CFF < 0next > ;
+: i < ?dup > h# 24048B 3, ;
+: +! ?lit if ?lit if h# 581 2, swap a, , ; then h# 501 2, a, < drop >
+   ; then < a! > h# 950401 3, 0 , < drop > ;
+: nop h# 90 1, ;
+: align here - d# 3 and drop if < nop align > ; then ;
+: or! < a! > h# 950409 3, 0 , < drop > ;
+: * h# 6AF0F 3, < nip > ;
+: */ h# C88B 2, < drop > H# F9F72EF7 , < nip > ;
+: /mod < swap > h# 99 1, H# 16893EF7 , ;
+: / < /mod nip > ;
+: mod < /mod drop > ; }block
+
+   23 shadow{ 
+: push ( lit to sp; eax to sp )
+: pop ( sp to eax )
+: - ( ones-complement )
+: begin -a ( current code address - byte )
+: while a-aa ( if-escape from any structure usage example begin xxx while
+   xxx next xxx then )
+: for n ( push count onto return stack, ) begin
+: *next aa-aa ( swap ) for ( and ) if ( addresses )
+: next a ( decrement count, jnz to ) for, ( pop return stack when done )
+: -next a ( same, jns - loop includes 0 )
+: i -n ( copy loop index to data stack )
+: *end aa-aa ( swap ) end ( and ) if ( addresses )
+: end a ( jmp to ) begin
+: +! na ( add to memory, 2 literals optimized )
+: align ( next call to end on word boundary )
+: or! na ( inclusive-or to memory, unoptimized )
+: * mm-p ( 32-bit product )
+: */ mnd-q ( 64-bit product, then quotient )
+: /mod nd-rq ( remainder and quotient )
+: / nd-q ( quotient )
+: mod nd-r ( remainder ) }block
+
+   24 code{  ( compiled macros )
+: 2/ h# F8D1 2, ;
+: time < ?dup > h# 310F 2, ;
+: 7push h# 57 1, ;
+: 7pop h# 5F 1, ; [ forth ]
+: @ @ ; { -cr }
+: ! ! ; { -cr }
+: + + ; { -cr }
+: - - ;
+: */ */ ; { -cr }
+: * * ; { -cr }
+: / / ; { -cr }
+: 2/ 2/ ;
+: dup dup ; { -cr }
+: drop drop ; { -cr }
+: nip nip ;
+: or or ; ( arithmetic )
+: negate - d# 1 + ;
+: min less if drop ; then swap drop ;
+: abs dup negate
+: max less if swap then drop ;
+: v+ ( vv-v ) push u+ pop + ; ( vector )
+: loads ( bn ) for dup push load pop d# 2 + next drop ;
+: writes ( acn ) for write next drop drop ;
+: reads ( acn ) for read next drop drop ; }block
+
+   25 shadow{ 
+: 2/ ( arithmetic right shift )
+: time -n ( pentium cycle counter, calibrate to actual clock rate )
+: 7push/7pop ( save/restore save register 7, edi )
+: @-drop ( these macros redefined in ) forth ( so they may be executed )
+: negate n-n ( when you just cant use ) -
+: min nn-n ( minimum )
+: abs n-u ( absolute value )
+: max nn-n ( maximum )
+: v+ vv-v ( add 2-vectors )
+: loads ( load successive blocks )
+: nc -a ( number of cylinders booted and saved )
+: writes ( address, cylinder, cylinder count )
+: reads ( address, cylinder, count. ) [ floppy access note do not hit
+   any keys while floppy is being written - wait for light to go out ] }block
+
+   26 code{  }block
+
+   27 shadow{  }block
+
+   28 code{  ( colors etc )
+: -offset ( n-n ) [ offset ] @ negate + ;
+: block [ offset ] @ +
+: blks h# 100 * ;
+: wrtboot [ d# 0 block ] d# 0 d# 1 writes stop ;
+: save [ d# 84 ] load ;
+: white h# FFFFFF color ;
+: red h# FF0000 color ;
+: green h# FF00 color ;
+: blue h# FF color ;
+: silver h# BFBFBF color ;
+: black d# 0 color ;
+: 5* d# 5 for 2emit next ;
+: cf d# 25 dup at red h# 1 h# 3 h# C h# 3 h# A 5* green h# 14 h# 2 h# 1
+   h# 3 h# E 5* ;
+: fill ( nan ) for over over ! d# 1 + next drop drop ;
+: move ( sdn ) for over @ over ! d# 1 + d# 1 u+ next drop drop ;
+: erase ( bn ) push d# 0 swap block pop blks fill ;
+: copy ( n ) [ blk ] @ block over block d# 512 move [ blk ] ! ; }block
+
+   29 shadow{ 
+: block n-a ( block number to word address )
+: wrtboot ( write boot and kernel )
+: save ( write entire image to floppy )
+: colors ( specified as rgb' 888 bits )
+: at xy ( set current screen position - in kernel )
+: box xy ( lower-right of colored rectangle - in kernel )
+: 5* emit ( letters )
+: cf ( display double-size colorforth )
+: fill n an ( writes n into a cell string )
+: move sdn ( copies a cell string from s to d )
+: erase bn ( zeroes a string of blocks )
+: copy n ( copies current editor block and its shadow to the given block ) }block
+
+   30 code{  ( decompress ) [ empt d# 32 load ]
+: char ( -n ) 0 b! ( ?new ) d# 4 bits b d# 8 and drop if b d# 4 and drop
+   if d# 3 bits d# 7 ; then d# 1 bits d# 5 ; then d# 4 b h# F and drop
+   if ; then
+: eob ( n ) drop pop drop ;
+: chars ( n-n ) char ?full c! 2*c b or chars ;
+: word ( n ) d# 28 [ nb ] ! dup chars tbits ;
+: short ( n ) d# 28 bits
+: t, d# -4 [ nb ] ! b tbits ;
+: literal ( n ) 0 b! d# 1 bits t,
+: 32bits d# 16 bits d# 16 bits b , ;
+: variable ( n ) word 32bits ;
+: tag ( -n ) b h# F and dup jump eob word literal word word literal short
+   word short word word word variable short word short
+: words ( ?new ) d# 4 bits tag words ;
+: range ( ann ) over block [ h ] ! dup push erase [ aa ] ! 0 [ na ] !
+   begin words [ h ] @ d# 256 + d# -256 and [ h ] ! next ;
+: restore [ ns ] @ dup and -if abs [ ns ] ! d# 36 block d# 3000 block
+   [ d# 18 blks nc @ d# -2 + * ] move [ d# 3000 block ] d# 36 [ nblk @
+   d# -36 + ] range ; then drop ; }block
+
+   31 shadow{ 
+: char ( examine high bits; shift 4, 5 or 7 bits )
+: eob ( end of block )
+: chars ( shift characters until 0 )
+: word ( shift characters, then tag )
+: short ( 28-bit value+tag )
+: literal ( 1-bit base base, tag. value in next word )
+: 32bits ( for values )
+: variable ( word, value )
+: tag ( vector )
+: words ( examine tags )
+: range ( process each block )
+: move ( blocks 72 thru 1419 to 3000 )
+: res ( restore compressed blocks ) }block
+
+   32 code{  ( decompress ) [ macro ] ( uses ebx )
+: b < ?dup > h# C38B 2, ;
+: b! h# D88B 2, < drop > ;
+: c! h# C88B 2, < drop > ;
+: 2*d h# C3A50F 3, ;
+: 2*c h# E0D3 2, ; [ forth ]
+:# na 25
+:# nb 9
+:# h 67510272
+:# an 0
+:# aa 67982848
+:# nz 4
+: ?new [ na ] @ dup and drop if ; then
+: new [ aa ] @ @ [ an ] ! d# 1 [ aa ] +! d# 32 [ na ] ! ;
+: shift ( n-n ) dup negate dup [ nb ] +! [ na ] +! c! [ an ] @ 2*d 2*c
+   [ an ] ! ;
+: bits ( n ) ?new dup negate [ na ] @ + -if dup push + shift new pop negate
+   shift ; then drop shift ;
+: tbits ( nn ) [ nb ] @ d# 8 + c! 2*c or
+: , [ h ] @ ! d# 1 [ h ] +! ;
+: tz ( nn-n ) over [ nz ] ! dup negate push + b begin dup d# 1 and drop
+   if drop drop pop drop [ nz ] @ ; then 2/ next b! dup [ nz ] @ - + -
+   [ nb ] +! pop drop ;
+: ?full ( n-n ) [ nb ] @ dup and -if tz dup push d# -4 + [ nb ] +! tbits
+   0 dup pop dup - d# 29 + [ nb ] ! ; then drop ; }block
+
+   33 shadow{ 
+: b ( pop ebx, register 3, into eax )
+: c! ( push eax into register 1, ecx )
+: 2*d ( shift ebx left by ecx. bits from eax )
+: 2*c ( shift eax left by ecx )
+: na ( bits remaining in source word )
+: nb ( bits remaining in ebx )
+: h ( destination address )
+: , ( store at destination )
+: ?new ( fetch new word if necessary )
+: new ( 32-bits in current word )
+: shift ( eax into ebx, decrement ) nb
+: tbits ( fill ebx with tag )
+: ?full ( is there room in ebx? )
+: bits ( shift bits into ebx. overflow into next word ) }block
+
+   34 code{  ( native system dependencies ) [ macro ]
+: p@ < a! ?dup > h# EC 1, ; [ forth ]
+: key? h# 64 p@ d# 1 and drop if h# 60 p@ h# 80 and drop if ; then pop
+   drop then ;
+: clock [ d# 40 ] load ;
+: altfrm ( -b ) [ aper @ d# 1024 d# 768 * d# -4 * + ] ;
+: topram ( -b ) [ H# 30000000 ] ;
+: !work ( n ) block d# 0 over [ d# 1 ] + @ [ d# 35 ] + [ d# 36 ] / writes
+   stop ;
+: @rest ( nn ) push [ d# 36 ] + block [ d# 2 ] pop reads stop ;
+: @back ( n ) dup block d# 0 [ d# 2 ] reads dup [ d# 18 ] + block dup
+   @ [ d# 18 block @ ] or drop if drop [ d# 78 ] @rest ; then dup [ d# 1 ]
+   + @ dup and -if nip abs [ d# 35 ] + [ d# 36 ] / [ d# -2 ] + @rest ;
+   then drop drop [ d# 78 ] @rest ;
+: !back ( n ) block d# 0 [ nblk ] @ [ d# 18 ] / writes stop ;
+: @cyls ( acn ) reads stop ;
+: screen d# 0 dup at d# 1024 d# 768 box ;
+: utime ( -n ) d# 0 ; { br }
+: serial ( -n ) d# 96 ; }block
+
+   35 shadow{ 
+: key? ( exits calling defn if key struck )
+: clock ( loads time of day suppt )
+: altfrm ( byte addr of alternate frame buffer )
+: topram ( end ram avail for applications. )
+: @back and !back ( read/wrt full disk to/from adr ) [ @back reads only
+   active part of compressed ]
+: @cyls ( equiv to reads )
+: screen ( fills screen with current color )
+: utime ( null definition for now for compatability ) }block
+
+   36 code{  ( FDO ) }block
+
+   37 shadow{  ( WS ) }block
+
+   38 code{  }block
+
+   39 shadow{  }block
+
+   40 code{  [ D# -2147483648 ] }block
+
+   41 shadow{  }block
+
+   42 code{  }block
+
+   43 shadow{  }block
+
+   44 code{  }block
+
+   45 shadow{  }block
+
+   46 code{  }block
+
+   47 shadow{  }block
+
+   48 code{  }block
+
+   49 shadow{  }block
+
+   50 code{  }block
+
+   51 shadow{  }block
+
+   52 code{  }block
+
+   53 shadow{  }block
+
+   54 code{  }block
+
+   55 shadow{  }block
+
+   56 code{  }block
+
+   57 shadow{  }block
+
+   58 code{  }block
+
+   59 shadow{  }block
+
+   60 code{  }block
+
+   61 shadow{  }block
+
+   62 code{  }block
+
+   63 shadow{  }block
+
+   64 code{  }block
+
+   65 shadow{  }block
+
+   66 code{  }block
+
+   67 shadow{  }block
+
+   68 code{  }block
+
+   69 shadow{  }block
+
+   70 code{  }block
+
+   71 shadow{  }block
+
+   72 code{  }block
+
+   73 shadow{  }block
+
+   74 code{  }block
+
+   75 shadow{  }block
+
+   76 code{  }block
+
+   77 shadow{  }block
+
+   78 code{  }block
+
+   79 shadow{  }block
+
+   80 code{  }block
+
+   81 shadow{  }block
+
+   82 code{  }block
+
+   83 shadow{  }block
+
+   84 code{  }block
+
+   85 shadow{  }block
+
+   86 code{  }block
+
+   87 shadow{  }block
+
+   88 code{  }block
+
+   89 shadow{  }block
+
+   90 code{  }block
+
+   91 shadow{  }block
+
+   92 code{  }block
+
+   93 shadow{  }block
+
+   94 code{  }block
+
+   95 shadow{  }block
+
+   96 code{  }block
+
+   97 shadow{  }block
+
+   98 code{  }block
+
+   99 shadow{  }block
+
+  100 code{  }block
+
+  101 shadow{  }block
+
+  102 code{  }block
+
+  103 shadow{  }block
+
+  104 code{  }block
+
+  105 shadow{  }block
+
+  106 code{  }block
+
+  107 shadow{  }block
+
+  108 code{  }block
+
+  109 shadow{  }block
+
+  110 code{  }block
+
+  111 shadow{  }block
+
+  112 code{  }block
+
+  113 shadow{  }block
+
+  114 code{  }block
+
+  115 shadow{  }block
+
+  116 code{  }block
+
+  117 shadow{  }block
+
+  118 code{  }block
+
+  119 shadow{  }block
+
+  120 code{  }block
+
+  121 shadow{  }block
+
+  122 code{  }block
+
+  123 shadow{  }block
+
+  124 code{  }block
+
+  125 shadow{  }block
+
+  126 code{  }block
+
+  127 shadow{  }block
+
+  128 code{  }block
+
+  129 shadow{  }block
+
+  130 code{  }block
+
+  131 shadow{  }block
+
+  132 code{  }block
+
+  133 shadow{  }block
+
+  134 code{  }block
+
+  135 shadow{  }block
+
+  136 code{  }block
+
+  137 shadow{  }block
+
+  138 code{  }block
+
+  139 shadow{  }block
+
+  140 code{  }block
+
+  141 shadow{  }block
+
+  142 code{  }block
+
+  143 shadow{  }block
+
+  144 code{  }block
+
+  145 shadow{  }block
+
+  146 code{  }block
+
+  147 shadow{  }block
+
+  148 code{  }block
+
+  149 shadow{  }block
+
+  150 code{  }block
+
+  151 shadow{  }block
+
+  152 code{  }block
+
+  153 shadow{  }block
+
+  154 code{  }block
+
+  155 shadow{  }block
+
+  156 code{  }block
+
+  157 shadow{  }block
+
+  158 code{  }block
+
+  159 shadow{  }block
+
+  160 code{  }block
+
+  161 shadow{  }block
+
+  162 code{  }block
+
+  163 shadow{  }block
+
+  164 code{  }block
+
+  165 shadow{  }block
+
+  166 code{  }block
+
+  167 shadow{  }block
+
+  168 code{  }block
+
+  169 shadow{  }block
+
+  170 code{  }block
+
+  171 shadow{  }block
+
+  172 code{  }block
+
+  173 shadow{  }block
+
+  174 code{  }block
+
+  175 shadow{  }block
+
+  176 code{  }block
+
+  177 shadow{  }block
+
+  178 code{  }block
+
+  179 shadow{  }block
+
+  180 code{  }block
+
+  181 shadow{  }block
+
+  182 code{  }block
+
+  183 shadow{  }block
+
+  184 code{  }block
+
+  185 shadow{  }block
+
+  186 code{  }block
+
+  187 shadow{  }block
+
+  188 code{  }block
+
+  189 shadow{  }block
+
+  190 code{  }block
+
+  191 shadow{  }block
+
+  192 code{  }block
+
+  193 shadow{  }block
+
+  194 code{  }block
+
+  195 shadow{  }block
+
+  196 code{  }block
+
+  197 shadow{  }block
+
+  198 code{  }block
+
+  199 shadow{  }block
+
+  200 code{  }block
+
+  201 shadow{  }block
+
+  202 code{  }block
+
+  203 shadow{  }block
+
+  204 code{  }block
+
+  205 shadow{  }block
+
+  206 code{  }block
+
+  207 shadow{  }block
+
+  208 code{  }block
+
+  209 shadow{  }block
+
+  210 code{  }block
+
+  211 shadow{  }block
+
+  212 code{  }block
+
+  213 shadow{  }block
+
+  214 code{  }block
+
+  215 shadow{  }block
+
+  216 code{  }block
+
+  217 shadow{  }block
+
+  218 code{  }block
+
+  219 shadow{  }block
+
+  220 code{  }block
+
+  221 shadow{  }block
+
+  222 code{  }block
+
+  223 shadow{  }block
+
+  224 code{  }block
+
+  225 shadow{  }block
+
+  226 code{  }block
+
+  227 shadow{  }block
+
+  228 code{  }block
+
+  229 shadow{  }block
+
+  230 code{  }block
+
+  231 shadow{  }block
+
+  232 code{  }block
+
+  233 shadow{  }block
+
+  234 code{  }block
+
+  235 shadow{  }block
+
+  236 code{  }block
+
+  237 shadow{  }block
+
+  238 code{  }block
+
+  239 shadow{  }block
+
+  240 code{  }block
+
+  241 shadow{  }block
+
+  242 code{  }block
+
+  243 shadow{  }block
+
+  244 code{  }block
+
+  245 shadow{  }block
+
+  246 code{  }block
+
+  247 shadow{  }block
+
+  248 code{  }block
+
+  249 shadow{  }block
+
+  250 code{  }block
+
+  251 shadow{  }block
+
+  252 code{  }block
+
+  253 shadow{  }block
+
+  254 code{  }block
+
+  255 shadow{  }block
+
+  256 code{  }block
+
+  257 shadow{  }block
+
+  258 code{  }block
+
+  259 shadow{  }block
+
+  260 code{  }block
+
+  261 shadow{  }block
+
+  262 code{  }block
+
+  263 shadow{  }block
+
+  264 code{  }block
+
+  265 shadow{  }block
+
+  266 code{  }block
+
+  267 shadow{  }block
+
+  268 code{  }block
+
+  269 shadow{  }block
+
+  270 code{  }block
+
+  271 shadow{  }block
+
+  272 code{  }block
+
+  273 shadow{  }block
+
+  274 code{  }block
+
+  275 shadow{  }block
+
+  276 code{  }block
+
+  277 shadow{  }block
+
+  278 code{  }block
+
+  279 shadow{  }block
+
+  280 code{  }block
+
+  281 shadow{  }block
+
+  282 code{  }block
+
+  283 shadow{  }block
+
+  284 code{  }block
+
+  285 shadow{  }block
+
+  286 code{  }block
+
+  287 shadow{  }block
+
+  288 code{  }block
+
+  289 shadow{  }block
+
+  290 code{  }block
+
+  291 shadow{  }block
+
+  292 code{  }block
+
+  293 shadow{  }block
+
+  294 code{  }block
+
+  295 shadow{  }block
+
+  296 code{  }block
+
+  297 shadow{  }block
+
+  298 code{  }block
+
+  299 shadow{  }block
+
+  300 code{  }block
+
+  301 shadow{  }block
+
+  302 code{  }block
+
+  303 shadow{  }block
+
+  304 code{  }block
+
+  305 shadow{  }block
+
+  306 code{  }block
+
+  307 shadow{  }block
+
+  308 code{  }block
+
+  309 shadow{  }block
+
+  310 code{  }block
+
+  311 shadow{  }block
+
+  312 code{  }block
+
+  313 shadow{  }block
+
+  314 code{  }block
+
+  315 shadow{  }block
+
+  316 code{  }block
+
+  317 shadow{  }block
+
+  318 code{  }block
+
+  319 shadow{  }block
+
+  320 code{  }block
+
+  321 shadow{  }block
+
+  322 code{  }block
+
+  323 shadow{  }block
+
+  324 code{  }block
+
+  325 shadow{  }block
+
+  326 code{  }block
+
+  327 shadow{  }block
+
+  328 code{  }block
+
+  329 shadow{  }block
+
+  330 code{  }block
+
+  331 shadow{  }block
+
+  332 code{  }block
+
+  333 shadow{  }block
+
+  334 code{  }block
+
+  335 shadow{  }block
+
+  336 code{  }block
+
+  337 shadow{  }block
+
+  338 code{  }block
+
+  339 shadow{  }block
+
+  340 code{  }block
+
+  341 shadow{  }block
+
+  342 code{  }block
+
+  343 shadow{  }block
+
+  344 code{  }block
+
+  345 shadow{  }block
+
+  346 code{  }block
+
+  347 shadow{  }block
+
+  348 code{  }block
+
+  349 shadow{  }block
+
+  350 code{  }block
+
+  351 shadow{  }block
+
+  352 code{  }block
+
+  353 shadow{  }block
+
+  354 code{  }block
+
+  355 shadow{  }block
+
+  356 code{  }block
+
+  357 shadow{  }block
+
+  358 code{  }block
+
+  359 shadow{  }block
+
+  360 code{  }block
+
+  361 shadow{  }block
+
+  362 code{  }block
+
+  363 shadow{  }block
+
+  364 code{  }block
+
+  365 shadow{  }block
+
+  366 code{  }block
+
+  367 shadow{  }block
+
+  368 code{  }block
+
+  369 shadow{  }block
+
+  370 code{  }block
+
+  371 shadow{  }block
+
+  372 code{  }block
+
+  373 shadow{  }block
+
+  374 code{  }block
+
+  375 shadow{  }block
+
+  376 code{  }block
+
+  377 shadow{  }block
+
+  378 code{  }block
+
+  379 shadow{  }block
+
+  380 code{  }block
+
+  381 shadow{  }block
+
+  382 code{  }block
+
+  383 shadow{  }block
+
+  384 code{  }block
+
+  385 shadow{  }block
+
+  386 code{  }block
+
+  387 shadow{  }block
+
+  388 code{  }block
+
+  389 shadow{  }block
+
+  390 code{  }block
+
+  391 shadow{  }block
+
+  392 code{  }block
+
+  393 shadow{  }block
+
+  394 code{  }block
+
+  395 shadow{  }block
+
+  396 code{  }block
+
+  397 shadow{  }block
+
+  398 code{  }block
+
+  399 shadow{  }block
+
+  400 code{  }block
+
+  401 shadow{  }block
+
+  402 code{  }block
+
+  403 shadow{  }block
+
+  404 code{  }block
+
+  405 shadow{  }block
+
+  406 code{  }block
+
+  407 shadow{  }block
+
+  408 code{  }block
+
+  409 shadow{  }block
+
+  410 code{  }block
+
+  411 shadow{  }block
+
+  412 code{  }block
+
+  413 shadow{  }block
+
+  414 code{  }block
+
+  415 shadow{  }block
+
+  416 code{  }block
+
+  417 shadow{  }block
+
+  418 code{  }block
+
+  419 shadow{  }block
+
+  420 code{  }block
+
+  421 shadow{  }block
+
+  422 code{  }block
+
+  423 shadow{  }block
+
+  424 code{  }block
+
+  425 shadow{  }block
+
+  426 code{  }block
+
+  427 shadow{  }block
+
+  428 code{  }block
+
+  429 shadow{  }block
+
+  430 code{  }block
+
+  431 shadow{  }block
+
+  432 code{  }block
+
+  433 shadow{  }block
+
+  434 code{  }block
+
+  435 shadow{  }block
+
+  436 code{  }block
+
+  437 shadow{  }block
+
+  438 code{  }block
+
+  439 shadow{  }block
+
+  440 code{  }block
+
+  441 shadow{  }block
+
+  442 code{  }block
+
+  443 shadow{  }block
+
+  444 code{  }block
+
+  445 shadow{  }block
+
+  446 code{  }block
+
+  447 shadow{  }block
+
+  448 code{  }block
+
+  449 shadow{  }block
+
+  450 code{  }block
+
+  451 shadow{  }block
+
+  452 code{  }block
+
+  453 shadow{  }block
+
+  454 code{  }block
+
+  455 shadow{  }block
+
+  456 code{  }block
+
+  457 shadow{  }block
+
+  458 code{  }block
+
+  459 shadow{  }block
+
+  460 code{  }block
+
+  461 shadow{  }block
+
+  462 code{  }block
+
+  463 shadow{  }block
+
+  464 code{  }block
+
+  465 shadow{  }block
+
+  466 code{  }block
+
+  467 shadow{  }block
+
+  468 code{  }block
+
+  469 shadow{  }block
+
+  470 code{  }block
+
+  471 shadow{  }block
+
+  472 code{  }block
+
+  473 shadow{  }block
+
+  474 code{  }block
+
+  475 shadow{  }block
+
+  476 code{  }block
+
+  477 shadow{  }block
+
+  478 code{  }block
+
+  479 shadow{  }block
+
+  480 code{  }block
+
+  481 shadow{  }block
+
+  482 code{  }block
+
+  483 shadow{  }block
+
+  484 code{  }block
+
+  485 shadow{  }block
+
+  486 code{  }block
+
+  487 shadow{  }block
+
+  488 code{  }block
+
+  489 shadow{  }block
+
+  490 code{  }block
+
+  491 shadow{  }block
+
+  492 code{  }block
+
+  493 shadow{  }block
+
+  494 code{  }block
+
+  495 shadow{  }block
+
+  496 code{  }block
+
+  497 shadow{  }block
+
+  498 code{  }block
+
+  499 shadow{  }block
+
+  500 code{  }block
+
+  501 shadow{  }block
+
+  502 code{  }block
+
+  503 shadow{  }block
+
+  504 code{  }block
+
+  505 shadow{  }block
+
+  506 code{  }block
+
+  507 shadow{  }block
+
+  508 code{  }block
+
+  509 shadow{  }block
+
+  510 code{  }block
+
+  511 shadow{  }block
+
+  512 code{  }block
+
+  513 shadow{  }block
+
+  514 code{  }block
+
+  515 shadow{  }block
+
+  516 code{  }block
+
+  517 shadow{  }block
+
+  518 code{  }block
+
+  519 shadow{  }block
+
+  520 code{  }block
+
+  521 shadow{  }block
+
+  522 code{  }block
+
+  523 shadow{  }block
+
+  524 code{  }block
+
+  525 shadow{  }block
+
+  526 code{  }block
+
+  527 shadow{  }block
+
+  528 code{  }block
+
+  529 shadow{  }block
+
+  530 code{  }block
+
+  531 shadow{  }block
+
+  532 code{  }block
+
+  533 shadow{  }block
+
+  534 code{  }block
+
+  535 shadow{  }block
+
+  536 code{  }block
+
+  537 shadow{  }block
+
+  538 code{  }block
+
+  539 shadow{  }block
+
+  540 code{  }block
+
+  541 shadow{  }block
+
+  542 code{  }block
+
+  543 shadow{  }block
+
+  544 code{  }block
+
+  545 shadow{  }block
+
+  546 code{  }block
+
+  547 shadow{  }block
+
+  548 code{  }block
+
+  549 shadow{  }block
+
+  550 code{  }block
+
+  551 shadow{  }block
+
+  552 code{  }block
+
+  553 shadow{  }block
+
+  554 code{  }block
+
+  555 shadow{  }block
+
+  556 code{  }block
+
+  557 shadow{  }block
+
+  558 code{  }block
+
+  559 shadow{  }block
+
+  560 code{  }block
+
+  561 shadow{  }block
+
+  562 code{  }block
+
+  563 shadow{  }block
+
+  564 code{  }block
+
+  565 shadow{  }block
+
+  566 code{  }block
+
+  567 shadow{  }block
+
+  568 code{  }block
+
+  569 shadow{  }block
+
+  570 code{  }block
+
+  571 shadow{  }block
+
+  572 code{  }block
+
+  573 shadow{  }block
+
+  574 code{  }block
+
+  575 shadow{  }block
+
+  576 code{  }block
+
+  577 shadow{  }block
+
+  578 code{  }block
+
+  579 shadow{  }block
+
+  580 code{  }block
+
+  581 shadow{  }block
+
+  582 code{  }block
+
+  583 shadow{  }block
+
+  584 code{  }block
+
+  585 shadow{  }block
+
+  586 code{  }block
+
+  587 shadow{  }block
+
+  588 code{  }block
+
+  589 shadow{  }block
+
+  590 code{  }block
+
+  591 shadow{  }block
+
+  592 code{  }block
+
+  593 shadow{  }block
+
+  594 code{  }block
+
+  595 shadow{  }block
+
+  596 code{  }block
+
+  597 shadow{  }block
+
+  598 code{  }block
+
+  599 shadow{  }block
+
+  600 code{  }block
+
+  601 shadow{  }block
+
+  602 code{  }block
+
+  603 shadow{  }block
+
+  604 code{  }block
+
+  605 shadow{  }block
+
+  606 code{  }block
+
+  607 shadow{  }block
+
+  608 code{  }block
+
+  609 shadow{  }block
+
+  610 code{  }block
+
+  611 shadow{  }block
+
+  612 code{  }block
+
+  613 shadow{  }block
+
+  614 code{  }block
+
+  615 shadow{  }block
+
+  616 code{  }block
+
+  617 shadow{  }block
+
+  618 code{  }block
+
+  619 shadow{  }block
+
+  620 code{  }block
+
+  621 shadow{  }block
+
+  622 code{  }block
+
+  623 shadow{  }block
+
+  624 code{  }block
+
+  625 shadow{  }block
+
+  626 code{  }block
+
+  627 shadow{  }block
+
+  628 code{  }block
+
+  629 shadow{  }block
+
+  630 code{  }block
+
+  631 shadow{  }block
+
+  632 code{  }block
+
+  633 shadow{  }block
+
+  634 code{  }block
+
+  635 shadow{  }block
+
+  636 code{  }block
+
+  637 shadow{  }block
+
+  638 code{  }block
+
+  639 shadow{  }block
+
+  640 code{  }block
+
+  641 shadow{  }block
+
+  642 code{  }block
+
+  643 shadow{  }block
+
+  644 code{  }block
+
+  645 shadow{  }block
+
+  646 code{  }block
+
+  647 shadow{  }block
+
+  648 code{  }block
+
+  649 shadow{  }block
+
+  650 code{  }block
+
+  651 shadow{  }block
+
+  652 code{  }block
+
+  653 shadow{  }block
+
+  654 code{  }block
+
+  655 shadow{  }block
+
+  656 code{  }block
+
+  657 shadow{  }block
+
+  658 code{  }block
+
+  659 shadow{  }block
+
+  660 code{  }block
+
+  661 shadow{  }block
+
+  662 code{  }block
+
+  663 shadow{  }block
+
+  664 code{  }block
+
+  665 shadow{  }block
+
+  666 code{  }block
+
+  667 shadow{  }block
+
+  668 code{  }block
+
+  669 shadow{  }block
+
+  670 code{  }block
+
+  671 shadow{  }block
+
+  672 code{  }block
+
+  673 shadow{  }block
+
+  674 code{  }block
+
+  675 shadow{  }block
+
+  676 code{  }block
+
+  677 shadow{  }block
+
+  678 code{  }block
+
+  679 shadow{  }block
+
+  680 code{  }block
+
+  681 shadow{  }block
+
+  682 code{  }block
+
+  683 shadow{  }block
+
+  684 code{  }block
+
+  685 shadow{  }block
+
+  686 code{  }block
+
+  687 shadow{  }block
+
+  688 code{  }block
+
+  689 shadow{  }block
+
+  690 code{  }block
+
+  691 shadow{  }block
+
+  692 code{  }block
+
+  693 shadow{  }block
+
+  694 code{  }block
+
+  695 shadow{  }block
+
+  696 code{  }block
+
+  697 shadow{  }block
+
+  698 code{  }block
+
+  699 shadow{  }block
+
+  700 code{  }block
+
+  701 shadow{  }block
+
+  702 code{  }block
+
+  703 shadow{  }block
+
+  704 code{  }block
+
+  705 shadow{  }block
+
+  706 code{  }block
+
+  707 shadow{  }block
+
+  708 code{  }block
+
+  709 shadow{  }block
+
+  710 code{  }block
+
+  711 shadow{  }block
+
+  712 code{  }block
+
+  713 shadow{  }block
+
+  714 code{  }block
+
+  715 shadow{  }block
+
+  716 code{  }block
+
+  717 shadow{  }block
+
+  718 code{  }block
+
+  719 shadow{  }block
+
+  720 code{  }block
+
+  721 shadow{  }block
+
+  722 code{  }block
+
+  723 shadow{  }block
+
+  724 code{  }block
+
+  725 shadow{  }block
+
+  726 code{  }block
+
+  727 shadow{  }block
+
+  728 code{  }block
+
+  729 shadow{  }block
+
+  730 code{  }block
+
+  731 shadow{  }block
+
+  732 code{  }block
+
+  733 shadow{  }block
+
+  734 code{  }block
+
+  735 shadow{  }block
+
+  736 code{  }block
+
+  737 shadow{  }block
+
+  738 code{  }block
+
+  739 shadow{  }block
+
+  740 code{  }block
+
+  741 shadow{  }block
+
+  742 code{  }block
+
+  743 shadow{  }block
+
+  744 code{  }block
+
+  745 shadow{  }block
+
+  746 code{  }block
+
+  747 shadow{  }block
+
+  748 code{  }block
+
+  749 shadow{  }block
+
+  750 code{  }block
+
+  751 shadow{  }block
+
+  752 code{  }block
+
+  753 shadow{  }block
+
+  754 code{  }block
+
+  755 shadow{  }block
+
+  756 code{  }block
+
+  757 shadow{  }block
+
+  758 code{  }block
+
+  759 shadow{  }block
+
+  760 code{  }block
+
+  761 shadow{  }block
+
+  762 code{  }block
+
+  763 shadow{  }block
+
+  764 code{  }block
+
+  765 shadow{  }block
+
+  766 code{  }block
+
+  767 shadow{  }block
+
+  768 code{  }block
+
+  769 shadow{  }block
+
+  770 code{  }block
+
+  771 shadow{  }block
+
+  772 code{  }block
+
+  773 shadow{  }block
+
+  774 code{  }block
+
+  775 shadow{  }block
+
+  776 code{  }block
+
+  777 shadow{  }block
+
+  778 code{  }block
+
+  779 shadow{  }block
+
+  780 code{  }block
+
+  781 shadow{  }block
+
+  782 code{  }block
+
+  783 shadow{  }block
+
+  784 code{  }block
+
+  785 shadow{  }block
+
+  786 code{  }block
+
+  787 shadow{  }block
+
+  788 code{  }block
+
+  789 shadow{  }block
+
+  790 code{  }block
+
+  791 shadow{  }block
+
+  792 code{  }block
+
+  793 shadow{  }block
+
+  794 code{  }block
+
+  795 shadow{  }block
+
+  796 code{  }block
+
+  797 shadow{  }block
+
+  798 code{  }block
+
+  799 shadow{  }block
+
+  800 code{  }block
+
+  801 shadow{  }block
+
+  802 code{  }block
+
+  803 shadow{  }block
+
+  804 code{  }block
+
+  805 shadow{  }block
+
+  806 code{  }block
+
+  807 shadow{  }block
+
+  808 code{  }block
+
+  809 shadow{  }block
+
+  810 code{  }block
+
+  811 shadow{  }block
+
+  812 code{  }block
+
+  813 shadow{  }block
+
+  814 code{  }block
+
+  815 shadow{  }block
+
+  816 code{  }block
+
+  817 shadow{  }block
+
+  818 code{  }block
+
+  819 shadow{  }block
+
+  820 code{  }block
+
+  821 shadow{  }block
+
+  822 code{  }block
+
+  823 shadow{  }block
+
+  824 code{  }block
+
+  825 shadow{  }block
+
+  826 code{  }block
+
+  827 shadow{  }block
+
+  828 code{  }block
+
+  829 shadow{  }block
+
+  830 code{  }block
+
+  831 shadow{  }block
+
+  832 code{  }block
+
+  833 shadow{  }block
+
+  834 code{  }block
+
+  835 shadow{  }block
+
+  836 code{  }block
+
+  837 shadow{  }block
+
+  838 code{  }block
+
+  839 shadow{  }block
+
+  840 code{  }block
+
+  841 shadow{  }block
+
+  842 code{  }block
+
+  843 shadow{  }block
+
+  844 code{  }block
+
+  845 shadow{  }block
+
+  846 code{  }block
+
+  847 shadow{  }block
+
+  848 code{  }block
+
+  849 shadow{  }block
+
+  850 code{  }block
+
+  851 shadow{  }block
+
+  852 code{  }block
+
+  853 shadow{  }block
+
+  854 code{  }block
+
+  855 shadow{  }block
+
+  856 code{  }block
+
+  857 shadow{  }block
+
+  858 code{  }block
+
+  859 shadow{  }block
+
+  860 code{  }block
+
+  861 shadow{  }block
+
+  862 code{  }block
+
+  863 shadow{  }block
+
+  864 code{  }block
+
+  865 shadow{  }block
+
+  866 code{  }block
+
+  867 shadow{  }block
+
+  868 code{  }block
+
+  869 shadow{  }block
+
+  870 code{  }block
+
+  871 shadow{  }block
+
+  872 code{  }block
+
+  873 shadow{  }block
+
+  874 code{  }block
+
+  875 shadow{  }block
+
+  876 code{  }block
+
+  877 shadow{  }block
+
+  878 code{  }block
+
+  879 shadow{  }block
+
+  880 code{  }block
+
+  881 shadow{  }block
+
+  882 code{  }block
+
+  883 shadow{  }block
+
+  884 code{  }block
+
+  885 shadow{  }block
+
+  886 code{  }block
+
+  887 shadow{  }block
+
+  888 code{  }block
+
+  889 shadow{  }block
+
+  890 code{  }block
+
+  891 shadow{  }block
+
+  892 code{  }block
+
+  893 shadow{  }block
+
+  894 code{  }block
+
+  895 shadow{  }block
+
+  896 code{  }block
+
+  897 shadow{  }block
+
+  898 code{  }block
+
+  899 shadow{  }block
+
+  900 code{  }block
+
+  901 shadow{  }block
+
+  902 code{  }block
+
+  903 shadow{  }block
+
+  904 code{  }block
+
+  905 shadow{  }block
+
+  906 code{  }block
+
+  907 shadow{  }block
+
+  908 code{  }block
+
+  909 shadow{  }block
+
+  910 code{  }block
+
+  911 shadow{  }block
+
+  912 code{  }block
+
+  913 shadow{  }block
+
+  914 code{  }block
+
+  915 shadow{  }block
+
+  916 code{  }block
+
+  917 shadow{  }block
+
+  918 code{  }block
+
+  919 shadow{  }block
+
+  920 code{  }block
+
+  921 shadow{  }block
+
+  922 code{  }block
+
+  923 shadow{  }block
+
+  924 code{  }block
+
+  925 shadow{  }block
+
+  926 code{  }block
+
+  927 shadow{  }block
+
+  928 code{  }block
+
+  929 shadow{  }block
+
+  930 code{  }block
+
+  931 shadow{  }block
+
+  932 code{  }block
+
+  933 shadow{  }block
+
+  934 code{  }block
+
+  935 shadow{  }block
+
+  936 code{  }block
+
+  937 shadow{  }block
+
+  938 code{  }block
+
+  939 shadow{  }block
+
+  940 code{  }block
+
+  941 shadow{  }block
+
+  942 code{  }block
+
+  943 shadow{  }block
+
+  944 code{  }block
+
+  945 shadow{  }block
+
+  946 code{  }block
+
+  947 shadow{  }block
+
+  948 code{  }block
+
+  949 shadow{  }block
+
+  950 code{  }block
+
+  951 shadow{  }block
+
+  952 code{  }block
+
+  953 shadow{  }block
+
+  954 code{  }block
+
+  955 shadow{  }block
+
+  956 code{  }block
+
+  957 shadow{  }block
+
+  958 code{  }block
+
+  959 shadow{  }block
+
+  960 code{  }block
+
+  961 shadow{  }block
+
+  962 code{  }block
+
+  963 shadow{  }block
+
+  964 code{  }block
+
+  965 shadow{  }block
+
+  966 code{  }block
+
+  967 shadow{  }block
+
+  968 code{  }block
+
+  969 shadow{  }block
+
+  970 code{  }block
+
+  971 shadow{  }block
+
+  972 code{  }block
+
+  973 shadow{  }block
+
+  974 code{  }block
+
+  975 shadow{  }block
+
+  976 code{  }block
+
+  977 shadow{  }block
+
+  978 code{  }block
+
+  979 shadow{  }block
+
+  980 code{  }block
+
+  981 shadow{  }block
+
+  982 code{  }block
+
+  983 shadow{  }block
+
+  984 code{  }block
+
+  985 shadow{  }block
+
+  986 code{  }block
+
+  987 shadow{  }block
+
+  988 code{  }block
+
+  989 shadow{  }block
+
+  990 code{  }block
+
+  991 shadow{  }block
+
+  992 code{  }block
+
+  993 shadow{  }block
+
+  994 code{  }block
+
+  995 shadow{  }block
+
+  996 code{  }block
+
+  997 shadow{  }block
+
+  998 code{  }block
+
+  999 shadow{  }block
+
+ 1000 code{  }block
+
+ 1001 shadow{  }block
+
+ 1002 code{  }block
+
+ 1003 shadow{  }block
+
+ 1004 code{  }block
+
+ 1005 shadow{  }block
+
+ 1006 code{  }block
+
+ 1007 shadow{  }block
+
+ 1008 code{  }block
+
+ 1009 shadow{  }block
+
+ 1010 code{  }block
+
+ 1011 shadow{  }block
+
+ 1012 code{  }block
+
+ 1013 shadow{  }block
+
+ 1014 code{  }block
+
+ 1015 shadow{  }block
+
+ 1016 code{  }block
+
+ 1017 shadow{  }block
+
+ 1018 code{  }block
+
+ 1019 shadow{  }block
+
+ 1020 code{  }block
+
+ 1021 shadow{  }block
+
+ 1022 code{  }block
+
+ 1023 shadow{  }block
+
+ 1024 code{  }block
+
+ 1025 shadow{  }block
+
+ 1026 code{  }block
+
+ 1027 shadow{  }block
+
+ 1028 code{  }block
+
+ 1029 shadow{  }block
+
+ 1030 code{  }block
+
+ 1031 shadow{  }block
+
+ 1032 code{  }block
+
+ 1033 shadow{  }block
+
+ 1034 code{  }block
+
+ 1035 shadow{  }block
+
+ 1036 code{  }block
+
+ 1037 shadow{  }block
+
+ 1038 code{  }block
+
+ 1039 shadow{  }block
+
+ 1040 code{  }block
+
+ 1041 shadow{  }block
+
+ 1042 code{  }block
+
+ 1043 shadow{  }block
+
+ 1044 code{  }block
+
+ 1045 shadow{  }block
+
+ 1046 code{  }block
+
+ 1047 shadow{  }block
+
+ 1048 code{  }block
+
+ 1049 shadow{  }block
+
+ 1050 code{  }block
+
+ 1051 shadow{  }block
+
+ 1052 code{  }block
+
+ 1053 shadow{  }block
+
+ 1054 code{  }block
+
+ 1055 shadow{  }block
+
+ 1056 code{  }block
+
+ 1057 shadow{  }block
+
+ 1058 code{  }block
+
+ 1059 shadow{  }block
+
+ 1060 code{  }block
+
+ 1061 shadow{  }block
+
+ 1062 code{  }block
+
+ 1063 shadow{  }block
+
+ 1064 code{  }block
+
+ 1065 shadow{  }block
+
+ 1066 code{  }block
+
+ 1067 shadow{  }block
+
+ 1068 code{  }block
+
+ 1069 shadow{  }block
+
+ 1070 code{  }block
+
+ 1071 shadow{  }block
+
+ 1072 code{  }block
+
+ 1073 shadow{  }block
+
+ 1074 code{  }block
+
+ 1075 shadow{  }block
+
+ 1076 code{  }block
+
+ 1077 shadow{  }block
+
+ 1078 code{  }block
+
+ 1079 shadow{  }block
+
+ 1080 code{  }block
+
+ 1081 shadow{  }block
+
+ 1082 code{  }block
+
+ 1083 shadow{  }block
+
+ 1084 code{  }block
+
+ 1085 shadow{  }block
+
+ 1086 code{  }block
+
+ 1087 shadow{  }block
+
+ 1088 code{  }block
+
+ 1089 shadow{  }block
+
+ 1090 code{  }block
+
+ 1091 shadow{  }block
+
+ 1092 code{  }block
+
+ 1093 shadow{  }block
+
+ 1094 code{  }block
+
+ 1095 shadow{  }block
+
+ 1096 code{  }block
+
+ 1097 shadow{  }block
+
+ 1098 code{  }block
+
+ 1099 shadow{  }block
+
+ 1100 code{  }block
+
+ 1101 shadow{  }block
+
+ 1102 code{  }block
+
+ 1103 shadow{  }block
+
+ 1104 code{  }block
+
+ 1105 shadow{  }block
+
+ 1106 code{  }block
+
+ 1107 shadow{  }block
+
+ 1108 code{  }block
+
+ 1109 shadow{  }block
+
+ 1110 code{  }block
+
+ 1111 shadow{  }block
+
+ 1112 code{  }block
+
+ 1113 shadow{  }block
+
+ 1114 code{  }block
+
+ 1115 shadow{  }block
+
+ 1116 code{  }block
+
+ 1117 shadow{  }block
+
+ 1118 code{  }block
+
+ 1119 shadow{  }block
+
+ 1120 code{  }block
+
+ 1121 shadow{  }block
+
+ 1122 code{  }block
+
+ 1123 shadow{  }block
+
+ 1124 code{  }block
+
+ 1125 shadow{  }block
+
+ 1126 code{  }block
+
+ 1127 shadow{  }block
+
+ 1128 code{  }block
+
+ 1129 shadow{  }block
+
+ 1130 code{  }block
+
+ 1131 shadow{  }block
+
+ 1132 code{  }block
+
+ 1133 shadow{  }block
+
+ 1134 code{  }block
+
+ 1135 shadow{  }block
+
+ 1136 code{  }block
+
+ 1137 shadow{  }block
+
+ 1138 code{  }block
+
+ 1139 shadow{  }block
+
+ 1140 code{  }block
+
+ 1141 shadow{  }block
+
+ 1142 code{  }block
+
+ 1143 shadow{  }block
+
+ 1144 code{  }block
+
+ 1145 shadow{  }block
+
+ 1146 code{  }block
+
+ 1147 shadow{  }block
+
+ 1148 code{  }block
+
+ 1149 shadow{  }block
+
+ 1150 code{  }block
+
+ 1151 shadow{  }block
+
+ 1152 code{  }block
+
+ 1153 shadow{  }block
+
+ 1154 code{  }block
+
+ 1155 shadow{  }block
+
+ 1156 code{  }block
+
+ 1157 shadow{  }block
+
+ 1158 code{  }block
+
+ 1159 shadow{  }block
+
+ 1160 code{  }block
+
+ 1161 shadow{  }block
+
+ 1162 code{  }block
+
+ 1163 shadow{  }block
+
+ 1164 code{  }block
+
+ 1165 shadow{  }block
+
+ 1166 code{  }block
+
+ 1167 shadow{  }block
+
+ 1168 code{  }block
+
+ 1169 shadow{  }block
+
+ 1170 code{  }block
+
+ 1171 shadow{  }block
+
+ 1172 code{  }block
+
+ 1173 shadow{  }block
+
+ 1174 code{  }block
+
+ 1175 shadow{  }block
+
+ 1176 code{  }block
+
+ 1177 shadow{  }block
+
+ 1178 code{  }block
+
+ 1179 shadow{  }block
+
+ 1180 code{  }block
+
+ 1181 shadow{  }block
+
+ 1182 code{  }block
+
+ 1183 shadow{  }block
+
+ 1184 code{  }block
+
+ 1185 shadow{  }block
+
+ 1186 code{  }block
+
+ 1187 shadow{  }block
+
+ 1188 code{  }block
+
+ 1189 shadow{  }block
+
+ 1190 code{  }block
+
+ 1191 shadow{  }block
+
+ 1192 code{  }block
+
+ 1193 shadow{  }block
+
+ 1194 code{  }block
+
+ 1195 shadow{  }block
+
+ 1196 code{  }block
+
+ 1197 shadow{  }block
+
+ 1198 code{  }block
+
+ 1199 shadow{  }block
+
+ 1200 code{  }block
+
+ 1201 shadow{  }block
+
+ 1202 code{  }block
+
+ 1203 shadow{  }block
+
+ 1204 code{  }block
+
+ 1205 shadow{  }block
+
+ 1206 code{  }block
+
+ 1207 shadow{  }block
+
+ 1208 code{  }block
+
+ 1209 shadow{  }block
+
+ 1210 code{  }block
+
+ 1211 shadow{  }block
+
+ 1212 code{  }block
+
+ 1213 shadow{  }block
+
+ 1214 code{  }block
+
+ 1215 shadow{  }block
+
+ 1216 code{  }block
+
+ 1217 shadow{  }block
+
+ 1218 code{  }block
+
+ 1219 shadow{  }block
+
+ 1220 code{  }block
+
+ 1221 shadow{  }block
+
+ 1222 code{  }block
+
+ 1223 shadow{  }block
+
+ 1224 code{  }block
+
+ 1225 shadow{  }block
+
+ 1226 code{  }block
+
+ 1227 shadow{  }block
+
+ 1228 code{  }block
+
+ 1229 shadow{  }block
+
+ 1230 code{  }block
+
+ 1231 shadow{  }block
+
+ 1232 code{  }block
+
+ 1233 shadow{  }block
+
+ 1234 code{  }block
+
+ 1235 shadow{  }block
+
+ 1236 code{  }block
+
+ 1237 shadow{  }block
+
+ 1238 code{  }block
+
+ 1239 shadow{  }block
+
+ 1240 code{  }block
+
+ 1241 shadow{  }block
+
+ 1242 code{  }block
+
+ 1243 shadow{  }block
+
+ 1244 code{  }block
+
+ 1245 shadow{  }block
+
+ 1246 code{  }block
+
+ 1247 shadow{  }block
+
+ 1248 code{  }block
+
+ 1249 shadow{  }block
+
+ 1250 code{  }block
+
+ 1251 shadow{  }block
+
+ 1252 code{  }block
+
+ 1253 shadow{  }block
+
+ 1254 code{  }block
+
+ 1255 shadow{  }block
+
+ 1256 code{  }block
+
+ 1257 shadow{  }block
+
+ 1258 code{  }block
+
+ 1259 shadow{  }block
+
+ 1260 code{  }block
+
+ 1261 shadow{  }block
+
+ 1262 code{  }block
+
+ 1263 shadow{  }block
+
+ 1264 code{  }block
+
+ 1265 shadow{  }block
+
+ 1266 code{  }block
+
+ 1267 shadow{  }block
+
+ 1268 code{  }block
+
+ 1269 shadow{  }block
+
+ 1270 code{  }block
+
+ 1271 shadow{  }block
+
+ 1272 code{  }block
+
+ 1273 shadow{  }block
+
+ 1274 code{  }block
+
+ 1275 shadow{  }block
+
+ 1276 code{  }block
+
+ 1277 shadow{  }block
+
+ 1278 code{  }block
+
+ 1279 shadow{  }block
+
+ 1280 code{  }block
+
+ 1281 shadow{  }block
+
+ 1282 code{  }block
+
+ 1283 shadow{  }block
+
+ 1284 code{  }block
+
+ 1285 shadow{  }block
+
+ 1286 code{  }block
+
+ 1287 shadow{  }block
+
+ 1288 code{  }block
+
+ 1289 shadow{  }block
+
+ 1290 code{  }block
+
+ 1291 shadow{  }block
+
+ 1292 code{  }block
+
+ 1293 shadow{  }block
+
+ 1294 code{  }block
+
+ 1295 shadow{  }block
+
+ 1296 code{  }block
+
+ 1297 shadow{  }block
+
+ 1298 code{  }block
+
+ 1299 shadow{  }block
+
+ 1300 code{  }block
+
+ 1301 shadow{  }block
+
+ 1302 code{  }block
+
+ 1303 shadow{  }block
+
+ 1304 code{  }block
+
+ 1305 shadow{  }block
+
+ 1306 code{  }block
+
+ 1307 shadow{  }block
+
+ 1308 code{  }block
+
+ 1309 shadow{  }block
+
+ 1310 code{  }block
+
+ 1311 shadow{  }block
+
+ 1312 code{  }block
+
+ 1313 shadow{  }block
+
+ 1314 code{  }block
+
+ 1315 shadow{  }block
+
+ 1316 code{  }block
+
+ 1317 shadow{  }block
+
+ 1318 code{  }block
+
+ 1319 shadow{  }block
+
+ 1320 code{  }block
+
+ 1321 shadow{  }block
+
+ 1322 code{  }block
+
+ 1323 shadow{  }block
+
+ 1324 code{  }block
+
+ 1325 shadow{  }block
+
+ 1326 code{  }block
+
+ 1327 shadow{  }block
+
+ 1328 code{  }block
+
+ 1329 shadow{  }block
+
+ 1330 code{  }block
+
+ 1331 shadow{  }block
+
+ 1332 code{  }block
+
+ 1333 shadow{  }block
+
+ 1334 code{  }block
+
+ 1335 shadow{  }block
+
+ 1336 code{  }block
+
+ 1337 shadow{  }block
+
+ 1338 code{  }block
+
+ 1339 shadow{  }block
+
+ 1340 code{  }block
+
+ 1341 shadow{  }block
+
+ 1342 code{  }block
+
+ 1343 shadow{  }block
+
+ 1344 code{  }block
+
+ 1345 shadow{  }block
+
+ 1346 code{  }block
+
+ 1347 shadow{  }block
+
+ 1348 code{  }block
+
+ 1349 shadow{  }block
+
+ 1350 code{  }block
+
+ 1351 shadow{  }block
+
+ 1352 code{  }block
+
+ 1353 shadow{  }block
+
+ 1354 code{  }block
+
+ 1355 shadow{  }block
+
+ 1356 code{  }block
+
+ 1357 shadow{  }block
+
+ 1358 code{  }block
+
+ 1359 shadow{  }block
+
+ 1360 code{  }block
+
+ 1361 shadow{  }block
+
+ 1362 code{  }block
+
+ 1363 shadow{  }block
+
+ 1364 code{  }block
+
+ 1365 shadow{  }block
+
+ 1366 code{  }block
+
+ 1367 shadow{  }block
+
+ 1368 code{  }block
+
+ 1369 shadow{  }block
+
+ 1370 code{  }block
+
+ 1371 shadow{  }block
+
+ 1372 code{  }block
+
+ 1373 shadow{  }block
+
+ 1374 code{  }block
+
+ 1375 shadow{  }block
+
+ 1376 code{  }block
+
+ 1377 shadow{  }block
+
+ 1378 code{  }block
+
+ 1379 shadow{  }block
+
+ 1380 code{  }block
+
+ 1381 shadow{  }block
+
+ 1382 code{  }block
+
+ 1383 shadow{  }block
+
+ 1384 code{  }block
+
+ 1385 shadow{  }block
+
+ 1386 code{  }block
+
+ 1387 shadow{  }block
+
+ 1388 code{  }block
+
+ 1389 shadow{  }block
+
+ 1390 code{  }block
+
+ 1391 shadow{  }block
+
+ 1392 code{  }block
+
+ 1393 shadow{  }block
+
+ 1394 code{  }block
+
+ 1395 shadow{  }block
+
+ 1396 code{  }block
+
+ 1397 shadow{  }block
+
+ 1398 code{  }block
+
+ 1399 shadow{  }block
+
+ 1400 code{  }block
+
+ 1401 shadow{  }block
+
+ 1402 code{  }block
+
+ 1403 shadow{  }block
+
+ 1404 code{  }block
+
+ 1405 shadow{  }block
+
+ 1406 code{  }block
+
+ 1407 shadow{  }block
+
+ 1408 code{  }block
+
+ 1409 shadow{  }block
+
+ 1410 code{  }block
+
+ 1411 shadow{  }block
+
+ 1412 code{  }block
+
+ 1413 shadow{  }block
+
+ 1414 code{  }block
+
+ 1415 shadow{  }block
+
+ 1416 code{  }block
+
+ 1417 shadow{  }block
+
+ 1418 code{  }block
+
+ 1419 shadow{  }block
+
+ 1420 code{  }block
+
+ 1421 shadow{  }block
+
+ 1422 code{  }block
+
+ 1423 shadow{  }block
+
+ 1424 code{  }block
+
+ 1425 shadow{  }block
+
+ 1426 code{  }block
+
+ 1427 shadow{  }block
+
+ 1428 code{  }block
+
+ 1429 shadow{  }block
+
+ 1430 code{  }block
+
+ 1431 shadow{  }block
+
+ 1432 code{  }block
+
+ 1433 shadow{  }block
+
+ 1434 code{  }block
+
+ 1435 shadow{  }block
+
+ 1436 code{  }block
+
+ 1437 shadow{  }block
+
+ 1438 code{  }block
+
+ 1439 shadow{  }block
+
+ 1440 code{  }block
+
+ 1441 shadow{  }block
+
+ 1442 code{  }block
+
+ 1443 shadow{  }block
+
+ 1444 code{  }block
+
+ 1445 shadow{  }block
+
+ 1446 code{  }block
+
+ 1447 shadow{  }block
+
+ 1448 code{  }block
+
+ 1449 shadow{  }block
+
+ 1450 code{  }block
+
+ 1451 shadow{  }block
+
+ 1452 code{  }block
+
+ 1453 shadow{  }block
+
+ 1454 code{  }block
+
+ 1455 shadow{  }block
+
+ 1456 code{  }block
+
+ 1457 shadow{  }block

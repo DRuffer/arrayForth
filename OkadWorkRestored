@@ -1,0 +1,3 @@
+#!/bin/env bash
+
+gforth ../ciasdis/ciasdis.frt -e "cidis OkadWorkRestored.cf OkadWorkRestored.cul bye" > OkadWorkRestored.dsm

@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Softsim</title>
+<link rel="stylesheet" type="text/css" href="../gadoc.css">
+</head>
+<body>
+
+<h1 align=center>Softsim for arrayForth&#153</h1>
+
+<h2>What is it?</h2>
+
+Softsim is short for "Software Simulator". It is a program that
+simulates the actions of a Green Arrays computer at a pretty high level.
+It takes short cuts that allow it to run much faster than a full
+hardware simulation. The following is a quick tutorial in how to use
+softsim which assumes that you already know how to write programs for
+the Green Arrays computers.
+
+<h2>Getting Started</h2>
+
+After starting colorforth, type "so" at the command line. You should see
+a colorful display, an up to 4x8 array of rectangles that represent
+individual computers or nodes in the GA chip. In the lower right part of
+the display you'll see two numbers in the larger font which represent
+"time" (the current step number) and "gap" (the number of steps between
+display updates). Further to the right you'll see keyboard hints.
+
+<br><br>If you're running the GA4 version you should see four rectangular
+areas in the upper right that contain full stack dumps and navigable 16
+word memory dumps for each of the four nodes. The GA4 is small enough
+that you can afford to display everything.
+
+<br><br>If you're instead running the GA144 version the 4x8 node display on
+the left only leaves room enough for two focus nodes on the right. Since
+4x8 is a small window into the 8x18 array of a GA144 you have the
+option, by pressing the w key, to toggle between a display of two focus
+nodes or one focus node and a graphic representation of the 4x8 window
+inside a full 8x18 rectangle. Sleeping nodes are silver and waking nodes
+are green.
+
+<h2>Navigating</h2>
+
+Do you see the red and yellow three digit numbers on the right side
+of the display?  Those are the numbers of the nodes being focused on in
+those two rectangles (or 1 or 4). On the left side of the display do you
+see the three digit gray numbers near the top of each node's rectangle?
+Those are the numbers of the nodes represented by each such rectangle.
+If one of the normally gray numbers happens to be red, then that is the node
+with the focus. You will also see that red number in the lower of the
+two rectangles on the right. Assuming the other focus node is visible, you
+should see its node number in yellow. Yellow identifies this "other" node
+on the left side as well.  Now look at the keyboard hints in the lower
+right corner.  The "ludr" hints mean left, up, down, and right. The
+middle row's ludr keys change the current focus node, moving the red
+marker in the array on the left and changing the red number in the lower
+rectangle on the right. It's possible to move the red marker off the
+screen, but you will still know where it has gone by looking at the
+focus node on the lower right. Try it and see. By the way, in the GA4
+version there is nothing to navigate, so the ludr hints aren't there.
+
+<br><br>Now try pressing the "ludr" keys in the upper row of the hints.
+This will shift your 4x8 window into the 8x18 GA144 array. You'll see
+the gray node numbers change as you press these keys. The focus node(s)
+on the right will not change. If you've toggled to the window display,
+you can see the blue 4x8 window moving inside the 8x18 rectangle.
+
+<br><br>Suppose you want to watch two nodes interacting in more detail.
+That's why there is a second focus node in the upper right corner of the
+display. The ludr keys only affect the focus node in the lower right,
+but you can swap the two focus nodes by pressing the "o" key (for other)
+in the lower right hand row of the keyboard. Try it. You'll see the red
+node numbers changing places. Now you can choose two nodes to focus on.
+The "other" node's number is yellow rather than red. If you enable the
+window display in the upper right via the "w" key, you will also see the
+focus node marked with a red "x" and the other node with a yellow "x".
+
+<br><br>In addition to the full stack dump, each focus node has a
+sixteen word memory dump. You can navigate through the memory dumps by
+pressing the "u" and "d" keys in the bottom row. They move up or down
+through memory in chunks of 16 words. The focus nodes now each have their
+own separate memory pointers.
+
+<h2>Making it Go</h2>
+
+Let's call the two numbers in the larger font in the lower right "time"
+and "gap". "time" is the number of steps that have occurred in the
+simulation. "gap" is the number of steps that will occur between display
+updates. "gap" starts as 1, so the display is updated after each single
+step. There is another variable named "fast" which can be swapped with
+"gap" if you want the display to run faster but show fewer updates.
+This variable can be increased or decreased by 1 or 100 when you press
+the + or - keys in the left hand.  The "f" key toggles the value of
+"gap" between "fast" and 1. The simulation runs very much faster when
+it's not updating the display.
+
+<br><br>The "g" and "s" keys in the left hand control the progress of
+the simulation.  Press and release the "s" key. You should see time
+change from 0 to 1 and some changes will occur in the 4x8 array on the
+left as well. "s" is for step.
+
+<br><br>When you press the "g" key, the simulation will go on running
+and updating the display until you press another key. "g" is for go.
+Be careful because whatever key you press will also be interpreted.
+If you just want to stop running the simulation then press the "s" key.
+Then the simulation will stop after one more step and nothing else will
+happen after that until you press another key.
+
+<br><br>The "p" key is for power. I simulates a power on reset, starting
+the simulation over from the beginning and setting time back to 1.
+
+<br><br>The "t" "w" "s" and "n" keys change the size of the window on the
+left. "t" for tall, "s" for short, "w" for wide and "n" for narrow.
+Currently the reclaimed area is empty, but future additions may make
+use of the space.
+
+<br><br>When you're done with softsim press the "." key (it's the space
+key on your PC keyboard). That returns you to the main colorforth
+prompt.
+
+<h2>What Do the Numbers Mean?</h2>
+
+In the array of nodes on the left each rectangle contains a list of the
+values of registers and opcode names representing the current state of
+that node. Most of the numbers have identifying colors which turn to
+gray when the node is suspended. You'd probably like to know which
+registers the numbers represent. Each node has eleven lines.
+>From top to bottom, they are:
+<br><br>
+
+<h3>PINS</h3>States of the pins are represented by 0 or 1 for low or
+high, yellow for output and cyan for input. Blank when the node has no
+external pins. Analog and Serdes pins are red. Pins are on the top for
+top nodes, bottom for bottom nodes, and on the outside for side nodes.
+<br><br>
+
+<h3>NODE/P</h3>The gray node number followed by the white address bus.
+Com port addresses appear as three characters including r, d, l, u, or
+'all' if it's a four port address.
+<br><br>
+   
+<h3>SLOT/OPCODE</h3>The white slot number is followed by the green opcode name.
+<br><br>
+
+<h3>I</h3>White, the instruction register.
+<br><br>
+
+<h3>M/P</h3>The memory timer counts down in green. A '-' indicates that
+the node is suspended. The value of P, the program counter, follows in white.
+<br><br>
+
+<h3>A</h3>White, 18 bit pointer register A.
+<br><br>
+
+<h3>B</h3>White, 10 bit pointer register B.
+<br><br>
+
+<h3>IOC</h3>Cyan, the write-only part of the IO register.
+<br><br>
+
+<h3>R</h3>Red, top of return stack.
+<br><br>
+
+<h3>T</h3>Green, top of data stack.
+<br><br>
+
+<h3>S</h3>Green, second on data stack.
+<br><br>
+
+<h3>@/!</h3>When a com port is being read or written to it is represented
+on the appropriate side of the node with a <b>@</b> for reading and a <b>!</b>
+for writing.  The Right and Down ports are in red while the Up and Left ports
+are in Magenta.
+<br><br>
+
+<h2>The Memory Dump and Decompilation</h2>
+
+The one or two smaller windows on the right show a combination memory dump
+and decompilation/disassembly of the code for a focus node, along with
+a dump of both stacks. The A and B registers appear at the top next to the
+node number. The stacks are shown as a single array with the return stack
+growing up and the data stack growing down. The memory dump has the addresses
+of memory words in the left column. The instruction word or 18 bit data word
+follows in green. The instructions for each slot appear next, sometimes followed
+by the value of an address field. While the focus node is executing the line 
+where the current instruction word was read appears in read. The instruction
+in the current slot is also in red. The other instructions remain white. 
+The line that the P register points to is shown in yellow. If the instruction 
+word has been fetched from a com port the disassembly and instruction word
+are shown in red above the memory dump, below the B register.
+
+<h2>Getting your Code to Run</h2>
+
+Assuming you already know how to edit program code for the target
+compiler, how does the simulation jump to this code? By default the
+simulator will cause each node to execute its normal boot behavior,
+which for non-boot nodes means jumping to its neighbors to await
+instructions. To cause the node to jump to another entry point when
+the simulator starts you specify the entry point in block 942, the
+load block for softsim. For example, if you want your test program
+to start magically at address 5 of node 1 then on block 942
+you would say
+<div class=code>
+<code class=t1>5 1 enter</code>
+</div>
+
+</body>
+</html>
