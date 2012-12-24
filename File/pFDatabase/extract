@@ -1,0 +1,5 @@
+echo "Extract script pFDatabase.fth from pFDatabase.lyx..."
+rm -f pFDatabase.nw
+lyx -e literate pFDatabase.lyx
+notangle -RpFDatabase.fth pFDatabase.nw > pFDatabase.fth
+chmod a+x pFDatabase.fth
