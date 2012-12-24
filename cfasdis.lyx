@@ -225,10 +225,6 @@ gforth cfasdis.frt -e "cfas OkadWork bye"
 \end_layout
 
 \begin_layout Standard
-However, the assembly portion crashes, at the moment.
-\end_layout
-
-\begin_layout Standard
 The cfasdis source is an extension of Albert's ciasdis as can be seen here:
 \end_layout
 
@@ -267,8 +263,21 @@ Before I start diving much deeper, I should explain that I am red/green
  This means that I do not see, or react to color like most people do.
  7% of males have this condition, as well as other people who do not perceive
  color the same way as others do.
- I use a program called eyePilot (Version 1.0.12 from Tenebraex) so I can
- figure out what colors ColorForth is using.
+ I have used a program called eyePilot (Version 1.0.12 from Tenebraex) so
+ I can figure out what colors ColorForth is using, but it has been withdrawn
+ from the market.
+ So, most recently, I found WhatColor 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.hikarun.com/e/
+\end_layout
+
+\end_inset
+
+, which appears to be supported, at least.
  I don't always need it, but frequently, 
 \family typewriter
 \series bold
@@ -641,7 +650,7 @@ Disassembler support for OkadWork.cf the arrayForth for GA144-1.10.
 
 
 \backslash
- Copyright (c) 2010 Dennis Ruffer
+ Copyright (c) 2012 Dennis Ruffer
 \begin_inset Newline newline
 \end_inset
 
@@ -1911,7 +1920,7 @@ DECIMAL
 \begin_inset Newline newline
 \end_inset
 
-TRUE CONSTANT SHOW-UNKNOWN
+FALSE CONSTANT SHOW-UNKNOWN
 \begin_inset Newline newline
 \end_inset
 
@@ -3471,7 +3480,7 @@ Input words and numbers
 \begin_inset Newline newline
 \end_inset
 
-TRUE CONSTANT TESTING
+FALSE CONSTANT TESTING
 \begin_inset Newline newline
 \end_inset
 
@@ -3968,6 +3977,14 @@ Translate ASCII to colorForth
 \begin_inset Newline newline
 \end_inset
 
+FALSE CONSTANT SHOW-#TOKENS
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
 : ENDBLOCK ( -- )   
 \backslash
  finish up the block by filling it with null tokens
@@ -3978,11 +3995,11 @@ Translate ASCII to colorForth
 \begin_inset Newline newline
 \end_inset
 
-    .CFPTR S" tokens processed ok" TYPE  0 curcolor !
+    SHOW-#TOKENS IF  .CFPTR S" tokens processed ok" TYPE
 \begin_inset Newline newline
 \end_inset
 
-    R> 1+ 0 DO  0 ADDN  LOOP ;
+    THEN  0 curcolor !  R> 1+ 0 DO  0 ADDN  LOOP ;
 \begin_inset Newline newline
 \end_inset
 
@@ -8196,29 +8213,39 @@ CREATE NAME-BUF   256 ALLOT
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D HEX S" EXPECT: L00000042 " TYPE 42 INVENT-NAME TYPE 1 <?> CR
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D HEX S" EXPECT: 0 " TYPE 42 s" L00000043" INVENTED-NAME? .
- 2 <?> CR
+\begin_inset Newline newline
+\end_inset
+
+: TEST-INVENT-NAME
+\begin_inset Newline newline
+\end_inset
+
+    assert( 42 INVENT-NAME S" L00000042" COMPARE 0= )
+\begin_inset Newline newline
+\end_inset
+
+    assert( 42 S" L00000043" INVENTED-NAME? 0= )
+\begin_inset Newline newline
+\end_inset
+
+    assert( 42 S" L00000042" INVENTED-NAME? -1 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-INVENT-NAME
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D HEX S" EXPECT: -1 " TYPE 42 s" L00000042" INVENTED-NAME? .
- 3 <?> CR
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D DECIMAL
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -9011,7 +9038,7 @@ TALLY-BA
 \series default
 ' contains 3 it would mean that it is at the same time an 8 bit and 16 bit
  operation.
- Bad!                                                   )
+ Bad!                                                  )
 \end_layout
 
 \begin_layout Standard
@@ -16715,18 +16742,6 @@ Handle labels as far as disassembly is concerned.
 
 
 \backslash
- : 
-\backslash
-D ;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
  -------------------- INTRODUCTION --------------------------------
 \begin_inset Newline newline
 \end_inset
@@ -22290,18 +22305,6 @@ Crawling is the process of following jumps to determine code space.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
- : 
-\backslash
-D ;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
 <<INSERT-EQU>>
 \begin_inset Newline newline
 \end_inset
@@ -22318,51 +22321,55 @@ D ;
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D HEX
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D RANGE-LABELS       LABELS !BAG
+\begin_inset Newline newline
+\end_inset
+
+RANGE-LABELS LABELS !BAG
+\begin_inset Newline newline
+\end_inset
+
+4FE 510 -dc-
+\begin_inset Newline newline
+\end_inset
+
+520 530 -dc: oops
+\begin_inset Newline newline
+\end_inset
+
+530 570 -dc-
+\begin_inset Newline newline
+\end_inset
+
+560 590 -db: bytes
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 4FE 510 -dc-
+\begin_inset Newline newline
+\end_inset
+
+: TEST-RANGES
+\begin_inset Newline newline
+\end_inset
+
+    assert( LABELS |BAG| 8 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-RANGES
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 520 530 -dc: oops
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 530 570 -dc-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 560 590 -db: bytes
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 4 ranges :" TYPE CR .LABELS CR 25 <?>
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D DECIMAL
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -22375,28 +22382,6 @@ D DECIMAL
 \end_inset
 
 <<RANGE-NAME>>
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-[DEFINED] ForCiForth [IF]
-\begin_inset Newline newline
-\end_inset
-
-    
-\backslash
-D REQUIRE H.
-\begin_inset Newline newline
-\end_inset
-
-[THEN]
-\begin_inset Newline newline
-\end_inset
-
-
 \begin_inset Newline newline
 \end_inset
 
@@ -22532,7 +22517,7 @@ ALSO ASSEMBLER
 \begin_inset Newline newline
 \end_inset
 
-<<COLLAPSE(I1)>>
+<<COLLAPSE[I1]>>
 \begin_inset Newline newline
 \end_inset
 
@@ -22569,12 +22554,6 @@ ALSO ASSEMBLER
 \end_inset
 
 PREVIOUS
-\begin_inset Newline newline
-\end_inset
-
-: 
-\backslash
-D ; 
 \begin_inset Newline newline
 \end_inset
 
@@ -22641,40 +22620,55 @@ Add target ADDRESS to the equ labels if it is not there.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D EQU-LABELS LABELS !BAG
+EQU-LABELS LABELS !BAG
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D S" EXPECT: empty " TYPE EQU-LABELS .LABELS  CR
+\begin_inset Newline newline
+\end_inset
+
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 42 ?INSERT-EQU?
+\begin_inset Newline newline
+\end_inset
+
+: TEST-?INSERT-EQU?
+\begin_inset Newline newline
+\end_inset
+
+    assert( EQU-LABELS LABELS |BAG| 0= )
+\begin_inset Newline newline
+\end_inset
+
+    42 ?INSERT-EQU?
+\begin_inset Newline newline
+\end_inset
+
+    assert( EQU-LABELS LABELS |BAG| 2 = )
+\begin_inset Newline newline
+\end_inset
+
+    42 ?INSERT-EQU?
+\begin_inset Newline newline
+\end_inset
+
+    assert( EQU-LABELS LABELS |BAG| 2 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-?INSERT-EQU?
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D S" EXPECT: L00000042 added " TYPE EQU-LABELS .LABELS     CR
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 42 ?INSERT-EQU?
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: L00000042 NOT added again " TYPE EQU-LABELS .LABELS     CR 24
- <?>
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -22700,24 +22694,23 @@ For range INDEX : "it is of the same type as the previous one".
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: -1 :" TYPE 2 COMPATIBLE? .
- CR
+: TEST-COMPATIBLE?
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: -1 :" TYPE 3 COMPATIBLE? .
- CR
+    assert( 2 COMPATIBLE? -1 = )
 \begin_inset Newline newline
 \end_inset
 
+    assert( 3 COMPATIBLE? -1 = )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: 0 :" TYPE 4 COMPATIBLE? .
- CR
+    assert( 4 COMPATIBLE? 0= )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-COMPATIBLE?
 \begin_inset Newline newline
 \end_inset
 
@@ -22742,15 +22735,19 @@ Get the name of range INDEX.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: NONAME :" TYPE 1 RANGE-NAME TYPE CR
+: TEST-RANGE-NAME
 \begin_inset Newline newline
 \end_inset
 
+    assert( 1 RANGE-NAME S" NONAME" COMPARE 0= )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: oops :" TYPE 2 RANGE-NAME TYPE CR 26 <?>
+    assert( 2 RANGE-NAME S" oops" COMPARE 0= )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-RANGE-NAME
 \begin_inset Newline newline
 \end_inset
 
@@ -22780,9 +22777,31 @@ For a collapsible pair of range with INDEX1 and INDEX2 return INDEX1 and
 \begin_inset Newline newline
 \end_inset
 
+HEX
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D  S" EXPECT 520 : " TYPE 2 3 NEW-RANGE-START 8 H.R 2DROP CR
+
+\begin_inset Newline newline
+\end_inset
+
+: TEST-NEW-RANGE-START
+\begin_inset Newline newline
+\end_inset
+
+    assert( 2 3 NEW-RANGE-START NIP NIP 520 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-NEW-RANGE-START
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -22812,9 +22831,31 @@ For a collapsible pair of range with INDEX1 and INDEX2 return INDEX1 and
 \begin_inset Newline newline
 \end_inset
 
+HEX
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D  S" EXPECT 590 : " TYPE 3 4 NEW-RANGE-END  8 H.R 2DROP CR 27 <?>
+
+\begin_inset Newline newline
+\end_inset
+
+: TEST-NEW-RANGE-END
+\begin_inset Newline newline
+\end_inset
+
+    assert( 3 4 NEW-RANGE-END NIP NIP 590 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-NEW-RANGE-END
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -22840,9 +22881,15 @@ Replace the two ranges INDEX1 and INDEX2 with the last range.
 \begin_inset Newline newline
 \end_inset
 
+: TEST-REPLACE
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D  S" EXPECT 1 LESS : " TYPE 2 3 REPLACE CR .LABELS CR 28 <?>
+   assert( LABELS |BAG| 2 3 REPLACE LABELS |BAG| - 4 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-REPLACE
 \begin_inset Newline newline
 \end_inset
 
@@ -22947,39 +22994,7 @@ For range INDEX: "It has the same type and alignment as the previous one."
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D INIT-ALL RANGE-LABELS  HEX
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 12 34 -dc-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 34 65 -db: AAP
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 38 80 -dl-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 82 90 -dl-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 88 94 -dl-
+HEX
 \begin_inset Newline newline
 \end_inset
 
@@ -22987,26 +23002,61 @@ D 88 94 -dl-
 \begin_inset Newline newline
 \end_inset
 
+INIT-ALL RANGE-LABELS
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: -1 :" TYPE 2 SAME-ALIGN .
- CR
+12 34 -dc-
+\begin_inset Newline newline
+\end_inset
+
+34 65 -db: AAP
+\begin_inset Newline newline
+\end_inset
+
+38 80 -dl-
+\begin_inset Newline newline
+\end_inset
+
+82 90 -dl-
+\begin_inset Newline newline
+\end_inset
+
+88 94 -dl-
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D S" EXPECT: -1 :" TYPE 3 SAME-ALIGN .
- CR 
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+: TEST-SAME-ALIGN
+\begin_inset Newline newline
+\end_inset
+
+    assert( 2 SAME-ALIGN -1 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( 3 SAME-ALIGN -1 = ) 
 \backslash
  Must become 0
 \begin_inset Newline newline
 \end_inset
 
+    assert( 4 SAME-ALIGN -1 = )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: -1 :" TYPE 4 SAME-ALIGN .
- CR
+; TEST-SAME-ALIGN
 \begin_inset Newline newline
 \end_inset
 
@@ -23032,19 +23082,35 @@ For range INDEX return END of previous, START of this one,
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 34 34 :" TYPE 2 END+START SWAP .
- .
- CR
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D S" EXPECT: 65 38 :" TYPE 3 END+START SWAP .
- .
- CR
+\begin_inset Newline newline
+\end_inset
+
+: TEST-END+START
+\begin_inset Newline newline
+\end_inset
+
+    assert( 2 END+START 34 = SWAP 34 = AND )
+\begin_inset Newline newline
+\end_inset
+
+    assert( 3 END+START 38 = SWAP 65 = AND )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-END+START
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -23069,24 +23135,23 @@ Range INDEX overlaps with previous one.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 0 :" TYPE 2 OVERLAP? .
- CR
+: TEST-OVERLAP?
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: -1 :" TYPE 3 OVERLAP? .
- CR
+    assert( 2 OVERLAP? 0= )
 \begin_inset Newline newline
 \end_inset
 
+    assert( 3 OVERLAP? -1 = )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: 0 :" TYPE 4 OVERLAP? .
- CR
+    assert( 4 OVERLAP? 0= )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-OVERLAP?
 \begin_inset Newline newline
 \end_inset
 
@@ -23111,24 +23176,23 @@ Range INDEX overlaps or borders with the previous one.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: -1 :" TYPE 2 OVERLAP-OR-BORDER? .
- CR
+: TEST-OVERLAP-OR-BORDER?
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: -1 :" TYPE 3 OVERLAP-OR-BORDER? .
- CR
+    assert( 2 OVERLAP-OR-BORDER? -1 = )
 \begin_inset Newline newline
 \end_inset
 
+    assert( 3 OVERLAP-OR-BORDER? -1 = )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: 0 :" TYPE 4 OVERLAP-OR-BORDER? .
- CR
+    assert( 4 OVERLAP-OR-BORDER? 0= )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-OVERLAP-OR-BORDER?
 \begin_inset Newline newline
 \end_inset
 
@@ -23153,24 +23217,23 @@ Range INDEX has a gap with the previous one.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 0 :" TYPE 2 GAP? .
- CR
+: TEST-GAP?
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 0 :" TYPE 3 GAP? .
- CR
+    assert( 2 GAP? 0 = )
 \begin_inset Newline newline
 \end_inset
 
+    assert( 3 GAP? 0= )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: -1 :" TYPE 4 GAP? .
- CR
+    assert( 4 GAP? -1 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-GAP?
 \begin_inset Newline newline
 \end_inset
 
@@ -23195,17 +23258,19 @@ For range INDEX: "It has a name"
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: -1 :" TYPE 2 IS-NAMED .
- CR
+: TEST-IS-NAMED
 \begin_inset Newline newline
 \end_inset
 
+    assert( 2 IS-NAMED -1 = )
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: 0 :" TYPE 3 IS-NAMED .
- CR
+    assert( 3 IS-NAMED 0= )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-IS-NAMED
 \begin_inset Newline newline
 \end_inset
 
@@ -23234,19 +23299,43 @@ Collapse range I into the previous range, that determines the properties.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 5 82 94 4 :" TYPE
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D LAB-UPB .
- 5 COLLAPSE 4 MAKE-CURRENT RANGE-START .
- RANGE-END .
-  LAB-UPB .
- CR
+\begin_inset Newline newline
+\end_inset
+
+: TEST-COLLAPSE
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 5 COLLAPSE 4 MAKE-CURRENT
+\begin_inset Newline newline
+\end_inset
+
+    assert( RANGE-START 82 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( RANGE-END 94 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 4 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-COLLAPSE
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -23275,23 +23364,43 @@ Trim the range previous to INDEX, such that it borders to range index.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 90 1000 -dl-
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D S" EXPECT: 82 90 :" TYPE 5 TRIM-RANGE 4 MAKE-CURRENT
+\begin_inset Newline newline
+\end_inset
+
+90 1000 -dl-
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D RANGE-START .
- RANGE-END .
-  CR
+\begin_inset Newline newline
+\end_inset
+
+: TEST-TRIM-RANGE
+\begin_inset Newline newline
+\end_inset
+
+    5 TRIM-RANGE 4 MAKE-CURRENT
+\begin_inset Newline newline
+\end_inset
+
+    assert( RANGE-START 82 = ) assert( RANGE-END 90 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-TRIM-RANGE
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -23324,87 +23433,79 @@ Combine range INDEX with the previous one.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D INIT-ALL
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 10  30 -dl-
+\begin_inset Newline newline
+\end_inset
+
+INIT-ALL
+\begin_inset Newline newline
+\end_inset
+
+10  30 -dl-
+\begin_inset Newline newline
+\end_inset
+
+20  40 -dl-
+\begin_inset Newline newline
+\end_inset
+
+30  50 -dl: aap0
+\begin_inset Newline newline
+\end_inset
+
+60  80 -dl-
+\begin_inset Newline newline
+\end_inset
+
+90 100 -dl: noot
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 20  40 -dl-
+\begin_inset Newline newline
+\end_inset
+
+: TEST-COMBINE
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 5 COMBINE assert( LAB-UPB 5 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 4 COMBINE assert( LAB-UPB 5 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 3 COMBINE assert( LAB-UPB 5 = )
+\begin_inset Newline newline
+\end_inset
+
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 30 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 2 COMBINE assert( LAB-UPB 4 = )
+\begin_inset Newline newline
+\end_inset
+
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-COMBINE
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 30 50  -dl: aap
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 60 80  -dl-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 90 100 -dl: noot
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 5 :" TYPE LAB-UPB .
- 5 COMBINE LAB-UPB .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 5 :" TYPE LAB-UPB .
- 4 COMBINE LAB-UPB .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 5 20 30 :" TYPE LAB-UPB .
- 3 COMBINE LAB-UPB .
- 2 MAKE-CURRENT
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D RANGE-START .
- RANGE-END .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 4 10 30 :" TYPE LAB-UPB .
- 2 COMBINE LAB-UPB .
- 1 MAKE-CURRENT
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D RANGE-START .
- RANGE-END .
- CR
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -23433,121 +23534,103 @@ Combine range INDEX with a previous overlapping or bordering range.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D INIT-ALL
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 10  30 -dl-
+\begin_inset Newline newline
+\end_inset
+
+INIT-ALL
+\begin_inset Newline newline
+\end_inset
+
+10  30 -dl-
+\begin_inset Newline newline
+\end_inset
+
+20  40 -dl-
+\begin_inset Newline newline
+\end_inset
+
+30  50 -dl: aap1
+\begin_inset Newline newline
+\end_inset
+
+60  80 -dl-
+\begin_inset Newline newline
+\end_inset
+
+90 100 -dl: noot1
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 20  40 -dl-
+\begin_inset Newline newline
+\end_inset
+
+: TEST-KILL-OVERLAP-1
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 5 KILL-OVERLAP assert( LAB-UPB 5 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 4 KILL-OVERLAP assert( LAB-UPB 5 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 3 KILL-OVERLAP assert( LAB-UPB 5 = )
+\begin_inset Newline newline
+\end_inset
+
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 30 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 5 = ) 2 KILL-OVERLAP assert( LAB-UPB 4 = )
+\begin_inset Newline newline
+\end_inset
+
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-KILL-OVERLAP-1
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 30 50  -dl: aap
+\begin_inset Newline newline
+\end_inset
+
+INIT-ALL
+\begin_inset Newline newline
+\end_inset
+
+10  30 -dl-
+\begin_inset Newline newline
+\end_inset
+
+20  28 -db-
+\begin_inset Newline newline
+\end_inset
+
+30  70 -dl: aap2
+\begin_inset Newline newline
+\end_inset
+
+60  80 -dl-
+\begin_inset Newline newline
+\end_inset
+
+7F 10F -dl-
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 60 80  -dl-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 90 100 -dl: noot
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 5 :" TYPE LAB-UPB .
- 5 KILL-OVERLAP LAB-UPB .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 5 :" TYPE LAB-UPB .
- 4 KILL-OVERLAP LAB-UPB .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 5 20 30 :" TYPE LAB-UPB .
- 3 KILL-OVERLAP LAB-UPB .
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 2 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 5 4 10 30 :" TYPE LAB-UPB .
- 2 KILL-OVERLAP LAB-UPB .
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 1 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D INIT-ALL
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 10  30 -dl-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 20  28 -db-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 30 70  -dl: aap
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 60 80  -dl-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 7F 10F -dl-
 \begin_inset Newline newline
 \end_inset
 
@@ -23557,63 +23640,51 @@ D 7F 10F -dl-
 \begin_inset Newline newline
 \end_inset
 
+: TEST-KILL-OVERLAP-2
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D S" EXPECT: 5 4 60 10F :" TYPE LAB-UPB .
- 5 KILL-OVERLAP LAB-UPB .
+    assert( LAB-UPB 5 = ) 5 KILL-OVERLAP assert( LAB-UPB 4 = )
+\begin_inset Newline newline
+\end_inset
+
+    4 MAKE-CURRENT assert( RANGE-START 60 = ) assert( RANGE-END 10F = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 4 = ) 4 KILL-OVERLAP assert( LAB-UPB 3 = )
+\begin_inset Newline newline
+\end_inset
+
+    3 MAKE-CURRENT assert( RANGE-START 30 = ) assert( RANGE-END 10F = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 3 = ) 3 KILL-OVERLAP assert( LAB-UPB 3 = )
+\begin_inset Newline newline
+\end_inset
+
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 28 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 3 = ) 2 KILL-OVERLAP assert( LAB-UPB 3 = )
+\begin_inset Newline newline
+\end_inset
+
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-KILL-OVERLAP-2
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 4 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 4 3 30 10F :" TYPE LAB-UPB .
- 4 KILL-OVERLAP LAB-UPB .
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 3 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 3 3 20 28 :" TYPE LAB-UPB .
- 3 KILL-OVERLAP LAB-UPB .
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 2 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT: 3 3 10 30 :" TYPE LAB-UPB .
- 2 KILL-OVERLAP LAB-UPB .
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D 1 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -23647,33 +23718,43 @@ Introduce char range to fill the gap at INDEX.
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D S" EXPECT: 3 4 28 30 :" TYPE LAB-UPB .
- 3 FILL-GAP LAB-UPB .
+HEX
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 4 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
+\begin_inset Newline newline
+\end_inset
+
+: TEST-FILL-GAP
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 3 = ) 3 FILL-GAP assert( LAB-UPB 4 = )
+\begin_inset Newline newline
+\end_inset
+
+    4 MAKE-CURRENT assert( RANGE-START 28 = ) assert( RANGE-END 30 = )
+\begin_inset Newline newline
+\end_inset
+
+    assert( LAB-UPB 4 = ) 2 FILL-GAP assert( LAB-UPB 4 = )
+\begin_inset Newline newline
+\end_inset
+
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 28 = )
+\begin_inset Newline newline
+\end_inset
+
+; TEST-FILL-GAP
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D S" EXPECT: 4 4 20 28 :" TYPE LAB-UPB .
- 2 FILL-GAP LAB-UPB .
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 2 MAKE-CURRENT RANGE-START .
- RANGE-END .
- CR
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
@@ -24094,11 +24175,11 @@ Collapse the label at INDEX with the next and or previous labels.
 
 \begin_layout Scrap
 
-<<COLLAPSE(I1)>>=
+<<COLLAPSE[I1]>>=
 \begin_inset Newline newline
 \end_inset
 
-: COLLAPSE(I1) RANGE-LABELS
+: COLLAPSE[I1] RANGE-LABELS
 \begin_inset Newline newline
 \end_inset
 
@@ -24118,41 +24199,47 @@ Collapse the label at INDEX with the next and or previous labels.
 \begin_inset Newline newline
 \end_inset
 
+HEX
+\begin_inset Newline newline
+\end_inset
 
-\backslash
-D LABELS !BAG
+LABELS !BAG
+\begin_inset Newline newline
+\end_inset
+
+4FE 520 -dc-
+\begin_inset Newline newline
+\end_inset
+
+520 530 -dc: oops1
+\begin_inset Newline newline
+\end_inset
+
+52A 570 -dc-
+\begin_inset Newline newline
+\end_inset
+
+560 590 -db: bytes1
+\begin_inset Newline newline
+\end_inset
+
+DECIMAL
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-D 4FE 520 -dc-
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 520 530 -dc: oops
+: TEST-COLLAPSE[I1]
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 52A 570 -dc-
+    assert( LABELS |BAG| 2 COLLAPSE[I1] LABELS |BAG| - 2 = )
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-D 560 590 -db: bytes 
-\backslash
-D .LABELS
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-D S" EXPECT 1 LESS : " TYPE 2 COLLAPSE(I1) CR .LABELS CR 29 <?>
+; TEST-COLLAPSE[I1]
 \begin_inset Newline newline
 \end_inset
 
@@ -24174,7 +24261,7 @@ Add the information that ADDRESS1 to ADDRESS2 is a code range.
 \begin_inset Newline newline
 \end_inset
 
-    REQUIRED-XT ANON-RANGE   R@ ROLL-LABEL   R> COLLAPSE(I1) ;
+    REQUIRED-XT ANON-RANGE   R@ ROLL-LABEL   R> COLLAPSE[I1] ;
 \begin_inset Newline newline
 \end_inset
 
@@ -24430,7 +24517,7 @@ lyx -e pdf cfasdis.lyx
 \begin_inset Newline newline
 \end_inset
 
-echo "Extract script $1 from cfasdis.lyx..."
+echo "Extract script cfasdis.frt from cfasdis.lyx..."
 \begin_inset Newline newline
 \end_inset
 
@@ -24442,11 +24529,11 @@ lyx -e literate cfasdis.lyx
 \begin_inset Newline newline
 \end_inset
 
-notangle -R$1 cfasdis.nw > $1
+notangle -Rcfasdis.frt cfasdis.nw > cfasdis
 \begin_inset Newline newline
 \end_inset
 
-chmod a+x $1
+chmod a+x cfasdis
 \begin_inset Newline newline
 \end_inset
 

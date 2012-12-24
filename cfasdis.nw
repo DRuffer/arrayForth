@@ -1,6 +1,6 @@
-%% LyX 2.0.2 created this file.  For more info, see http://www.lyx.org/.
+%% LyX 2.0.5 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
-\documentclass[10pt,english]{article}
+\documentclass[10pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{listings}
@@ -11,7 +11,6 @@
 \setlength{\parskip}{\smallskipamount}
 \setlength{\parindent}{0pt}
 \usepackage[dvips]{color}
-\usepackage{babel}
 \usepackage{longtable}
 \usepackage{url}
 \usepackage[unicode=true,pdfusetitle,
@@ -79,8 +78,6 @@ gforth cfasdis.frt -e "cfdis OkadWork bye" > OkadWork.dsm
 gforth cfasdis.frt -e "cfas OkadWork bye" 
 @
 
-However, the assembly portion crashes, at the moment.
-
 The cfasdis source is an extension of Albert's ciasdis as can be seen
 here:
 
@@ -97,10 +94,12 @@ here:
 Before I start diving much deeper, I should explain that I am red/green
 color blind. This means that I do not see, or react to color like
 most people do. 7\% of males have this condition, as well as other
-people who do not perceive color the same way as others do. I use
-a program called eyePilot (Version 1.0.12 from Tenebraex) so I can
-figure out what colors ColorForth is using. I don't always need it,
-but frequently, \texttt{\textbf{\textcolor{yellow}{yellow}}} and \texttt{\textbf{\textcolor{green}{green}}}
+people who do not perceive color the same way as others do. I have
+used a program called eyePilot (Version 1.0.12 from Tenebraex) so
+I can figure out what colors ColorForth is using, but it has been
+withdrawn from the market. So, most recently, I found WhatColor \url{http://www.hikarun.com/e/},
+which appears to be supported, at least. I don't always need it, but
+frequently, \texttt{\textbf{\textcolor{yellow}{yellow}}} and \texttt{\textbf{\textcolor{green}{green}}}
 look far to much alike and on the block I will be using in a few moments,
 I see that the green component can have an RGB value of 192 or 255.
 I see that the User's manual explains that these are HEX numbers,
@@ -180,7 +179,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Disassembler support for OkadWork.cf the arrayForth for GA144-1.10.
 
 <<cfdis.f>>=
-\ Copyright (c) 2010 Dennis Ruffer
+\ Copyright (c) 2012 Dennis Ruffer
 
 <<Restore.f>>
 
@@ -483,7 +482,7 @@ DECIMAL
     IF  DUP C@ 32 - SWAP C!  ELSE  DROP  THEN ;
 : CAPS ( addr len -- )   0 ?DO  DUP 1CAP 1+  LOOP  DROP ;
 
-TRUE CONSTANT SHOW-UNKNOWN
+FALSE CONSTANT SHOW-UNKNOWN
 
 : .WORD ( n -- )   0 capext !  PAD+BL  PADCOUNT 2DROP ;
 : .BLUE ( n -- )   0 capext !  PAD+BL  PADCOUNT
@@ -869,7 +868,7 @@ VARIABLE 1STCAP  TRUE 1STCAP !    \ 1st letter that can be capitalized
 \subsubsection{Input words and numbers}
 
 <<get-words+numbers>>=
-TRUE CONSTANT TESTING
+FALSE CONSTANT TESTING
 
 : ADDN ( n -- )   TESTING IF  DUP CP @ @-LE -    \ add a fully formed token
         IF  .CFPTR  DUP 8 H.R S" <>" TYPE CP @ @-LE 8 H.R SPACE .AFPTR
@@ -996,10 +995,12 @@ The capitalization support is no longer used.
 \subsubsection{Translate ASCII to colorForth}
 
 <<a2cf>>=
+FALSE CONSTANT SHOW-#TOKENS
+
 : ENDBLOCK ( -- )   \ finish up the block by filling it with null tokens
     CFEND @ CP @ - 4 /MOD DUP >R 0< OR ABORT" bad pointers"
-    .CFPTR S" tokens processed ok" TYPE  0 curcolor !
-    R> 1+ 0 DO  0 ADDN  LOOP ;
+    SHOW-#TOKENS IF  .CFPTR S" tokens processed ok" TYPE
+    THEN  0 curcolor !  R> 1+ 0 DO  0 ADDN  LOOP ;
 
 GET-CURRENT ( * )   WORDLIST DUP CONSTANT AF-VOC   SET-CURRENT
 
@@ -2180,10 +2181,15 @@ CREATE NAME-BUF   256 ALLOT
 <<INVENT-NAME>>
 <<INVENTED-NAME?>>
 
-\D HEX S" EXPECT: L00000042 " TYPE 42 INVENT-NAME TYPE 1 <?> CR
-\D HEX S" EXPECT: 0 " TYPE 42 s" L00000043" INVENTED-NAME? . 2 <?> CR
-\D HEX S" EXPECT: -1 " TYPE 42 s" L00000042" INVENTED-NAME? . 3 <?> CR
-\D DECIMAL
+HEX
+
+: TEST-INVENT-NAME
+    assert( 42 INVENT-NAME S" L00000042" COMPARE 0= )
+    assert( 42 S" L00000043" INVENTED-NAME? 0= )
+    assert( 42 S" L00000042" INVENTED-NAME? -1 = )
+; TEST-INVENT-NAME
+
+DECIMAL
 @
 
 
@@ -2337,7 +2343,7 @@ TALLY-BI & TALLY-BY & TALLY-BA & HERE & 8A43 4 DUMP & \tabularnewline
 
 The bit in '\texttt{\textbf{TALLY-BA}}' means a 16 bit operation.
 Now if '\texttt{\textbf{TALLY-BA}}' contains 3 it would mean that
-it is at the same time an 8 bit and 16 bit operation. Bad!                                                   )
+it is at the same time an 8 bit and 16 bit operation. Bad!                                                  )
 
 The following problems can be detected:
 \begin{itemize}
@@ -4590,8 +4596,6 @@ one for the assembler.
 
 1000 CONSTANT MAX-LABEL
 
-\ : \D ;
-
 \ -------------------- INTRODUCTION --------------------------------
 
 <<generic-labels>>
@@ -6180,28 +6184,26 @@ Crawling is the process of following jumps to determine code space.
     REQUIRE BAG
 [THEN]
 
-\ : \D ;
-
 <<INSERT-EQU>>
 <<INSERT-EQU-INVENT>>
 <<?INSERT-EQU?>>
 
-\D HEX
-\D RANGE-LABELS       LABELS !BAG
-\D 4FE 510 -dc-
-\D 520 530 -dc: oops
-\D 530 570 -dc-
-\D 560 590 -db: bytes
-\D S" EXPECT: 4 ranges :" TYPE CR .LABELS CR 25 <?>
-\D DECIMAL
+HEX
+
+RANGE-LABELS LABELS !BAG
+4FE 510 -dc-
+520 530 -dc: oops
+530 570 -dc-
+560 590 -db: bytes
+
+: TEST-RANGES
+    assert( LABELS |BAG| 8 = )
+; TEST-RANGES
+
+DECIMAL
 
 <<COMPATIBLE?>>
 <<RANGE-NAME>>
-
-[DEFINED] ForCiForth [IF]
-    \D REQUIRE H.
-[THEN]
-
 <<NEW-RANGE-START>>
 <<NEW-RANGE-END>>
 <<REPLACE>>
@@ -6235,7 +6237,7 @@ ALSO ASSEMBLER
 <<STARTER?>>
 <<JUMP-TARGET>>
 <<ANALYSE-INSTRUCTION>>
-<<COLLAPSE(I1)>>
+<<COLLAPSE[I1]>>
 <<INSERT-RANGE>>
 <<CRAWL-ONE>>
 <<?CRAWL-ONE?>>
@@ -6245,7 +6247,6 @@ ALSO ASSEMBLER
 <<CRAWL16>>
 
 PREVIOUS
-: \D ; 
 @
 
 Insert the equ-label ADDRESS1 with an NAME. If equ labels was sorted,
@@ -6269,12 +6270,19 @@ name.
 <<?INSERT-EQU?>>=
 : ?INSERT-EQU?    EQU-LABELS DUP >LABEL IF DROP ELSE INSERT-EQU-INVENT THEN ;
 
-\D EQU-LABELS LABELS !BAG
-\D S" EXPECT: empty " TYPE EQU-LABELS .LABELS  CR
-\D 42 ?INSERT-EQU?
-\D S" EXPECT: L00000042 added " TYPE EQU-LABELS .LABELS     CR
-\D 42 ?INSERT-EQU?
-\D S" EXPECT: L00000042 NOT added again " TYPE EQU-LABELS .LABELS     CR 24 <?>
+EQU-LABELS LABELS !BAG
+
+HEX
+
+: TEST-?INSERT-EQU?
+    assert( EQU-LABELS LABELS |BAG| 0= )
+    42 ?INSERT-EQU?
+    assert( EQU-LABELS LABELS |BAG| 2 = )
+    42 ?INSERT-EQU?
+    assert( EQU-LABELS LABELS |BAG| 2 = )
+; TEST-?INSERT-EQU?
+
+DECIMAL
 @
 
 For range INDEX : \textquotedbl{}it is of the same type as the previous
@@ -6283,9 +6291,11 @@ one\textquotedbl{}.
 <<COMPATIBLE?>>=
 : COMPATIBLE?   DUP MAKE-CURRENT RANGE-XT   SWAP 1- MAKE-CURRENT RANGE-XT  = ;
 
-\D S" EXPECT: -1 :" TYPE 2 COMPATIBLE? . CR
-\D S" EXPECT: -1 :" TYPE 3 COMPATIBLE? . CR
-\D S" EXPECT: 0 :" TYPE 4 COMPATIBLE? . CR
+: TEST-COMPATIBLE?
+    assert( 2 COMPATIBLE? -1 = )
+    assert( 3 COMPATIBLE? -1 = )
+    assert( 4 COMPATIBLE? 0= )
+; TEST-COMPATIBLE?
 @
 
 Get the name of range INDEX.
@@ -6293,8 +6303,10 @@ Get the name of range INDEX.
 <<RANGE-NAME>>=
 : RANGE-NAME LABELS[] CELL+ @ >NFA @ $@ ;
 
-\D S" EXPECT: NONAME :" TYPE 1 RANGE-NAME TYPE CR
-\D S" EXPECT: oops :" TYPE 2 RANGE-NAME TYPE CR 26 <?>
+: TEST-RANGE-NAME
+    assert( 1 RANGE-NAME S" NONAME" COMPARE 0= )
+    assert( 2 RANGE-NAME S" oops" COMPARE 0= )
+; TEST-RANGE-NAME
 @
 
 For a collapsible pair of range with INDEX1 and INDEX2 return INDEX1
@@ -6304,7 +6316,13 @@ and INDEX2 plus a new START for the combined range.
 : NEW-RANGE-START OVER MAKE-CURRENT RANGE-START  OVER MAKE-CURRENT RANGE-START
     MIN ;
 
-\D  S" EXPECT 520 : " TYPE 2 3 NEW-RANGE-START 8 H.R 2DROP CR
+HEX
+
+: TEST-NEW-RANGE-START
+    assert( 2 3 NEW-RANGE-START NIP NIP 520 = )
+; TEST-NEW-RANGE-START
+
+DECIMAL
 @
 
 For a collapsible pair of range with INDEX1 and INDEX2 return INDEX1
@@ -6314,7 +6332,13 @@ and INDEX2 plus a new END for the combined range.
 : NEW-RANGE-END OVER MAKE-CURRENT RANGE-END  OVER MAKE-CURRENT RANGE-END
     MAX ;
 
-\D  S" EXPECT 590 : " TYPE 3 4 NEW-RANGE-END  8 H.R 2DROP CR 27 <?>
+HEX
+
+: TEST-NEW-RANGE-END
+    assert( 3 4 NEW-RANGE-END NIP NIP 590 = )
+; TEST-NEW-RANGE-END
+
+DECIMAL
 @
 
 Replace the two ranges INDEX1 and INDEX2 with the last range. Place
@@ -6323,7 +6347,9 @@ it at index1 (which has the correct start address).
 <<REPLACE>>=
 : REPLACE  OVER >R REMOVE-LABEL REMOVE-LABEL R> ROLL-LABEL ;
 
-\D  S" EXPECT 1 LESS : " TYPE 2 3 REPLACE CR .LABELS CR 28 <?>
+: TEST-REPLACE
+   assert( LABELS |BAG| 2 3 REPLACE LABELS |BAG| - 4 = )
+; TEST-REPLACE
 @
 
 This looks like a proper design.
@@ -6351,16 +6377,22 @@ as the previous one.\textquotedbl{}
 : SAME-ALIGN    DUP MAKE-CURRENT  RANGE-START SWAP
     1- MAKE-CURRENT   RANGE-START - RANGE-STRIDE MOD 0= ;
 
-\D INIT-ALL RANGE-LABELS  HEX
-\D 12 34 -dc-
-\D 34 65 -db: AAP
-\D 38 80 -dl-
-\D 82 90 -dl-
-\D 88 94 -dl-
+HEX
 
-\D S" EXPECT: -1 :" TYPE 2 SAME-ALIGN . CR
-\D S" EXPECT: -1 :" TYPE 3 SAME-ALIGN . CR \ Must become 0
-\D S" EXPECT: -1 :" TYPE 4 SAME-ALIGN . CR
+INIT-ALL RANGE-LABELS
+12 34 -dc-
+34 65 -db: AAP
+38 80 -dl-
+82 90 -dl-
+88 94 -dl-
+
+DECIMAL
+
+: TEST-SAME-ALIGN
+    assert( 2 SAME-ALIGN -1 = )
+    assert( 3 SAME-ALIGN -1 = ) \ Must become 0
+    assert( 4 SAME-ALIGN -1 = )
+; TEST-SAME-ALIGN
 @
 
 For range INDEX return END of previous, START of this one,
@@ -6368,8 +6400,14 @@ For range INDEX return END of previous, START of this one,
 <<END+START>>=
 : END+START DUP MAKE-CURRENT RANGE-START SWAP 1- MAKE-CURRENT RANGE-END SWAP ;
 
-\D S" EXPECT: 34 34 :" TYPE 2 END+START SWAP . . CR
-\D S" EXPECT: 65 38 :" TYPE 3 END+START SWAP . . CR
+HEX
+
+: TEST-END+START
+    assert( 2 END+START 34 = SWAP 34 = AND )
+    assert( 3 END+START 38 = SWAP 65 = AND )
+; TEST-END+START
+
+DECIMAL
 @
 
 Range INDEX overlaps with previous one.
@@ -6377,9 +6415,11 @@ Range INDEX overlaps with previous one.
 <<OVERLAP?>>=
 : OVERLAP? END+START > ;
 
-\D S" EXPECT: 0 :" TYPE 2 OVERLAP? . CR
-\D S" EXPECT: -1 :" TYPE 3 OVERLAP? . CR
-\D S" EXPECT: 0 :" TYPE 4 OVERLAP? . CR
+: TEST-OVERLAP?
+    assert( 2 OVERLAP? 0= )
+    assert( 3 OVERLAP? -1 = )
+    assert( 4 OVERLAP? 0= )
+; TEST-OVERLAP?
 @
 
 Range INDEX overlaps or borders with the previous one.
@@ -6387,9 +6427,11 @@ Range INDEX overlaps or borders with the previous one.
 <<OVERLAP-OR-BORDER?>>=
 : OVERLAP-OR-BORDER? END+START >= ;
 
-\D S" EXPECT: -1 :" TYPE 2 OVERLAP-OR-BORDER? . CR
-\D S" EXPECT: -1 :" TYPE 3 OVERLAP-OR-BORDER? . CR
-\D S" EXPECT: 0 :" TYPE 4 OVERLAP-OR-BORDER? . CR
+: TEST-OVERLAP-OR-BORDER?
+    assert( 2 OVERLAP-OR-BORDER? -1 = )
+    assert( 3 OVERLAP-OR-BORDER? -1 = )
+    assert( 4 OVERLAP-OR-BORDER? 0= )
+; TEST-OVERLAP-OR-BORDER?
 @
 
 Range INDEX has a gap with the previous one.
@@ -6397,9 +6439,11 @@ Range INDEX has a gap with the previous one.
 <<GAP?>>=
 : GAP? END+START < ;
 
-\D S" EXPECT: 0 :" TYPE 2 GAP? . CR
-\D S" EXPECT: 0 :" TYPE 3 GAP? . CR
-\D S" EXPECT: -1 :" TYPE 4 GAP? . CR
+: TEST-GAP?
+    assert( 2 GAP? 0 = )
+    assert( 3 GAP? 0= )
+    assert( 4 GAP? -1 = )
+; TEST-GAP?
 @
 
 For range INDEX: \textquotedbl{}It has a name\textquotedbl{}
@@ -6407,8 +6451,10 @@ For range INDEX: \textquotedbl{}It has a name\textquotedbl{}
 <<IS-NAMED>>=
 : IS-NAMED ( n -- )   RANGE-NAME NONAME$ $= 0= ;
 
-\D S" EXPECT: -1 :" TYPE 2 IS-NAMED . CR
-\D S" EXPECT: 0 :" TYPE 3 IS-NAMED . CR
+: TEST-IS-NAMED
+    assert( 2 IS-NAMED -1 = )
+    assert( 3 IS-NAMED 0= )
+; TEST-IS-NAMED
 @
 
 Collapse range I into the previous range, that determines the properties.
@@ -6417,8 +6463,16 @@ Collapse range I into the previous range, that determines the properties.
 : COLLAPSE ( i -- )   DUP MAKE-CURRENT  RANGE-END OVER 1- MAKE-CURRENT
     RANGE-END MAX RANGE-END!  REMOVE-LABEL ;
 
-\D S" EXPECT: 5 82 94 4 :" TYPE
-\D LAB-UPB . 5 COLLAPSE 4 MAKE-CURRENT RANGE-START . RANGE-END .  LAB-UPB . CR
+HEX
+
+: TEST-COLLAPSE
+    assert( LAB-UPB 5 = ) 5 COLLAPSE 4 MAKE-CURRENT
+    assert( RANGE-START 82 = )
+    assert( RANGE-END 94 = )
+    assert( LAB-UPB 4 = )
+; TEST-COLLAPSE
+
+DECIMAL
 @
 
 Trim the range previous to INDEX, such that it borders to range index.
@@ -6427,9 +6481,16 @@ Trim the range previous to INDEX, such that it borders to range index.
 : TRIM-RANGE ( i -- )   DUP MAKE-CURRENT  RANGE-START SWAP 1- MAKE-CURRENT
     RANGE-END! ;
 
-\D 90 1000 -dl-
-\D S" EXPECT: 82 90 :" TYPE 5 TRIM-RANGE 4 MAKE-CURRENT
-\D RANGE-START . RANGE-END .  CR
+HEX
+
+90 1000 -dl-
+
+: TEST-TRIM-RANGE
+    5 TRIM-RANGE 4 MAKE-CURRENT
+    assert( RANGE-START 82 = ) assert( RANGE-END 90 = )
+; TEST-TRIM-RANGE
+
+DECIMAL
 @
 
 Combine range INDEX with the previous one.
@@ -6439,18 +6500,25 @@ Combine range INDEX with the previous one.
     DUP OVERLAP-OR-BORDER? OVER IS-NAMED 0= AND IF DUP COLLAPSE THEN
     DUP OVERLAP? OVER IS-NAMED AND IF DUP TRIM-RANGE THEN  DROP ;
 
-\D INIT-ALL
-\D 10  30 -dl-
-\D 20  40 -dl-
-\D 30 50  -dl: aap
-\D 60 80  -dl-
-\D 90 100 -dl: noot
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 5 COMBINE LAB-UPB . CR
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 4 COMBINE LAB-UPB . CR
-\D S" EXPECT: 5 5 20 30 :" TYPE LAB-UPB . 3 COMBINE LAB-UPB . 2 MAKE-CURRENT
-\D RANGE-START . RANGE-END . CR
-\D S" EXPECT: 5 4 10 30 :" TYPE LAB-UPB . 2 COMBINE LAB-UPB . 1 MAKE-CURRENT
-\D RANGE-START . RANGE-END . CR
+HEX
+
+INIT-ALL
+10  30 -dl-
+20  40 -dl-
+30  50 -dl: aap0
+60  80 -dl-
+90 100 -dl: noot
+
+: TEST-COMBINE
+    assert( LAB-UPB 5 = ) 5 COMBINE assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 4 COMBINE assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 3 COMBINE assert( LAB-UPB 5 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 30 = )
+    assert( LAB-UPB 5 = ) 2 COMBINE assert( LAB-UPB 4 = )
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+; TEST-COMBINE
+
+DECIMAL
 @
 
 Combine range INDEX with a previous overlapping or bordering range.
@@ -6459,33 +6527,44 @@ Combine range INDEX with a previous overlapping or bordering range.
 : KILL-OVERLAP ( i -- )   DUP SAME-ALIGN  OVER COMPATIBLE? AND IF
         DUP COMBINE  THEN  DROP ;
 
-\D INIT-ALL
-\D 10  30 -dl-
-\D 20  40 -dl-
-\D 30 50  -dl: aap
-\D 60 80  -dl-
-\D 90 100 -dl: noot
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 5 KILL-OVERLAP LAB-UPB . CR
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 4 KILL-OVERLAP LAB-UPB . CR
-\D S" EXPECT: 5 5 20 30 :" TYPE LAB-UPB . 3 KILL-OVERLAP LAB-UPB .
-\D 2 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 5 4 10 30 :" TYPE LAB-UPB . 2 KILL-OVERLAP LAB-UPB .
-\D 1 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D INIT-ALL
-\D 10  30 -dl-
-\D 20  28 -db-
-\D 30 70  -dl: aap
-\D 60 80  -dl-
-\D 7F 10F -dl-
+HEX
+
+INIT-ALL
+10  30 -dl-
+20  40 -dl-
+30  50 -dl: aap1
+60  80 -dl-
+90 100 -dl: noot1
+
+: TEST-KILL-OVERLAP-1
+    assert( LAB-UPB 5 = ) 5 KILL-OVERLAP assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 4 KILL-OVERLAP assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 3 KILL-OVERLAP assert( LAB-UPB 5 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 30 = )
+    assert( LAB-UPB 5 = ) 2 KILL-OVERLAP assert( LAB-UPB 4 = )
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+; TEST-KILL-OVERLAP-1
+
+INIT-ALL
+10  30 -dl-
+20  28 -db-
+30  70 -dl: aap2
+60  80 -dl-
+7F 10F -dl-
+
 \ The following is actually wrong because the aligning is not tested yet.
-\D S" EXPECT: 5 4 60 10F :" TYPE LAB-UPB . 5 KILL-OVERLAP LAB-UPB .
-\D 4 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 4 3 30 10F :" TYPE LAB-UPB . 4 KILL-OVERLAP LAB-UPB .
-\D 3 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 3 3 20 28 :" TYPE LAB-UPB . 3 KILL-OVERLAP LAB-UPB .
-\D 2 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 3 3 10 30 :" TYPE LAB-UPB . 2 KILL-OVERLAP LAB-UPB .
-\D 1 MAKE-CURRENT RANGE-START . RANGE-END . CR
+: TEST-KILL-OVERLAP-2
+    assert( LAB-UPB 5 = ) 5 KILL-OVERLAP assert( LAB-UPB 4 = )
+    4 MAKE-CURRENT assert( RANGE-START 60 = ) assert( RANGE-END 10F = )
+    assert( LAB-UPB 4 = ) 4 KILL-OVERLAP assert( LAB-UPB 3 = )
+    3 MAKE-CURRENT assert( RANGE-START 30 = ) assert( RANGE-END 10F = )
+    assert( LAB-UPB 3 = ) 3 KILL-OVERLAP assert( LAB-UPB 3 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 28 = )
+    assert( LAB-UPB 3 = ) 2 KILL-OVERLAP assert( LAB-UPB 3 = )
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+; TEST-KILL-OVERLAP-2
+
+DECIMAL
 @
 
 Introduce char range to fill the gap at INDEX. Note that the result
@@ -6496,10 +6575,16 @@ is unordered.
         DUP 1+ LAB-UPB MAX KILL-OVERLAP
         DUP KILL-OVERLAP  THEN  DROP ;
 
-\D S" EXPECT: 3 4 28 30 :" TYPE LAB-UPB . 3 FILL-GAP LAB-UPB .
-\D 4 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 4 4 20 28 :" TYPE LAB-UPB . 2 FILL-GAP LAB-UPB .
-\D 2 MAKE-CURRENT RANGE-START . RANGE-END . CR
+HEX
+
+: TEST-FILL-GAP
+    assert( LAB-UPB 3 = ) 3 FILL-GAP assert( LAB-UPB 4 = )
+    4 MAKE-CURRENT assert( RANGE-START 28 = ) assert( RANGE-END 30 = )
+    assert( LAB-UPB 4 = ) 2 FILL-GAP assert( LAB-UPB 4 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 28 = )
+; TEST-FILL-GAP
+
+DECIMAL
 @
 
 Clean up the range labels, from behind. Although the bounds may not
@@ -6637,18 +6722,23 @@ are all valid.
 
 Collapse the label at INDEX with the next and or previous labels.
 
-<<COLLAPSE(I1)>>=
-: COLLAPSE(I1) RANGE-LABELS
+<<COLLAPSE[I1]>>=
+: COLLAPSE[I1] RANGE-LABELS
     DUP LAB-UPB < IF DUP 1+ KILL-OVERLAP THEN
     DUP 1 > IF DUP KILL-OVERLAP THEN
     DROP ;
 
-\D LABELS !BAG
-\D 4FE 520 -dc-
-\D 520 530 -dc: oops
-\D 52A 570 -dc-
-\D 560 590 -db: bytes \D .LABELS
-\D S" EXPECT 1 LESS : " TYPE 2 COLLAPSE(I1) CR .LABELS CR 29 <?>
+HEX
+LABELS !BAG
+4FE 520 -dc-
+520 530 -dc: oops1
+52A 570 -dc-
+560 590 -db: bytes1
+DECIMAL
+
+: TEST-COLLAPSE[I1]
+    assert( LABELS |BAG| 2 COLLAPSE[I1] LABELS |BAG| - 2 = )
+; TEST-COLLAPSE[I1]
 @
 
 Add the information that ADDRESS1 to ADDRESS2 is a code range. If
@@ -6656,7 +6746,7 @@ range labels was sorted, it remains so.
 
 <<INSERT-RANGE>>=
 : INSERT-RANGE   OVER RANGE-LABELS WHERE-LABEL >R
-    REQUIRED-XT ANON-RANGE   R@ ROLL-LABEL   R> COLLAPSE(I1) ;
+    REQUIRED-XT ANON-RANGE   R@ ROLL-LABEL   R> COLLAPSE[I1] ;
 @
 
 Analyse the code range from ADDRESS up to an unconditional transfer.
@@ -6739,11 +6829,11 @@ A script for converting this document to PDF form follows:
 lyx -e pdf cfasdis.lyx
 @
 <<*>>=
-echo "Extract script $1 from cfasdis.lyx..."
+echo "Extract script cfasdis.frt from cfasdis.lyx..."
 rm -f cfasdis.nw
 lyx -e literate cfasdis.lyx
-notangle -R$1 cfasdis.nw > $1
-chmod a+x $1
+notangle -Rcfasdis.frt cfasdis.nw > cfasdis
+chmod a+x cfasdis
 @
 
 Each of these scripts can be pulled out manually given the default

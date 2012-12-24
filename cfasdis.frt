@@ -4,55 +4,55 @@
 
 CR \ Start compile time output on a new line
 
-: uses ( flag -- )  0= IF POSTPONE \ THEN ;
-: ?? ( "name" -- flag )  BL WORD FIND SWAP DROP 0= 0= ;
+: uses ( flag -- )  0= IF POSTPONE \ THEN ;
+: ?? ( "name" -- flag )  BL WORD FIND SWAP DROP 0= 0= ;
 ?? STR= 0= uses : MATCH? >R COUNT ROT COUNT ROT = R> AND ;
 ?? STR= 0= uses : (STR=) BEGIN DUP 0 > WHILE MATCH? 1- REPEAT 0= ;
-?? STR= 0= uses : STR= ROT 2DUP = >R MIN (STR=) >R 2DROP R> R> AND ;
-?? ENVIRONMENT? 0= uses : ENVIRONMENT? 2DROP 0 ;
+?? STR= 0= uses : STR= ROT 2DUP = >R MIN (STR=) >R 2DROP R> R> AND ;
+?? ENVIRONMENT? 0= uses : ENVIRONMENT? 2DROP 0 ;
 : env-flag?  DUP IF DROP THEN ;              \ flag true?
 : env-str?  DUP IF >R 2DROP R> THEN ;        \ string present?
-: env-str=  ROT IF STR= ELSE 2DROP 0 THEN ;  \ string matches?
+: env-str=  ROT IF STR= ELSE 2DROP 0 THEN ;  \ string matches?
 
 \ bigforth compat.f -e bye
 S" BIGFORTH" ENVIRONMENT? env-str?
-    uses CREATE ForBigForth
+    uses CREATE ForBigForth
 \ lina -s compat.f
 S" NAME" ENVIRONMENT? S" ciforth" env-str=
-    uses CREATE ForCiForth
+    uses CREATE ForCiForth
 \ ficl compat.f
 \ Grrr.  FICL has no way to quit automatically after running a script.
 S" ficl-version" ENVIRONMENT? env-str?
-    uses CREATE ForFicl
+    uses CREATE ForFicl
 \ gforth compat.f -e bye
 S" gforth" ENVIRONMENT? env-str?
-    uses CREATE ForGForth
+    uses CREATE ForGForth
 \ ???
 S" IFORTH" ENVIRONMENT? env-flag?
-     uses CREATE ForIForth
+     uses CREATE ForIForth
 \ kforth compat.f -e bye
 ?? NONDEFERRED
-    uses CREATE ForKForth
+    uses CREATE ForKForth
 \ pfe -q -y compat.f
 S" FORTH-NAME" ENVIRONMENT? S" pfe" env-str=
-    uses CREATE ForPfe
+    uses CREATE ForPfe
 \ pforth compat.f
 ?? ::::loadp4th.fth
-    uses CREATE ForPForth
+    uses CREATE ForPForth
 \ spf4 compat.f BYE
 S" FORTH-SYS" ENVIRONMENT? S" SP-FORTH" env-str=
     uses CREATE ForSpf4
-        \ REQUIRE CASE-INS lib/ext/caseins.f
+        \ REQUIRE CASE-INS lib/ext/caseins.f
 \ ??? vfx include compat.f bye ???
 ?? VFXFORTH
-    uses CREATE ForVfx
+    uses CREATE ForVfx
 \ win32forth include compat.f bye
 S" WIN32FORTH" ENVIRONMENT? env-str?
-    uses CREATE ForWin32Forth
+    uses CREATE ForWin32Forth
 \ sf include compat.f bye
 ?? VERSION DUP uses S" SwiftForth" version over compare 0= AND
-    uses CREATE ForSwiftForth
-: NONAME$ ( -- a n )   s" NONAME" ;
+    uses CREATE ForSwiftForth
+: NONAME$ ( -- a n )   s" NONAME" ;
 
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
@@ -63,17 +63,17 @@ S" WIN32FORTH" ENVIRONMENT? env-str?
         dup allocate throw
         swap 2dup r@ read-file throw
         over <> abort" could not read whole file"
-        r> close-file throw ;
+        r> close-file throw ;
     : PUT-FILE ( a1 n1 a2 n2 -- )
         r/w create-file throw
         dup >r write-file throw
-        r> close-file throw ;
+        r> close-file throw ;
 [THEN]
 [DEFINED] ForCiForth [IF]
     REQUIRE OLD:    REQUIRE $=    REQUIRE class    REQUIRE W/O
     : NEW-PRESENT   OLD: PRESENT DUP IF DUP >NFA @ $@ NONAME$ $= 0= AND THEN ;
-    ' NEW-PRESENT ' PRESENT 3 CELLS MOVE
-    : FAR@ L@ ;    HIDE L@
+    ' NEW-PRESENT ' PRESENT 3 CELLS MOVE
+    : FAR@ L@ ;    HIDE L@
 [THEN]
 
 \ --------------------------------------------------------------
@@ -95,7 +95,7 @@ S" WIN32FORTH" ENVIRONMENT? env-str?
 
 [DEFINED] ForCiForth [IF]
 : -warning 0 ; : +warning drop ;
-[THEN]
+[THEN]
 CREATE 'TYPE   ' TYPE DUP , ,
 
 -warning
@@ -106,7 +106,7 @@ CREATE 'TYPE   ' TYPE DUP , ,
 
 : 2DROP'  2DROP ;      \ Need a high level word here.
 : (SHUTUP) ( xt -- )   ['] 2DROP' 'TYPE !  EXECUTE  'TYPE RESTORED ;
-: SHUTUP ( -name- )   ' POSTPONE LITERAL  POSTPONE (SHUTUP) ; IMMEDIATE
+: SHUTUP ( -name- )   ' POSTPONE LITERAL  POSTPONE (SHUTUP) ; IMMEDIATE
 
 [DEFINED] ForSwiftForth [IF]  true constant ForDOS  [THEN]
 [DEFINED] ForGForth [IF] \ Add missing GForth definitions
@@ -127,7 +127,7 @@ CREATE CHAR-BUF   0 C,
          CHAR-BUF C!  CHAR-BUF 1 TYPE  THEN ;
 : SPACE ( -- )      'TYPE 2@ = IF  SPACE  ELSE  BL EMIT  THEN ;
 : SPACES ( n -- )   'TYPE 2@ = IF  SPACES  ELSE  0 ?DO  SPACE  LOOP  THEN ;
-+warning
++warning
 
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
@@ -138,7 +138,7 @@ CREATE CHAR-BUF   0 C,
     : append ( from len to -- )   2DUP >R >R  COUNT + SWAP MOVE
         R> R@ C@ + R> C! ;
     : place ( from len to -- )   0 OVER C! SWAP 255 MIN SWAP APPEND ;
-
+    
     : @+ ( a -- a' n )   DUP >R CELL+ R> @ ;
     : $= ( a1 n1 a2 n2 -- f )   COMPARE 0= ;
     : $@ ( a -- a' n )   COUNT ;
@@ -146,28 +146,28 @@ CREATE CHAR-BUF   0 C,
     : $! ( a n a' -- )   PLACE ;
     : $+! ( a n a' -- )   APPEND ;
     : $C+ ( c a -- )   CAPPEND ;
-    +warning
+    +warning
     VARIABLE BASE'
     : <HEX   BASE @ BASE' ! HEX ;       ( 0/1  SWITCH TO HEX)
     : HEX>   BASE' @ BASE !     ;       ( 1/0  AND BACK)
-
+    
     [DEFINED] ForCiForth [IF]
-    : 4? ( n -- )   1+ 4 MOD 0= IF  [CHAR] , HOLD THEN ;
+    : 4? ( n -- )   1+ 4 MOD 0= IF  [CHAR] , HOLD THEN ;
         : (DH.)   <HEX  <#  1- 0 ?DO  #  I 4?  LOOP  #  #>  HEX> ;
     [ELSE]
         : (DH.)   <HEX  <#  1- 0 ?DO  #  LOOP  #  #>  HEX> ;
     [THEN]
     : (H.R) ( n digits -- a len )   >R S>D R> (DH.) ;
     : H.R ( n digits -- )   (H.R) TYPE ;
-
+    
     : (H.) ( n -- a len )   DUP ABS 0  <HEX  <# #S ROT SIGN #>  HEX> ;
-    : H.   (H.) TYPE SPACE ;
+    : H.   (H.) TYPE SPACE ;
     -warning
     : C.   S>D <# # #S #> TYPE SPACE ; ( print byte )
     : (.)   S>D TUCK DABS <# #S ROT SIGN #> ;
     : .   (.) TYPE SPACE ;
     : .R   >R (.) R> OVER - 0 MAX SPACES TYPE ;
-    +warning
+    +warning
 
      : CORA swap over compare ;
      : ETYPE TYPE ;
@@ -175,28 +175,28 @@ CREATE CHAR-BUF   0 C,
      variable exit-code
      0 value _  ' _ to _
 
-    : BUILD-BAG ( n -- )   HERE CELL+ , CELLS ALLOT ;
-    : BAG ( n -- )   CREATE HERE CELL+ , CELLS ALLOT DOES> ;
-    : !BAG ( bag -- )   DUP CELL+ SWAP ! ;
-    : BAG? ( bag -- )   @+ = 0= ;
-    : BAG+! ( x bag -- )   DUP >R @ ! 0 CELL+ R> +! ;
-    : BAG@- ( bag -- x )   0 CELL+ NEGATE OVER +! @ @ ;
+    : BUILD-BAG ( n -- )   HERE CELL+ , CELLS ALLOT ;
+    : BAG ( n -- )   CREATE HERE CELL+ , CELLS ALLOT DOES> ;
+    : !BAG ( bag -- )   DUP CELL+ SWAP ! ;
+    : BAG? ( bag -- )   @+ = 0= ;
+    : BAG+! ( x bag -- )   DUP >R @ ! 0 CELL+ R> +! ;
+    : BAG@- ( bag -- x )   0 CELL+ NEGATE OVER +! @ @ ;
     : BAG-REMOVE ( a bag -- )
-        >R  DUP CELL+ SWAP  OVER R@ @ SWAP - MOVE  -1 CELLS R> +! ;
+        >R  DUP CELL+ SWAP  OVER R@ @ SWAP - MOVE  -1 CELLS R> +! ;
     : BAG-HOLE ( a bag -- )
-        >R  DUP CELL+   OVER R@ @ SWAP - MOVE   0 CELL+ R> +! ;
-    : BAG-INSERT ( x a bag -- )   OVER SWAP BAG-HOLE ! ;
-    : |BAG| ( bag -- n )   @+ SWAP - 0 CELL+ / ;
+        >R  DUP CELL+   OVER R@ @ SWAP - MOVE   0 CELL+ R> +! ;
+    : BAG-INSERT ( x a bag -- )   OVER SWAP BAG-HOLE ! ;
+    : |BAG| ( bag -- n )   @+ SWAP - 0 CELL+ / ;
     : DO-BAG  POSTPONE @+ POSTPONE SWAP POSTPONE ?DO ; IMMEDIATE
-    : LOOP-BAG 0 CELL+ POSTPONE LITERAL POSTPONE +LOOP ; IMMEDIATE
-    : .BAG ( bag -- )   DO-BAG  I ?  LOOP-BAG ;
+    : LOOP-BAG 0 CELL+ POSTPONE LITERAL POSTPONE +LOOP ; IMMEDIATE
+    : .BAG ( bag -- )   DO-BAG  I ?  LOOP-BAG ;
     : BAG-WHERE ( x bag -- a )   DO-BAG  DUP I @ = IF
             DROP I UNLOOP EXIT  THEN
-        LOOP-BAG  DROP 0 ;
-    : IN-BAG? ( x bag -- )   BAG-WHERE 0= 0= ;
-    : BAG- ( x bag -- )   DUP >R   BAG-WHERE   R> BAG-REMOVE ;
+        LOOP-BAG  DROP 0 ;
+    : IN-BAG? ( x bag -- )   BAG-WHERE 0= 0= ;
+    : BAG- ( x bag -- )   DUP >R   BAG-WHERE   R> BAG-REMOVE ;
     : SET+ ( x bag -- )   2DUP IN-BAG? IF 2DROP ELSE BAG+! THEN ;
-    : SET- ( x bag -- )   2DUP IN-BAG? IF BAG- ELSE 2DROP THEN ;
+    : SET- ( x bag -- )   2DUP IN-BAG? IF BAG- ELSE 2DROP THEN ;
     : BIN-SEARCH ( n IMIN, n IMAX, xt COMP -- n IRES )   >R
         BEGIN       \ Loop variant IMAX - IMIN
             2DUP  <> WHILE
@@ -207,11 +207,11 @@ CREATE CHAR-BUF   0 C,
                     SWAP DROP \ Replace IMAX
                 THEN
         REPEAT
-        R> 2DROP ;
+        R> 2DROP ;
     : EXCHANGE ( a1 a2 n -- )   0 ?DO  OVER I +  OVER I +  OVER C@  OVER C@
-            >R SWAP C!  R> SWAP C!  LOOP  2DROP ;
+            >R SWAP C!  R> SWAP C!  LOOP  2DROP ;
     ( QSORT ) \ AvdH A2apr22
-
+    
     \ Compare item N1 and N2. Return 'N1' IS lower and not equal.
     VARIABLE *<
     \ Exchange item N1 and N2.
@@ -229,38 +229,43 @@ CREATE CHAR-BUF   0 C,
             THEN
         2DUP > UNTIL    ( lo_1 hi_2 lo_2 hi_1)
         R> DROP                            ( R: )
-        SWAP ROT ;      ( lo_1 hi_1 lo_2 hi_2)
+        SWAP ROT ;      ( lo_1 hi_1 lo_2 hi_2)
     : (QSORT)             ( lo hi -- )
         PARTITION         ( lo_1 hi_1 lo_2 hi_2)
         2DUP < IF  RECURSE  ELSE  2DROP  THEN
-        2DUP < IF  RECURSE  ELSE  2DROP  THEN ;
-
-    : QSORT ( xt1 xt2 -- )   *<--> !  *< !  (QSORT) ;
+        2DUP < IF  RECURSE  ELSE  2DROP  THEN ;
+    
+    : QSORT ( xt1 xt2 -- )   *<--> !  *< !  (QSORT) ;
 [ELSE]
     REQUIRE H.    REQUIRE RESTORED
-    : .^   .S R@ @ >NFA @ $@ TYPE ;
+    : .^   .S R@ @ >NFA @ $@ TYPE ;
 [THEN]
 
 : \D POSTPONE \ ;
-\ : \D ;
-\ : QSORT-SAFE 2>R 2DUP < IF 2R> QSORT ELSE 2DROP 2R> 2DROP THEN ;
+\ : \D ;
+\ : QSORT-SAFE 2>R 2DUP < IF 2R> QSORT ELSE 2DROP 2R> 2DROP THEN ;
 CREATE NAME-BUF   256 ALLOT
 
-: INVENT-NAME   s" L" NAME-BUF $!   0 8 (DH.) NAME-BUF $+! NAME-BUF $@ ;
+: INVENT-NAME   s" L" NAME-BUF $!   0 8 (DH.) NAME-BUF $+! NAME-BUF $@ ;
 : INVENTED-NAME? ( a1 a2 n -- flag )  9 <> IF  2DROP 0
-    ELSE  SWAP INVENT-NAME CORA 0=  THEN ;
+    ELSE  SWAP INVENT-NAME CORA 0=  THEN ;
 
-\D HEX S" EXPECT: L00000042 " TYPE 42 INVENT-NAME TYPE 1 <?> CR
-\D HEX S" EXPECT: 0 " TYPE 42 s" L00000043" INVENTED-NAME? . 2 <?> CR
-\D HEX S" EXPECT: -1 " TYPE 42 s" L00000042" INVENTED-NAME? . 3 <?> CR
-\D DECIMAL
+HEX
+
+: TEST-INVENT-NAME
+    assert( 42 INVENT-NAME S" L00000042" COMPARE 0= )
+    assert( 42 S" L00000043" INVENTED-NAME? 0= )
+    assert( 42 S" L00000042" INVENTED-NAME? -1 = )
+; TEST-INVENT-NAME
+
+DECIMAL
 [DEFINED] >= 0= [IF] : >= < 0= ; [THEN]
-[DEFINED] <= 0= [IF] : <= > 0= ; [THEN]
-: ?ABORT ROT IF ETYPE 2 EXIT-CODE ! BYE ELSE 2DROP THEN ;
+[DEFINED] <= 0= [IF] : <= > 0= ; [THEN]
+: ?ABORT ROT IF ETYPE 2 EXIT-CODE ! BYE ELSE 2DROP THEN ;
 
 [DEFINED] ForCiForth [IF]
     REQUIRE $=    REQUIRE ."$"
-[THEN]
+[THEN]
 include File.fth  Files FALSE REVERSE !  BIG-ENDIAN  ONLY FORTH DEFINITIONS
 ( $Id: asgen.frt,v 4.31 2005/03/07 11:54:58 albert Exp $ )
 ( Copyright{2000}: Albert van der Horst, HCC FIG Holland by GNU Public License)
@@ -295,20 +300,20 @@ CREATE '_AP_       ' HERE DUP , ,    : _AP_ '_AP_ @ EXECUTE ;
 : (-ADORN-ADDRESS) DROP CR ;   ( Action between two disassembled instr.    )
 
 CREATE 'ADORN-ADDRESS   ' (-ADORN-ADDRESS) DUP , ,
-: ADORN-ADDRESS ( a -- )   'ADORN-ADDRESS @ EXECUTE ;
+: ADORN-ADDRESS ( a -- )   'ADORN-ADDRESS @ EXECUTE ;
 ( ############### PART I ASSEMBLER #################################### )
-: !+ ( x a -- a' )   >R R@ ! R> CELL+ ;
-: @- ( a -- x a' )   0 CELL+ - >R R@ @ R>  ;
+: !+ ( x a -- a' )   >R R@ ! R> CELL+ ;
+: @- ( a -- x a' )   0 CELL+ - >R R@ @ R>  ;
 -warning
 : CTRL CHAR 31 AND ;
 : [CTRL] CTRL POSTPONE LITERAL ; IMMEDIATE
-+warning
-CREATE TABLE1   1 , 1 ,
-: ROTLEFT ( x n -- x' )   TABLE1 + @ UM* OR ;
++warning
+CREATE TABLE1   1 , 1 ,
+: ROTLEFT ( x n -- x' )   TABLE1 + @ UM* OR ;
 
 [DEFINED] ForCiForth [IF]
     'TABLE1 HIDDEN
-[THEN]
+[THEN]
 : %>BODY ; ( From DEA to the DATA field of a created word, now the same )
 : %BODY> ; ( Reverse of above)
 
@@ -331,7 +336,7 @@ CREATE TABLE1   1 , 1 ,
   1 CELLS DEA-FIELD >DFA    ( type of word, replacing the DOES> check   )
 CONSTANT |DEA| ( the name is tacked onto the end when it is created     )
 
-: %ID. >NFA @ $@ TYPE SPACE ;
+: %ID. >NFA @ $@ TYPE SPACE ;
 
 -warning
 VOCABULARY ASSEMBLER IMMEDIATE
@@ -344,190 +349,190 @@ Assem HEX
 [DEFINED] ForCiForth [IF]
     'ONLY >WID CURRENT !    \ Making ONLY the CONTEXT is dangerous! This will do.
     "'" 'ONLY >WID (FIND)   ALIAS %         ( "'" ) 2DROP
-    CONTEXT @ CURRENT !     \ Restore current.
+    CONTEXT @ CURRENT !     \ Restore current.
 [THEN]
 
-: %>DOES ( dea -- x ) >DFA ;
-: IGNORE? >NFA @ CHAR+ C@ [CHAR] ~ = ;
-: VOCEND? ( dea -- f )   >LFA @ 0= ;
+: %>DOES ( dea -- x ) >DFA ;
+: IGNORE? >NFA @ CHAR+ C@ [CHAR] ~ = ;
+: VOCEND? ( dea -- f )   >LFA @ 0= ;
 : (>NEXT%) ( dea -- dea )   >LFA @ ;
 : >NEXT% ( dea -- dea' )   BEGIN  (>NEXT%) DUP >NFA @ CHAR+ C@
-    [CHAR] - - UNTIL ;
-0 VALUE STARTVOC ( -- dea )
+    [CHAR] - - UNTIL ;
+0 VALUE STARTVOC ( -- dea )
 VARIABLE 'IS-A   1 'IS-A !
-: IS-A ( -- )   CREATE  'IS-A @ ,  DOES> ( dea -- f ) @ SWAP %>DOES @ = ;
+: IS-A ( -- )   CREATE  'IS-A @ ,  DOES> ( dea -- f ) @ SWAP %>DOES @ = ;
 : MEMBER ( n -- )   STARTVOC >DFA ! ;
 : REMEMBER ( -- )   ?CSP  'IS-A @ POSTPONE LITERAL  POSTPONE MEMBER
-    1 'IS-A +!  !CSP ; IMMEDIATE
-\ : ?ERROR DROP DROP ;
+    1 'IS-A +!  !CSP ; IMMEDIATE
+\ : ?ERROR DROP DROP ;
 : CREATE--   SAVE-INPUT  BL WORD $@ $, >R  RESTORE-INPUT THROW
     R> DUP $@ S" --" COMPARE 0= IF  -warning CREATE +warning
     ELSE  CREATE  THEN  HERE DUP >R  |DEA| DUP ALLOT  ERASE
-    R@ >NFA !  STARTVOC R@ >LFA !  R> TO STARTVOC ;
-: CONTAINED-IN OVER AND = ;
-: lsbyte, DUP AS-C, 0008 RSHIFT ;
-: lsbyte@ 1- SWAP 8 LSHIFT OVER C@ OR SWAP ;
-: lsbytes  >R R@ + BEGIN R> DUP WHILE 1- >R  lsbyte@ REPEAT 2DROP ;
-: MC@ 0 ROT ROT lsbytes ;
-: MC<0 + 1- C@ 80 AND 80 = ;
-: MC@-S 2DUP MC<0 ROT ROT lsbytes ;
-VARIABLE TALLY-BI
-VARIABLE TALLY-BY
-VARIABLE TALLY-BA
-VARIABLE BA-DEFAULT    0 BA-DEFAULT !
-VARIABLE OLDCOMMA
-VARIABLE ISS
-VARIABLE ISL
-VARIABLE BA-XT
+    R@ >NFA !  STARTVOC R@ >LFA !  R> TO STARTVOC ;
+: CONTAINED-IN OVER AND = ;
+: lsbyte, DUP AS-C, 0008 RSHIFT ;
+: lsbyte@ 1- SWAP 8 LSHIFT OVER C@ OR SWAP ;
+: lsbytes  >R R@ + BEGIN R> DUP WHILE 1- >R  lsbyte@ REPEAT 2DROP ;
+: MC@ 0 ROT ROT lsbytes ;
+: MC<0 + 1- C@ 80 AND 80 = ;
+: MC@-S 2DUP MC<0 ROT ROT lsbytes ;
+VARIABLE TALLY-BI
+VARIABLE TALLY-BY
+VARIABLE TALLY-BA
+VARIABLE BA-DEFAULT    0 BA-DEFAULT !
+VARIABLE OLDCOMMA
+VARIABLE ISS
+VARIABLE ISL
+VARIABLE BA-XT
 : RESET-BAD ( -- )   BA-XT @ DUP IF EXECUTE ELSE
-        DROP  BA-DEFAULT @ TALLY-BA ! THEN ;
+        DROP  BA-DEFAULT @ TALLY-BA ! THEN ;
 : !TALLY ( -- )   0 TALLY-BI !   0 TALLY-BY !   RESET-BAD   0 OLDCOMMA ! ;
-    0 BA-XT !   !TALLY
-: AT-REST? TALLY-BI @ 0=   TALLY-BY @ 0=  AND ;
+    0 BA-XT !   !TALLY
+: AT-REST? TALLY-BI @ 0=   TALLY-BY @ 0=  AND ;
 : BADPAIRS? DUP 1 LSHIFT AND AAAAAAAAAAAAAAAA AND ;
-: BAD? TALLY-BA @ BADPAIRS? ;
-: CONSISTENT? TALLY-BA @ OR BADPAIRS? 0= ;
+: BAD? TALLY-BA @ BADPAIRS? ;
+: CONSISTENT? TALLY-BA @ OR BADPAIRS? 0= ;
 DECIMAL
-: CHECK26 AT-REST? 0= ABORT" PREVIOUS INSTRUCTION INCOMPLETE" ;
-: CHECK32 BAD? ABORT" PREVIOUS OPCODE PLUS FIXUPS INCONSISTENT" ;
+: CHECK26 AT-REST? 0= ABORT" PREVIOUS INSTRUCTION INCOMPLETE" ;
+: CHECK32 BAD? ABORT" PREVIOUS OPCODE PLUS FIXUPS INCONSISTENT" ;
 : CHECK31 2DUP SWAP CONTAINED-IN 0=
-    ABORT" DESIGN ERROR, INCOMPATIBLE MASK" ;
+    ABORT" DESIGN ERROR, INCOMPATIBLE MASK" ;
 : CHECK31A 2DUP OVER >R RSHIFT 1 OR OVER LSHIFT R> <>
-    ABORT" DESIGN ERROR, INCOMPATIBLE MASK" ;
+    ABORT" DESIGN ERROR, INCOMPATIBLE MASK" ;
 : CHECK32B  2DUP OR INVERT 0= ( all ones) >R
     INVERT AND 0= ( all zero's ) R> OR ( okay)
-    0= ABORT" PREVIOUS OPCODE PLUS FIXUPS INCONSISTENT" ;
+    0= ABORT" PREVIOUS OPCODE PLUS FIXUPS INCONSISTENT" ;
 : CHECK33 2DUP SWAP INVERT CONTAINED-IN 0=
-    ABORT" DESIGN ERROR, INCOMPATIBLE MASK" ;
-: CHECK28 2DUP AND ABORT" UNEXPECTED FIXUP/COMMAER" ;
-: CHECK29 2DUP OR -1 - ABORT" DUPLICATE FIXUP/UNEXPECTED COMMAER" ;
+    ABORT" DESIGN ERROR, INCOMPATIBLE MASK" ;
+: CHECK28 2DUP AND ABORT" UNEXPECTED FIXUP/COMMAER" ;
+: CHECK29 2DUP OR -1 - ABORT" DUPLICATE FIXUP/UNEXPECTED COMMAER" ;
 : CHECK30 DUP OLDCOMMA @ < ABORT" COMMAERS IN WRONG ORDER"
-    DUP OLDCOMMA ! ;
+    DUP OLDCOMMA ! ;
 HEX
 : OR! >R R@ @  CHECK28 OR R> ! ;
-: OR!U >R R@ @  OR R> ! ;
-: AND! >R INVERT R@ @ CHECK29 AND R> ! ;
-: assemble, ( x -- )   ISL @ 0 DO  lsbyte,  LOOP  DROP ;
-: !POSTIT ( -- )   AS-HERE ISS !  0 OLDCOMMA ! ;
+: OR!U >R R@ @  OR R> ! ;
+: AND! >R INVERT R@ @ CHECK29 AND R> ! ;
+: assemble, ( x -- )   ISL @ 0 DO  lsbyte,  LOOP  DROP ;
+: !POSTIT ( -- )   AS-HERE ISS !  0 OLDCOMMA ! ;
 : TALLY:, ( a -- )   DUP >BI @ TALLY-BI !  DUP >BY @ TALLY-BY !
-    DUP >BA @ TALLY-BA OR!U  DUP >CNT @ ISL !  >DIS @ BA-XT ! ;
+    DUP >BA @ TALLY-BA OR!U  DUP >CNT @ ISL !  >DIS @ BA-XT ! ;
 : POSTIT ( a -- )   CHECK26   !TALLY   !POSTIT
-    DUP >DATA @ >R   TALLY:,   R> assemble, ;
+    DUP >DATA @ >R   TALLY:,   R> assemble, ;
 : BUILD-IP ( ba by bi opc cnt -- )   STARTVOC >CNT !  STARTVOC >DATA !
     STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !
-    0 ( prefix) STARTVOC >PRF ! ;
+    0 ( prefix) STARTVOC >PRF ! ;
 IS-A IS-1PI : 1PI  CHECK33 CREATE-- REMEMBER  1 BUILD-IP DOES>  POSTIT ;
 IS-A IS-2PI : 2PI  CHECK33 CREATE-- REMEMBER  2 BUILD-IP DOES>  POSTIT ;
 IS-A IS-3PI : 3PI  CHECK33 CREATE-- REMEMBER  3 BUILD-IP DOES>  POSTIT ;
-IS-A IS-4PI : 4PI  CHECK33 CREATE-- REMEMBER  4 BUILD-IP DOES>  POSTIT ;
+IS-A IS-4PI : 4PI  CHECK33 CREATE-- REMEMBER  4 BUILD-IP DOES>  POSTIT ;
 : IS-PI  >R 0
-    R@ IS-1PI OR  R@ IS-2PI OR  R@ IS-3PI OR   R@ IS-4PI OR R> DROP ;
+    R@ IS-1PI OR  R@ IS-2PI OR  R@ IS-3PI OR   R@ IS-4PI OR R> DROP ;
 : TALLY:| ( a -- )   DUP >BI @ TALLY-BI AND!  DUP >BY @ TALLY-BY OR!
-    >BA @ TALLY-BA OR!U ;
-: FIXUP>   DUP >DATA @ ISS @ OR!   TALLY:|   CHECK32 ;
+    >BA @ TALLY-BA OR!U ;
+: FIXUP>   DUP >DATA @ ISS @ OR!   TALLY:|   CHECK32 ;
 IS-A IS-xFI : xFI  CHECK31 CREATE-- REMEMBER STARTVOC >DATA !
-    STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA ! DOES>  FIXUP> ;
-: TRIM-SIGNED >R   2DUP R@ SWAP RSHIFT CHECK32B   LSHIFT R> AND ;
+    STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA ! DOES>  FIXUP> ;
+: TRIM-SIGNED >R   2DUP R@ SWAP RSHIFT CHECK32B   LSHIFT R> AND ;
 : FIXUP-DATA ( a -- )   DUP >DATA @  SWAP >R  LSHIFT ISS @ OR!
-    R> TALLY:|  CHECK32 ;
+    R> TALLY:|  CHECK32 ;
 : FIXUP-SIGNED ( a -- )   DUP >DATA @  SWAP >R
     R@ >BI @ TRIM-SIGNED ISS @ OR!
-    R> TALLY:| CHECK32 ;
+    R> TALLY:| CHECK32 ;
 IS-A IS-DFI : DFI  CHECK31A CREATE-- REMEMBER STARTVOC >DATA !
-    STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !  DOES>  FIXUP-DATA ;
+    STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !  DOES>  FIXUP-DATA ;
 IS-A IS-DFIs : DFIs  CHECK31A CREATE-- REMEMBER STARTVOC >DATA !
-    STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !  DOES>  FIXUP-SIGNED ;
+    STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !  DOES>  FIXUP-SIGNED ;
 : REVERSE-BYTES
     1 CELLS 0 DO DUP  FF AND SWAP 8 RSHIFT   LOOP
-    8 CELLS 0 DO SWAP I LSHIFT OR   8 +LOOP ;
-: CORRECT-R 0 CELL+ ISL @ - ROTLEFT ;
+    8 CELLS 0 DO SWAP I LSHIFT OR   8 +LOOP ;
+: CORRECT-R 0 CELL+ ISL @ - ROTLEFT ;
 : TALLY:|R ( a -- )   DUP >BI @ CORRECT-R TALLY-BI AND!
-    DUP >BY @ TALLY-BY OR!  >BA @ TALLY-BA OR!U ;
-: FIXUP<   CORRECT-R ISS @ OR! ;
+    DUP >BY @ TALLY-BY OR!  >BA @ TALLY-BA OR!U ;
+: FIXUP<   CORRECT-R ISS @ OR! ;
 IS-A IS-FIR : FIR  CHECK31 CREATE-- REMEMBER REVERSE-BYTES STARTVOC >DATA !
     REVERSE-BYTES STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !
-    DOES>  DUP >DATA @  FIXUP< TALLY:|R  CHECK32 ;
+    DOES>  DUP >DATA @  FIXUP< TALLY:|R  CHECK32 ;
 IS-A IS-DFIR : DFIR  CHECK31 CREATE-- REMEMBER STARTVOC >DATA !
     REVERSE-BYTES STARTVOC >BI !  STARTVOC >BY !  STARTVOC >BA !
     DOES>  DUP >DATA @  SWAP >R  LSHIFT REVERSE-BYTES FIXUP<
-        R> TALLY:|R  CHECK32 ;
-: (AND!BYTE) >R 0FF AND INVERT R@ C@ CHECK29 AND R> C! ;
-: AND!BYTE BEGIN 2DUP (AND!BYTE) SWAP 8 RSHIFT DUP WHILE SWAP 1+ REPEAT 2DROP ;
-: (OR!BYTE) >R R@ C@  CHECK28 OR R> C! ;
-: OR!BYTE BEGIN 1- 2DUP (OR!BYTE) SWAP 8 RSHIFT DUP WHILE SWAP REPEAT 2DROP ;
+        R> TALLY:|R  CHECK32 ;
+: (AND!BYTE) >R 0FF AND INVERT R@ C@ CHECK29 AND R> C! ;
+: AND!BYTE BEGIN 2DUP (AND!BYTE) SWAP 8 RSHIFT DUP WHILE SWAP 1+ REPEAT 2DROP ;
+: (OR!BYTE) >R R@ C@  CHECK28 OR R> C! ;
+: OR!BYTE BEGIN 1- 2DUP (OR!BYTE) SWAP 8 RSHIFT DUP WHILE SWAP REPEAT 2DROP ;
 : TALLY:|R'  DUP >BI @ TALLY-BI AND!BYTE  DUP >BY @ TALLY-BY OR!
-    >BA @ TALLY-BA OR!U ;
-: FIXUP<'   DUP >DATA @ ISS @ ISL @ + OR!BYTE  TALLY:|R'  CHECK32 ;
-: TALLY:,, ( a -- )   DUP >BY @ CHECK30 TALLY-BY AND!  >BA @ TALLY-BA OR!U ;
-: COMMA ( a -- )   DUP >DATA @ >R  TALLY:,,  CHECK32  R> EXECUTE ;
+    >BA @ TALLY-BA OR!U ;
+: FIXUP<'   DUP >DATA @ ISS @ ISL @ + OR!BYTE  TALLY:|R'  CHECK32 ;
+: TALLY:,, ( a -- )   DUP >BY @ CHECK30 TALLY-BY AND!  >BA @ TALLY-BA OR!U ;
+: COMMA ( a -- )   DUP >DATA @ >R  TALLY:,,  CHECK32  R> EXECUTE ;
 IS-A IS-COMMA : COMMAER CREATE-- REMEMBER STARTVOC >DATA !  0 STARTVOC >BI !
     STARTVOC >BY !  STARTVOC >BA !  STARTVOC >CNT !  STARTVOC >DIS !
-    DOES>  COMMA ;
-CREATE PRO-TALLY 3 CELLS ALLOT
-: T! PRO-TALLY !+ !+ !+ DROP ;
-: T!R   REVERSE-BYTES T! ; 
-: T@ PRO-TALLY 3 CELLS +  @- @- @- DROP ;
+    DOES>  COMMA ;
+CREATE PRO-TALLY 3 CELLS ALLOT
+: T! PRO-TALLY !+ !+ !+ DROP ;
+: T!R   REVERSE-BYTES T! ; 
+: T@ PRO-TALLY 3 CELLS +  @- @- @- DROP ;
 : 1FAMILY,    0 DO   DUP >R T@ R> 1PI   OVER + LOOP DROP DROP ;
 : 2FAMILY,    0 DO   DUP >R T@ R> 2PI   OVER + LOOP DROP DROP ;
 : 3FAMILY,    0 DO   DUP >R T@ R> 3PI   OVER + LOOP DROP DROP ;
 : 4FAMILY,    0 DO   DUP >R T@ R> 4PI   OVER + LOOP DROP DROP ;
 : xFAMILY|    0 DO   DUP >R T@ R> xFI   OVER + LOOP DROP DROP ;
 : FAMILY|R    0 DO   DUP >R T@ REVERSE-BYTES R> FIR   OVER + LOOP DROP DROP ;
-: xFAMILY|F   0 DO   DUP >R T@ R> DFI   OVER + LOOP DROP DROP ;
+: xFAMILY|F   0 DO   DUP >R T@ R> DFI   OVER + LOOP DROP DROP ;
 ( ############### PART II DISASSEMBLER ################################ )
-12 BAG DISS
+12 BAG DISS
 : !DISS DISS !BAG ;
 : .DISS-AUX DISS @+ SWAP DO
         I @ DUP IS-COMMA OVER IS-DFI OR OVER IS-DFIs OR IF I DISS - . THEN
         [DEFINED] ForSwiftForth [IF]  .'  [THEN]
         [DEFINED] ForGForth [IF]  ID.  [THEN]
     0 CELL+ +LOOP  CR ;
-VARIABLE DISS-VECTOR    ' .DISS-AUX DISS-VECTOR !
+VARIABLE DISS-VECTOR    ' .DISS-AUX DISS-VECTOR !
 : +DISS DISS BAG+! ;
 : DISS? DISS BAG? ;
-: DISS- 0 CELL+ NEGATE DISS +! ;
+: DISS- 0 CELL+ NEGATE DISS +! ;
 : TRY-PI
     DUP IS-PI IF
     AT-REST? IF
         DUP TALLY:,
         DUP +DISS
     THEN
-    THEN ;
+    THEN ;
 : TRY-xFI
     DUP IS-xFI IF
     DUP >BI @ TALLY-BI @ CONTAINED-IN IF
         DUP TALLY:|
         DUP +DISS
     THEN
-    THEN ;
+    THEN ;
 : TRY-DFI
     DUP IS-DFI OVER IS-DFIs OR IF
     DUP >BI @ TALLY-BI @ CONTAINED-IN IF
         DUP TALLY:|
         DUP +DISS
     THEN
-    THEN ;
+    THEN ;
 : TRY-FIR
     DUP IS-FIR IF
     DUP >BI @ CORRECT-R TALLY-BI @ CONTAINED-IN IF
         DUP TALLY:|R
         DUP +DISS
     THEN
-    THEN ;
+    THEN ;
 : TRY-COMMA
     DUP IS-COMMA IF
     DUP >BY @ TALLY-BY @ CONTAINED-IN IF
         DUP TALLY:,,
         DUP +DISS
     THEN
-    THEN ;
+    THEN ;
 : REBUILD
     !TALLY
     DISS? IF
         DISS @+ SWAP !DISS DO  ( Get bounds before clearing)
             I @ TRY-PI TRY-xFI TRY-DFI TRY-FIR TRY-COMMA DROP
         0 CELL+ +LOOP
-    THEN ;
+    THEN ;
 : BACKTRACK
 (   S" BACKTRACKING" TYPE                                               )
     DROP DISS @ @- DISS !
@@ -535,14 +540,14 @@ VARIABLE DISS-VECTOR    ' .DISS-AUX DISS-VECTOR !
 (   S" Failed at :" TYPE DUP ID. CR                                     )
     >NEXT%
 (   DISS-                                                               )
-    REBUILD ;
-: RESULT? AT-REST? DISS? AND   BAD? 0= AND ;
+    REBUILD ;
+: RESULT? AT-REST? DISS? AND   BAD? 0= AND ;
 : .RESULT
     RESULT? IF
         DISS-VECTOR @ EXECUTE
         DISS-
         REBUILD
-    THEN ;
+    THEN ;
 \     % RESULT +DISS Spurious? Remove after next total test.
 : SHOW-STEP
     TRY-PI TRY-DFI TRY-xFI TRY-FIR TRY-COMMA
@@ -550,25 +555,25 @@ VARIABLE DISS-VECTOR    ' .DISS-AUX DISS-VECTOR !
     >NEXT%
 (       DUP ID.                                                         )
     BAD? IF BACKTRACK THEN
-    BEGIN DUP VOCEND? DISS? AND WHILE BACKTRACK REPEAT ;
+    BEGIN DUP VOCEND? DISS? AND WHILE BACKTRACK REPEAT ;
 : SHOW-ALL ( -- )
     !DISS   !TALLY
     STARTVOC BEGIN
         SHOW-STEP
-    DUP VOCEND? UNTIL DROP ;
+    DUP VOCEND? UNTIL DROP ;
 : SHOW-OPCODES ( -- )
     !DISS   !TALLY
     STARTVOC BEGIN
         DUP IS-PI IF DUP %ID. THEN >NEXT%
-    DUP VOCEND? UNTIL DROP ;
+    DUP VOCEND? UNTIL DROP ;
 : SHOW:
     !DISS   !TALLY
     ' DUP BEGIN
         SHOW-STEP
-    OVER DISS CELL+ @ - OVER VOCEND? OR UNTIL DROP DROP ;
-VARIABLE AS-POINTER       HERE AS-POINTER !
-: INSTRUCTION  ISS @   ISL @   MC@ ;
-VARIABLE LATEST-INSTRUCTION
+    OVER DISS CELL+ @ - OVER VOCEND? OR UNTIL DROP DROP ;
+VARIABLE AS-POINTER       HERE AS-POINTER !
+: INSTRUCTION  ISS @   ISL @   MC@ ;
+VARIABLE LATEST-INSTRUCTION
 : DIS-PI ( dea -- dea )
     DUP IS-PI IF
     AT-REST? IF
@@ -582,7 +587,7 @@ VARIABLE LATEST-INSTRUCTION
         DUP >CNT @ AS-POINTER +!
     THEN
     THEN
-    THEN ;
+    THEN ;
 : DIS-xFI ( dea -- dea )
     DUP IS-xFI IF
     DUP >BI @ TALLY-BI @ CONTAINED-IN IF
@@ -593,7 +598,7 @@ VARIABLE LATEST-INSTRUCTION
     THEN
     THEN
     THEN
-    THEN ;
+    THEN ;
 : DIS-DFI ( dea -- dea )
     DUP IS-DFI OVER IS-DFIs OR IF
     DUP >BI @ TALLY-BI @ CONTAINED-IN IF
@@ -602,7 +607,7 @@ VARIABLE LATEST-INSTRUCTION
         DUP +DISS
     THEN
     THEN
-    THEN ;
+    THEN ;
 : DIS-DFIR ( dea -- dea )
     DUP IS-DFIR IF
     DUP >BI @ CORRECT-R   TALLY-BI @ CONTAINED-IN IF
@@ -611,7 +616,7 @@ VARIABLE LATEST-INSTRUCTION
         DUP +DISS
     THEN
     THEN
-    THEN ;
+    THEN ;
 : DIS-FIR ( dea -- dea )
     DUP IS-FIR IF
     DUP >BI @ CORRECT-R   TALLY-BI @ CONTAINED-IN IF
@@ -622,7 +627,7 @@ VARIABLE LATEST-INSTRUCTION
     THEN
     THEN
     THEN
-    THEN ;
+    THEN ;
 : DIS-COMMA ( dea -- dea )
     DUP IS-COMMA IF
     DUP >BY @ TALLY-BY @ CONTAINED-IN IF
@@ -631,25 +636,25 @@ VARIABLE LATEST-INSTRUCTION
         DUP +DISS
     THEN
     THEN
-    THEN ;
+    THEN ;
 : .DFI
     INSTRUCTION   OVER >BI @ AND   OVER >DATA @ RSHIFT   U.
-    %ID. ;
+    %ID. ;
 : .DFIR
     INSTRUCTION   OVER >BI @ CORRECT-R AND   OVER >DATA @ RSHIFT
     REVERSE-BYTES CORRECT-R U.
-    %ID. ;
+    %ID. ;
 : .COMMA-STANDARD
     AS-POINTER @ OVER >CNT @ MC@ U.
     DUP >CNT @ AS-POINTER +!
-    %ID. ;
+    %ID. ;
 : .COMMA-SIGNED
     AS-POINTER @ OVER >CNT @ MC@ .
     DUP >CNT @ AS-POINTER +!
-    %ID. ;
+    %ID. ;
 : .COMMA   DUP >DIS @ IF   DUP >DIS @ EXECUTE   ELSE
-        .COMMA-STANDARD   THEN ;
-: %~ID. DUP IGNORE? IF DROP ELSE %ID. THEN  ;
+        .COMMA-STANDARD   THEN ;
+: %~ID. DUP IGNORE? IF DROP ELSE %ID. THEN  ;
 : .DISS   DISS @+ SWAP DO
         I @
         DUP IS-COMMA IF
@@ -663,11 +668,11 @@ VARIABLE LATEST-INSTRUCTION
         ELSE
             %~ID.
         THEN THEN THEN THEN
-    0 CELL+ +LOOP ;
+    0 CELL+ +LOOP ;
 VARIABLE I-ALIGNMENT    1 I-ALIGNMENT !   ( Instruction alignment )
 
 : SHOW-MEMORY ( a -- a' )   BEGIN  COUNT C. S"  C, " TYPE
-        DUP I-ALIGNMENT @ MOD WHILE  REPEAT ;
+        DUP I-ALIGNMENT @ MOD WHILE  REPEAT ;
 : ((DISASSEMBLE)) ( a dea -- a' )
     SWAP
     DUP AS-POINTER !  >R
@@ -683,20 +688,37 @@ VARIABLE I-ALIGNMENT    1 I-ALIGNMENT !   ( Instruction alignment )
         R> DROP AS-POINTER @
     ELSE
         R> SHOW-MEMORY
-    THEN ;
+    THEN ;
 : (DISASSEMBLE) ( a -- a' )   !DISS !TALLY STARTVOC ((DISASSEMBLE)) ;
-: DIS ( x -- )   PAD !  PAD (DISASSEMBLE) ;
+: DIS ( x -- )   PAD !  PAD (DISASSEMBLE) ;
 : FORCED-DISASSEMBLY ( dea -- )
-    !DISS  !TALLY  AS-POINTER @ SWAP ((DISASSEMBLE)) DROP ;
+    !DISS  !TALLY  AS-POINTER @ SWAP ((DISASSEMBLE)) DROP ;
 : DISASSEMBLE-RANGE ( first last -- )
-    SWAP  BEGIN DUP ADORN-ADDRESS  (DISASSEMBLE) 2DUP > 0= UNTIL  2DROP ;
+    SWAP  BEGIN DUP ADORN-ADDRESS  (DISASSEMBLE) 2DUP > 0= UNTIL  2DROP ;
+: END-CODE
+    ?CSP ?EXEC CHECK26 CHECK32 PREVIOUS ; IMMEDIATE
+
+( FIXME : we must get rid of this one )
+: ;C POSTPONE END-CODE S" WARNING: get rid of C;" TYPE CR ; IMMEDIATE
+
+\ The following two definitions must *NOT* be in the assembler wordlist.
+PREVIOUS DEFINITIONS DECIMAL
+
+ALSO ASSEMBLER
+: CODE
+    ?EXEC ASM-CREATE POSTPONE ASSEMBLER !TALLY !CSP ; IMMEDIATE
+: ;CODE
+    ?CSP   POSTPONE (;CODE)   POSTPONE [   POSTPONE ASSEMBLER ; IMMEDIATE
+: DDD ( a -- a' )   (DISASSEMBLE) ;
+: D-R ( first last -- )   DISASSEMBLE-RANGE ;
+PREVIOUS 
 ( $Id: aswrap.frt,v 1.21 2009/03/26 19:40:39 albert Exp $ )
 ( Copyright{2000}: Albert van der Horst, HCC FIG Holland by GNU Public License)
 ( Uses Richard Stallmans convention. Uppercased word are parameters.    )
 
-: HOT-PATCH ( xt -- ) ' >BODY ! ;
-VARIABLE CODE-LENGTH 2000000 CODE-LENGTH !
-100 BAG SECTION-REGISTRY
+: HOT-PATCH ( xt -- ) ' >BODY ! ;
+VARIABLE CODE-LENGTH 2000000 CODE-LENGTH !
+100 BAG SECTION-REGISTRY
 0 VALUE CURRENT-SECTION
 
 : SECTION-FIELD ( u size -- u' ) CREATE OVER , +
@@ -713,7 +735,7 @@ CONSTANT |SECTION|
 : CODE-SPACE ( -- a ) 'CODE-SPACE @ ;
 : -ORG- ( a -- ) 'TARGET-START ! ;
 : TARGET-START ( -- a ) 'TARGET-START @ ;
-: FILE-OFFSET ( -- a ) 'FILE-OFFSET @ ;
+: FILE-OFFSET ( -- a ) 'FILE-OFFSET @ ;
 : ((SECTION)) ( file target code -name- )
     SAVE-INPUT CREATE HERE DUP >R DUP SECTION-REGISTRY BAG+!
     |SECTION| DUP ALLOT ERASE RESTORE-INPUT THROW BL WORD $@ $, R@ >NFA !
@@ -721,21 +743,21 @@ CONSTANT |SECTION|
     'CODE-SPACE ! 'TARGET-START ! 'FILE-OFFSET !
     DOES> TO CURRENT-SECTION ;
 : (SECTION) ( file target -- ) CODE-LENGTH @ ALLOCATE THROW ((SECTION)) ;
-CREATE 'SECTION ' (SECTION) DUP , , : SECTION 'SECTION @ EXECUTE ;
+CREATE 'SECTION ' (SECTION) DUP , , : SECTION 'SECTION @ EXECUTE ;
 : DEFAULT-SECTION ( -- )
     0 \ File start address
     0 \ Target start address
     s" SECTION the-default-section" EVALUATE ;
-DEFAULT-SECTION
-:NONAME ( -- a ) CP @ ; HOT-PATCH 'AS-HERE
-: TARGET-END ( -- a ) TARGET-START CP @ CODE-SPACE - + ;
-: PLAUSIBLE-LABEL? ( a -- f ) TARGET-START TARGET-END WITHIN ;
-: HOST-END ( -- a ) CP @ ;
-: ORG ( a -- ) -ORG- CODE-SPACE CP ! ;
-: HOST>TARGET ( a -- a' ) CODE-SPACE - TARGET-START + ;
-: TARGET>HOST ( a -- a' ) TARGET-START - CODE-SPACE + ;
-: FILE>TARGET ( a -- a' ) FILE-OFFSET - TARGET-START + ;
-: TARGET>FILE ( a -- a' ) TARGET-START - FILE-OFFSET + ;
+DEFAULT-SECTION
+:NONAME ( -- a ) CP @ ; HOT-PATCH 'AS-HERE
+: TARGET-END ( -- a ) TARGET-START CP @ CODE-SPACE - + ;
+: PLAUSIBLE-LABEL? ( a -- f ) TARGET-START TARGET-END WITHIN ;
+: HOST-END ( -- a ) CP @ ;
+: ORG ( a -- ) -ORG- CODE-SPACE CP ! ;
+: HOST>TARGET ( a -- a' ) CODE-SPACE - TARGET-START + ;
+: TARGET>HOST ( a -- a' ) TARGET-START - CODE-SPACE + ;
+: FILE>TARGET ( a -- a' ) FILE-OFFSET - TARGET-START + ;
+: TARGET>FILE ( a -- a' ) TARGET-START - FILE-OFFSET + ;
 
 \ Abbreviation.
 [DEFINED] ForSwiftForth NOT [IF]
@@ -743,27 +765,27 @@ DEFAULT-SECTION
 [THEN]
 
 : SUB-SECTION ( a -name- ) DUP TARGET>FILE
-    OVER ROT TARGET>HOST CP @ >R ((SECTION)) R> CP ! ;
-:NONAME ( -- a ) CP @ HOST>TARGET ; HOT-PATCH '_AP_
+    OVER ROT TARGET>HOST CP @ >R ((SECTION)) R> CP ! ;
+:NONAME ( -- a ) CP @ HOST>TARGET ; HOT-PATCH '_AP_
 [DEFINED] ForCiForth
 [DEFINED] ForGForth OR [IF]
     : SWAP-AS ( -- ) CP @ DP @ CP ! DP ! ;
 [THEN]
 [DEFINED] ForSwiftForth [IF]
     : SWAP-AS ( -- ) CP @ H @ CP ! H ! ;
-[THEN]
-:NONAME ( n -- ) CP +! ; HOT-PATCH 'AS-ALLOT
-:NONAME ( c -- ) CP @ 1 AS-ALLOT C! ; HOT-PATCH 'AS-C,
-: RESB ( u -- ) AS-HERE OVER AS-ALLOT SWAP ERASE ;
-: RES-TIL ( a -- ) _AP_ - AS-ALLOT ;
-: AS-ALIGN ( n -- ) _AP_ BEGIN 2DUP SWAP MOD WHILE 1+ REPEAT RES-TIL DROP ; 
+[THEN]
+:NONAME ( n -- ) CP +! ; HOT-PATCH 'AS-ALLOT
+:NONAME ( c -- ) CP @ 1 AS-ALLOT C! ; HOT-PATCH 'AS-C,
+: RESB ( u -- ) AS-HERE OVER AS-ALLOT SWAP ERASE ;
+: RES-TIL ( a -- ) _AP_ - AS-ALLOT ;
+: AS-ALIGN ( n -- ) _AP_ BEGIN 2DUP SWAP MOD WHILE 1+ REPEAT RES-TIL DROP ; 
 ( $Id: asi386.frt,v 4.23 2005/05/09 01:00:40 albert Exp $ )
 ( Copyright{2000}: Albert van der Horst, HCC FIG Holland by GNU Public License)
 
 ALSO ASSEMBLER DEFINITIONS HEX
 
  : (W,) lsbyte, lsbyte, DROP ;
- : (L,) lsbyte, lsbyte, lsbyte, lsbyte, DROP ;
+ : (L,) lsbyte, lsbyte, lsbyte, lsbyte, DROP ;
 
  ( ############## 80386 ASSEMBLER PROPER ############################### )
  ( The decreasing BY means that a decompiler hits them in the right      )
@@ -847,7 +869,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
  240401 0000 0100 0000 FIR B|
  240402 0000 0100 0100 FIR X|
 
-0600 0 01FF 0000 1PI ~SIB,
+0600 0 01FF 0000 1PI ~SIB,
  041000 0000 FF03 T!
   0008 0000 8 2FAMILY, ADD, OR, ADC, SBB, AND, SUB, XOR, CMP,
  041000 0000 FF01 T!
@@ -867,7 +889,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
  1022 0 FF0000 T! 0100 00B20F 4 3FAMILY, LSS, -- LFS, LGS, ( 3)
  1501 0 FF0000 T! 0800 00B60F 2 3FAMILY, MOVZX|B, MOVSX|B,  ( 3)
  1502 0 FF0000 T! 0800 00B70F 2 3FAMILY, MOVZX|W, MOVSX|W,  ( 3)
- 1002 0 FF0000 00AF0F 3PI IMUL,                     ( 3)
+ 1002 0 FF0000 00AF0F 3PI IMUL,                     ( 3)
  0 04 C701 00C6 2PI MOVI,
  0012 0 0007 T!   0008 40 4 1FAMILY, INC|X, DEC|X, PUSH|X, POP|X,
  0012 0 0007 90 1PI XCHG|AX,
@@ -890,7 +912,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
    080000 00000F 6 3FAMILY, SLDT, STR, LLDT, LTR, VERR, VERW,  ( 3)
    100000 20010F 2 3FAMILY, SMSW, LMSW,       ( 3)
  0022 0 C70000 T! ( It says X but in fact memory of different sizes) ( 3)
-   080000 00010F 4 3FAMILY, SGDT, SIDT, LGDT, LIDT, ( 3)
+   080000 00010F 4 3FAMILY, SGDT, SIDT, LGDT, LIDT, ( 3)
  0001 0 02000001 00 FIR B'|
  0002 0 02000001 01 FIR X'|
  0008 02 0201 T!    0002 A0 2 1FAMILY, MOV|TA, MOV|FA,
@@ -900,7 +922,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
  0000 0 0201 T!  0002 A4 6 1FAMILY, MOVS, CMPS, -- STOS, LODS, SCAS,
  0 10 0201 T!   0002 E4 2 1FAMILY, IN|P, OUT|P,
  0 00 0201 T!   0002 EC 2 1FAMILY, IN|D, OUT|D,
- 0 00 0201 T!   0002 6C 2 1FAMILY, INS, OUTS,     ( 3)
+ 0 00 0201 T!   0002 6C 2 1FAMILY, INS, OUTS,     ( 3)
  0800     0000 01000001 T!R     01 00 2 FAMILY|R Y| N|
  0800     0000 0400000E T!R     02 00 8 FAMILY|R O| C| Z| CZ| S| P| L| LE|
  0800 40 050F 0070 1PI J,
@@ -916,7 +938,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
  0800 80 50F00 800F 2PI J|X,                                           ( 3)
  0800 0 0100 T!R  0100 0000 2 FAMILY|R Y'| N'|                          ( 3)
  0800 0 0E00 T!R  0200 0000 8 FAMILY|R O'| C'| Z'| CZ'| S'| P'| L'| LE'| ( 3)
- 0901 0 C70F00 00900F 3PI SET,  ( 3)
+ 0901 0 C70F00 00900F 3PI SET,  ( 3)
  2000 0000 0 T!  0008 06 4 1FAMILY, PUSH|ES, PUSH|CS, PUSH|SS, PUSH|DS,
  2000 0000 0 T!  0008 07 4 1FAMILY, POP|ES, -- POP|SS, POP|DS,
 
@@ -944,16 +966,16 @@ ALSO ASSEMBLER DEFINITIONS HEX
    0001 0104 0000   00C8 1PI ENTER, ( 3)
        0000 0 00   00C9 1PI LEAVE, ( 3)
        0000 0 00   00D7 1PI XLAT,  ( 3)
-       0000 0 00 060F 2PI CLTS,  ( 3)
+       0000 0 00 060F 2PI CLTS,  ( 3)
 : (SIB),,   TALLY-BY @   0 TALLY-BY !
     CHECK32 TALLY-BA @ 0900 INVERT AND TALLY-BA !   ['] NOOP BA-XT !
     ~SIB,   TALLY-BY !   ;
-' (SIB),,  ' SIB,, >BODY >DATA !
+' (SIB),,  ' SIB,, >BODY >DATA !
 : DIS-SIB DROP
     LATEST-INSTRUCTION @        \ We don't want sib visible.
     [ ' ~SIB, >BODY ] LITERAL FORCED-DISASSEMBLY
     LATEST-INSTRUCTION ! ;
-' DIS-SIB    ' SIB,, >BODY >DIS !
+' DIS-SIB    ' SIB,, >BODY >DIS !
 -warning
 : [AX   ~SIB| SIB,, [AX ;
 : [SP   ~SIB| SIB,, [SP ;
@@ -964,20 +986,20 @@ ALSO ASSEMBLER DEFINITIONS HEX
 : [BX   ~SIB| SIB,, [BX ;
 : [DI   ~SIB| SIB,, [DI ;
 : [MEM  ~SIB| SIB,, [MEM ;
-+warning
++warning
 :NONAME   TALLY-BA  C000 TOGGLE ;  ' AS:, >BODY >PRF !
-:NONAME   TALLY-BA 30000 TOGGLE ;  ' OS:, >BODY >PRF !
+:NONAME   TALLY-BA 30000 TOGGLE ;  ' OS:, >BODY >PRF !
 
 ( ############## 80386 ASSEMBLER PROPER END ########################### )
 : RB, _AP_ 1 + - (RB,) ;    ' .COMMA-SIGNED   ' (RB,) >BODY >DIS !
 : RW, _AP_ 2 + - (RW,) ;    ' .COMMA-SIGNED   ' (RW,) >BODY >DIS !
-: RL, _AP_ 4 + - (RL,) ;    ' .COMMA-SIGNED   ' (RL,) >BODY >DIS !
+: RL, _AP_ 4 + - (RL,) ;    ' .COMMA-SIGNED   ' (RL,) >BODY >DIS !
 : BITS-32   28000 BA-DEFAULT ! ;
-: BITS-16   14000 BA-DEFAULT ! ;
+: BITS-16   14000 BA-DEFAULT ! ;
 
 BITS-32
 PREVIOUS DEFINITIONS DECIMAL
-( ############## 8086 ASSEMBLER POST ################################## )
+( ############## 8086 ASSEMBLER POST ################################## )
 
 \ Tools
 ( $Id: access.frt,v 1.6 2005/01/04 19:20:35 albert Exp $ )
@@ -988,7 +1010,7 @@ ALSO ASSEMBLER
 : B@ TARGET>HOST C@ ;
 : W@ TARGET>HOST 2 MC@ ;
 : L@ TARGET>HOST 4 MC@ ;
-PREVIOUS
+PREVIOUS
 ( $Id: labelas.frt,v 1.17 2009/03/26 19:40:39 albert Exp $ )
 ( Copyright{2000}: Albert van der Horst, HCC FIG Holland by GNU Public License)
 ( Uses Richard Stallmans convention. Uppercased word are parameters.    )
@@ -999,23 +1021,23 @@ PREVIOUS
     REQUIRE POSTFIX
 [THEN]
 
-: FIX-DEA DROP ['] _ ;
+: FIX-DEA DROP ['] _ ;
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
      : BACKSPACE-IN   -2 >IN +! 0 ;
 [THEN]
 [DEFINED] ForCiForth [IF]
     : BACKSPACE-IN   IN[] IF -2 IN +! THEN DROP ;
-[THEN]
+[THEN]
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
     : FIX-NMB   -1 >IN +!  BL WORD DROP  BACKSPACE-IN ;
 [THEN]
 [DEFINED] ForCiForth [IF]
     : FIX-NMB   -1 IN +!  (WORD) 2DROP  BACKSPACE-IN   0 DPL ! ;
-[THEN]
-: ERROR10 ( f n -- )   DROP IF  FIX-NMB  THEN ;
-: ERROR12 ( f n -- )   DROP IF  FIX-DEA  THEN ;
+[THEN]
+: ERROR10 ( f n -- )   DROP IF  FIX-NMB  THEN ;
+: ERROR12 ( f n -- )   DROP IF  FIX-DEA  THEN ;
 
 [DEFINED] ForCiForth [IF]
     REQUIRE OLD:
@@ -1025,54 +1047,54 @@ PREVIOUS
     DUP 10 = IF  ERROR10  ELSE
     DUP 12 = IF  ERROR12  ELSE
         (?ERROR)
-    THEN THEN ;
-: RESET-SECTION ( file target -- )   2DROP  BL WORD COUNT EVALUATE  CODE-SPACE CP ! ;
+    THEN THEN ;
+: RESET-SECTION ( file target -- )   2DROP  BL WORD COUNT EVALUATE  CODE-SPACE CP ! ;
 : FIRSTPASS ( -- )   CR S" FIRSTPASS " TYPE CR
     ['] ?ERROR-FIXING '?ERROR !
     'SECTION RESTORED ;
 
 : SECONDPASS ( -- )   CR S" SECONDPASS " TYPE CR
     ['] RESET-SECTION 'SECTION !
-    '?ERROR RESTORED ;
-CREATE 'LABELS  HERE ,
+    '?ERROR RESTORED ;
+CREATE 'LABELS  HERE ,
 : IS-A-LABEL? ( a n -- f )   GET-CURRENT SEARCH-WORDLIST DUP IF
         SWAP >BODY  BEGIN  >LFA ['] @ CATCH IF  DROP 0= EXIT
             THEN  ?DUP WHILE  DUP 'LABELS = IF  DROP EXIT
-                THEN  REPEAT  0=  THEN ;
+                THEN  REPEAT  0=  THEN ;
 : KNOWN-LABEL? ( a n -- a n f )   2DUP IS-A-LABEL? >R
     R@ IF  2DUP GET-CURRENT SEARCH-WORDLIST IF
             EXECUTE _AP_ <> IF  S" ERROR: phase error defining label "
                 TYPE  2DUP TYPE  CR
-    THEN THEN THEN  R> ;
+    THEN THEN THEN  R> ;
 
 [DEFINED] ForCiForth [IF]
     'ONLY >WID CURRENT !  \ Making ONLY the CONTEXT is dangerous! This will do.
     : : (WORD)
         KNOWN-LABEL? IF 2DROP ELSE 2>R _AP_ 2R> POSTFIX CONSTANT THEN ;
-    PREFIX IMMEDIATE DEFINITIONS
+    PREFIX IMMEDIATE DEFINITIONS
 [THEN]
 
-100 BAG DX-SET    : !DX-SET DX-SET !BAG ;
+100 BAG DX-SET    : !DX-SET DX-SET !BAG ;
 : GET-DX-SET ( -- )   DEPTH >R
     BEGIN  BL WORD DUP C@  WHILE  FIND IF  EXECUTE  ELSE
             COUNT 0 0 2SWAP >NUMBER 2DROP DROP
         THEN  REPEAT  DROP
-    DEPTH R> ?DO  DX-SET BAG+!  LOOP ;
-: C,-DX-SET ( -- )   BEGIN  DX-SET BAG@- AS-C,  DX-SET BAG? 0=  UNTIL ;
-: db ( -- )   !DX-SET  GET-DX-SET  C,-DX-SET ;
+    DEPTH R> ?DO  DX-SET BAG+!  LOOP ;
+: C,-DX-SET ( -- )   BEGIN  DX-SET BAG@- AS-C,  DX-SET BAG? 0=  UNTIL ;
+: db ( -- )   !DX-SET  GET-DX-SET  C,-DX-SET ;
 ALSO ASSEMBLER
-: W,-DX-SET ( -- )   BEGIN  DX-SET BAG@- (W,)  DX-SET BAG? 0=  UNTIL ;
-: dw ( -- )   !DX-SET  GET-DX-SET  W,-DX-SET ;
-: L,-DX-SET ( -- )   BEGIN  DX-SET BAG@- (L,)  DX-SET BAG? 0=  UNTIL ;
-: dl ( -- )   !DX-SET  GET-DX-SET  L,-DX-SET ;
-: ($,) ( a n -- )   AS-HERE SWAP DUP AS-ALLOT MOVE ;
+: W,-DX-SET ( -- )   BEGIN  DX-SET BAG@- (W,)  DX-SET BAG? 0=  UNTIL ;
+: dw ( -- )   !DX-SET  GET-DX-SET  W,-DX-SET ;
+: L,-DX-SET ( -- )   BEGIN  DX-SET BAG@- (L,)  DX-SET BAG? 0=  UNTIL ;
+: dl ( -- )   !DX-SET  GET-DX-SET  L,-DX-SET ;
+: ($,) ( a n -- )   AS-HERE SWAP DUP AS-ALLOT MOVE ;
 : $,-DX-SET ( -- )
     BEGIN  DX-SET BAG@- DUP 256 0 WITHIN IF
         DX-SET BAG@- ($,)  ELSE  AS-C,  THEN
-    DX-SET BAG? 0=  UNTIL ;
+    DX-SET BAG? 0=  UNTIL ;
 : d$ ( -- )   !DX-SET  GET-DX-SET  $,-DX-SET ;
-: "   [CHAR] " PARSE ;
-PREVIOUS
+: "   [CHAR] " PARSE ;
+PREVIOUS
 ( $Id: labeldis.frt,v 1.86 2010/06/03 23:27:28 albert Exp $ )
 ( Copyright{2004}: Albert van der Horst, HCC FIG Holland by GNU Public License)
 ( Uses Richard Stallmans convention. Uppercased word are parameters.    )
@@ -1085,13 +1107,11 @@ PREVIOUS
 
 1000 CONSTANT MAX-LABEL
 
-\ : \D ;
-
 \ -------------------- INTRODUCTION --------------------------------
 
-100 BAG THE-REGISTER
-: REALLOC ( u -- a )   HERE >R  DUP ALLOT  R@ SWAP MOVE   R> ;
-: REALLOC-POINTER ( a n -- )   >R  DUP @ R> REALLOC  SWAP ! ;
+100 BAG THE-REGISTER
+: REALLOC ( u -- a )   HERE >R  DUP ALLOT  R@ SWAP MOVE   R> ;
+: REALLOC-POINTER ( a n -- )   >R  DUP @ R> REALLOC  SWAP ! ;
 0 VALUE CURRENT-LABELSTRUCT \ current label pointer
 
 : LABEL-FIELD ( u size -- u' )   CREATE  OVER , +
@@ -1110,9 +1130,9 @@ CONSTANT |LABELSTRUCT|
 : DECOMP ( -- )   'DECOMP @ EXECUTE ;
 : .PAY ( -- )   '.PAY @ EXECUTE ;
 
-: DOUBLE-SIZE ( -- )   'MAX-LAB DUP @ 2* SWAP ! ;
-: MAX-LAB ( -- n )   'MAX-LAB @ ;
-: LAB-UPB ( -- n )   LABELS |BAG| 2/ ;
+: DOUBLE-SIZE ( -- )   'MAX-LAB DUP @ 2* SWAP ! ;
+: MAX-LAB ( -- n )   'MAX-LAB @ ;
+: LAB-UPB ( -- n )   LABELS |BAG| 2/ ;
 : >RELOCATABLE ( -- )   LABELS DUP @  OVER - SWAP ! ;
 : RELOCATABLE> ( -- )   LABELS DUP +! ;
 : ?REALLOC? ( -- )
@@ -1120,38 +1140,38 @@ CONSTANT |LABELSTRUCT|
         >RELOCATABLE  CURRENT-LABEL MAX-LAB 2* 6 + CELLS REALLOC-POINTER
         CURRENT-LABEL EXECUTE   RELOCATABLE>  THEN ;
 
-: LAB+! ( a -- )   LABELS BAG+!  ?REALLOC? ;
+: LAB+! ( a -- )   LABELS BAG+!  ?REALLOC? ;
 
 : LABELSTRUCT ( n print gen -- )   SAVE-INPUT  CREATE  HERE DUP >R
     DUP THE-REGISTER BAG+!  |LABELSTRUCT| DUP ALLOT  ERASE
     RESTORE-INPUT THROW  BL WORD $@ $, R@ >NFA !
     CURRENT-LABELSTRUCT R@ >LFA !  R> TO CURRENT-LABELSTRUCT
     DUP 'CURRENT-LABEL !  'DECOMP !  '.PAY !  DUP 'MAX-LAB ! 2* BUILD-BAG
-    DOES>  TO CURRENT-LABELSTRUCT ;
+    DOES>  TO CURRENT-LABELSTRUCT ;
 
-: LABELS[] ( n -- a )   1- 2* CELLS LABELS CELL+ + ;
-: REMOVE-LABEL ( -- )   LABELS[] LABELS  2DUP BAG-REMOVE BAG-REMOVE ;
+: LABELS[] ( n -- a )   1- 2* CELLS LABELS CELL+ + ;
+: REMOVE-LABEL ( -- )   LABELS[] LABELS  2DUP BAG-REMOVE BAG-REMOVE ;
 : DO-LAB   POSTPONE LABELS POSTPONE DO-BAG ; IMMEDIATE
-: LOOP-LAB   2 CELLS POSTPONE LITERAL POSTPONE +LOOP ; IMMEDIATE
-: .PAY. ( a -- )   CELL+ ? ;
-: .PAY$ ( a -- )   CELL+ @ $@ TYPE  3 SPACES ;
-: .PAY-DEA ( a -- )   CELL+ @ %ID. ;
-: LABEL-NAME ( n -- a n )   LABELS[] CELL+ @ >BODY >NFA @ $@ ;
-: .LABELS ( -- )   DO-LAB  I @ .  I .PAY  CR  LOOP-LAB ;
-: LAB-BOUNDS ( -- l u )   1 LAB-UPB ;
-: LAB< ( i1 i2 -- f )   LABELS[] @  SWAP LABELS[] @  SWAP < ;
-: LAB<-> ( i1 i2 -- )   LABELS[] SWAP LABELS[]  2 CELLS EXCHANGE ;
-: SORT-LABELS ( -- )   LAB-BOUNDS  ['] LAB<  ['] LAB<->  QSORT ;
-VARIABLE CONT
-: L< ( n -- f )   LABELS[] @  CONT @ < ;
-: WHERE-LABEL ( a -- )   CONT !  LAB-BOUNDS 1+  ['] L<  BIN-SEARCH ;
+: LOOP-LAB   2 CELLS POSTPONE LITERAL POSTPONE +LOOP ; IMMEDIATE
+: .PAY. ( a -- )   CELL+ ? ;
+: .PAY$ ( a -- )   CELL+ @ $@ TYPE  3 SPACES ;
+: .PAY-DEA ( a -- )   CELL+ @ %ID. ;
+: LABEL-NAME ( n -- a n )   LABELS[] CELL+ @ >BODY >NFA @ $@ ;
+: .LABELS ( -- )   DO-LAB  I @ .  I .PAY  CR  LOOP-LAB ;
+: LAB-BOUNDS ( -- l u )   1 LAB-UPB ;
+: LAB< ( i1 i2 -- f )   LABELS[] @  SWAP LABELS[] @  SWAP < ;
+: LAB<-> ( i1 i2 -- )   LABELS[] SWAP LABELS[]  2 CELLS EXCHANGE ;
+: SORT-LABELS ( -- )   LAB-BOUNDS  ['] LAB<  ['] LAB<->  QSORT ;
+VARIABLE CONT
+: L< ( n -- f )   LABELS[] @  CONT @ < ;
+: WHERE-LABEL ( a -- )   CONT !  LAB-BOUNDS 1+  ['] L<  BIN-SEARCH ;
 
 VARIABLE LABEL-CACHE    \ Index of next label.
 
-: FIND-LABEL ( n -- )   WHERE-LABEL  DUP LAB-UPB 1+ <> AND  DUP LABEL-CACHE ! ;
+: FIND-LABEL ( n -- )   WHERE-LABEL  DUP LAB-UPB 1+ <> AND  DUP LABEL-CACHE ! ;
 : >LABEL ( a -- )   DUP >R  FIND-LABEL DUP IF  LABELS[] DUP @  R@ <> IF
     DROP 0  THEN THEN
-    R> DROP ;
+    R> DROP ;
 
 VARIABLE MAX-DEV-P   -8 MAX-DEV-P !    \ Max deviation acceptable with previous
 VARIABLE MAX-DEV-N    8 MAX-DEV-N !    \ Max deviation acceptable with next
@@ -1159,42 +1179,42 @@ VARIABLE MAX-DEV-N    8 MAX-DEV-N !    \ Max deviation acceptable with next
 : (~LABEL)   DUP MAX-DEV-P @ + FIND-LABEL
     DUP 0= IF 2DROP 0 ELSE
         OVER MAX-DEV-N @ + OVER LABELS[] @  < IF 2DROP 0 ELSE
-    SWAP DROP THEN THEN ;
+    SWAP DROP THEN THEN ;
 : IMPROVE-LABEL
     BEGIN  DUP LAB-UPB <> IF  2DUP 1+ LABELS[] @ < 0=  ELSE  0  THEN
-    WHILE  1+  REPEAT ;
+    WHILE  1+  REPEAT ;
 : ~LABEL   DUP (~LABEL) DUP 0= IF  2DROP 0 0
-    ELSE  IMPROVE-LABEL  LABELS[] SWAP OVER @ -  THEN ;
+    ELSE  IMPROVE-LABEL  LABELS[] SWAP OVER @ -  THEN ;
 : ROLL-LABEL   DUP   LABELS[]  DUP LABELS BAG-HOLE   LABELS BAG-HOLE
-    LAB-BOUNDS SWAP DROP   LAB<->   -2 CELLS LABELS  +! ;
+    LAB-BOUNDS SWAP DROP   LAB<->   -2 CELLS LABELS  +! ;
 : NEXT-LABEL   LABEL-CACHE @   DUP IF
         1+ DUP LAB-BOUNDS + = IF DROP 0 THEN
-    DUP LABEL-CACHE ! THEN ;
-: .EQU    LABELS[] DUP @ 8 H.R S"  LABEL " TYPE  CELL+ @ %ID. CR ;
-MAX-LABEL ' .PAY-DEA ' .EQU LABELSTRUCT EQU-LABELS  LABELS !BAG
+    DUP LABEL-CACHE ! THEN ;
+: .EQU    LABELS[] DUP @ 8 H.R S"  LABEL " TYPE  CELL+ @ %ID. CR ;
+MAX-LABEL ' .PAY-DEA ' .EQU LABELSTRUCT EQU-LABELS  LABELS !BAG
 : LABELED ( x a n -- )   S" CREATE " PAD $!  PAD COUNT + OVER
     2SWAP PAD $+!  PAD $@ EVALUATE  HERE >R  'LABELS @ , ( >LFA )
     R@ 'LABELS !  HERE 2 CELLS + , ( >NFA )  ROT DUP , ( >DATA )
     -ROT $, DROP  EQU-LABELS  LAB+!  R> LAB+!
-    DOES> ( -- x )   >DATA @ ;
+    DOES> ( -- x )   >DATA @ ;
 : LABEL   BL WORD COUNT LABELED ;
-: EQU LABEL ;
-: =EQU-LABEL   HOST>TARGET  EQU-LABELS >LABEL ;
+: EQU LABEL ;
+: =EQU-LABEL   HOST>TARGET  EQU-LABELS >LABEL ;
 : .EQU-ALL   HOST>TARGET  EQU-LABELS   0 ( no labels printed) SWAP
     LAB-UPB 1+ OVER WHERE-LABEL ?DO
         DUP I LABELS[] @ <> IF LEAVE THEN
         SWAP 1+ SWAP
         [CHAR] : EMIT I LABELS[] .PAY
-    LOOP DROP ;
-: ADORN-WITH-LABEL   .EQU-ALL    0= IF 12 SPACES THEN ;
+    LOOP DROP ;
+: ADORN-WITH-LABEL   .EQU-ALL    0= IF 12 SPACES THEN ;
 
 HEX FFFF0000 CONSTANT LARGE-NUMBER-MASK
 
-: .0?   DUP 0A0 100 WITHIN SWAP 0A 10 WITHIN OR IF [CHAR] 0 EMIT THEN ;
+: .0?   DUP 0A0 100 WITHIN SWAP 0A 10 WITHIN OR IF [CHAR] 0 EMIT THEN ;
 : SMART.   DUP ABS 100 < IF DUP .0? . ELSE
-    LARGE-NUMBER-MASK OVER AND IF 8 ELSE 4 THEN H.R SPACE THEN ;
+    LARGE-NUMBER-MASK OVER AND IF 8 ELSE 4 THEN H.R SPACE THEN ;
 : .~LABEL   SWAP .PAY   ?DUP IF
-    DUP 0< IF NEGATE . S" - " TYPE ELSE . S" + " TYPE THEN THEN ;
+    DUP 0< IF NEGATE . S" - " TYPE ELSE . S" + " TYPE THEN THEN ;
 
 DECIMAL
 VARIABLE SMALL-LABEL-LIMIT   100 SMALL-LABEL-LIMIT !
@@ -1203,7 +1223,7 @@ VARIABLE SMALL-LABEL-LIMIT   100 SMALL-LABEL-LIMIT !
     DUP ABS SMALL-LABEL-LIMIT @ < IF SMART.
     ELSE DUP ~LABEL OVER IF .~LABEL DROP
     ELSE 2DROP SMART.
-    THEN THEN ;
+    THEN THEN ;
 
 \D 0 SMALL-LABEL-LIMIT !
 \D 12 LABEL AAP
@@ -1228,15 +1248,15 @@ VARIABLE SMALL-LABEL-LIMIT   100 SMALL-LABEL-LIMIT !
 \D 5 DUP INVENT-NAME LABELED
 \D SORT-LABELS .LABELS 5 <?> CR
 \D .LABELS 6 <?> CR
-\D S" EXPECT 5: " TYPE 5 FIND-LABEL @LABEL >DATA @ . 7 <?> CR
+\D S" EXPECT 5: " TYPE 5 FIND-LABEL @LABEL >DATA @ . 7 <?> CR
 : LABEL=   @LABEL >DATA @   SWAP @LABEL >DATA @   = ;
 
-\D S" EXPECT -1:" TYPE 5 FIND-LABEL DUP 1+ LABEL= . CR
+\D S" EXPECT -1:" TYPE 5 FIND-LABEL DUP 1+ LABEL= . CR
 : REMOVE-TRIVIAL   DUP @LABEL DUP >DATA @ SWAP >NFA @ $@ INVENTED-NAME? IF
         DUP REMOVE-LABEL ELSE 1+ THEN ;
 
 \D 5 FIND-LABEL  DUP REMOVE-TRIVIAL .  REMOVE-TRIVIAL .
-\D .LABELS 8 <?> CR
+\D .LABELS 8 <?> CR
 : CLEAN-LABELS   EQU-LABELS
     2 BEGIN DUP LAB-UPB < WHILE DUP DUP 1- LABEL= >R DUP DUP 1+ LABEL= R> OR IF
             REMOVE-TRIVIAL ELSE 1+ THEN REPEAT DROP ;
@@ -1244,26 +1264,26 @@ VARIABLE SMALL-LABEL-LIMIT   100 SMALL-LABEL-LIMIT !
 \D 5 DUP INVENT-NAME LABELED  SORT-LABELS
 \D .LABELS 9 <?> CR
 \D CLEAN-LABELS
-\D .LABELS 10 <?> CR
-: .COMMENT:   LABELS[] DUP @ 8 H.R S"  COMMENT: " TYPE  CELL+ @ $@ TYPE CR ;
-MAX-LABEL ' .PAY$ ' .COMMENT: LABELSTRUCT COMMENT:-LABELS  LABELS !BAG
+\D .LABELS 10 <?> CR
+: .COMMENT:   LABELS[] DUP @ 8 H.R S"  COMMENT: " TYPE  CELL+ @ $@ TYPE CR ;
+MAX-LABEL ' .PAY$ ' .COMMENT: LABELSTRUCT COMMENT:-LABELS  LABELS !BAG
 : COMMENT:   COMMENT:-LABELS   LAB+!  [CTRL] J PARSE $, LAB+! ;
 
 \D 12 COMMENT: AAP
 \D 115 COMMENT: NOOTJE
 \D 2 COMMENT: MIES
-\D 123 COMMENT: POPI
-VARIABLE COMMENT:-TO-BE
+\D 123 COMMENT: POPI
+VARIABLE COMMENT:-TO-BE
 : INIT-COMMENT:   0 COMMENT:-TO-BE ! ;
-  INIT-COMMENT:
+  INIT-COMMENT:
 : PRINT-OLD-COMMENT:   COMMENT:-TO-BE @ DUP IF
     S" \ " TYPE   $@ TYPE _ THEN DROP
-    INIT-COMMENT: ;
+    INIT-COMMENT: ;
 : REMEMBER-COMMENT:   COMMENT:-LABELS   HOST>TARGET >LABEL
     DUP IF CELL+ @ COMMENT:-TO-BE ! _ THEN DROP  ;
 
 \D 12 REMEMBER-COMMENT: PRINT-OLD-COMMENT: CR  \ Should give nothing, not found!
-\D 12 0 HOST>TARGET - REMEMBER-COMMENT: PRINT-OLD-COMMENT: CR
+\D 12 0 HOST>TARGET - REMEMBER-COMMENT: PRINT-OLD-COMMENT: CR
 
 \D .LABELS CR
 \D SORT-LABELS
@@ -1273,19 +1293,19 @@ VARIABLE COMMENT:-TO-BE
 \D 12 FIND-LABEL  LABELS[] .PAY CR
 \D 12 1- FIND-LABEL  LABELS[] .PAY CR
 \D 12 >LABEL .PAY CR
-\D 12 1- >LABEL H. CR
+\D 12 1- >LABEL H. CR
 : .MDIRECTIVE   LABELS[] DUP @ DUP >R 8 H.R S"  :COMMENT " TYPE
     CELL+ @ $@  BEGIN  2DUP 10 SCAN ?DUP
     WHILE  1 /STRING 2SWAP 2OVER NIP - 1- 2 /STRING TYPE CR
         R@ 8 H.R S"  :COMMENT " TYPE
-    REPEAT  R> 2DROP 2 /STRING TYPE CR ;
-MAX-LABEL ' .PAY$ ' .MDIRECTIVE LABELSTRUCT MCOMMENT-LABELS  LABELS !BAG
-: NEW-DIRECTIVE ( a n x -- )   LAB+! $, LAB+! ;
+    REPEAT  R> 2DROP 2 /STRING TYPE CR ;
+MAX-LABEL ' .PAY$ ' .MDIRECTIVE LABELSTRUCT MCOMMENT-LABELS  LABELS !BAG
+: NEW-DIRECTIVE ( a n x -- )   LAB+! $, LAB+! ;
 : OLD-DIRECTIVE ( a n -- )   >LABEL CELL+ DUP >R
-    @ $@ PAD $!  [CTRL] J PAD $C+  PAD $+!  PAD $@ $, R> ! ;
+    @ $@ PAD $!  [CTRL] J PAD $C+  PAD $+!  PAD $@ $, R> ! ;
 : DIRECTIVE ( a n x -- )   MCOMMENT-LABELS >R
     R@ >LABEL IF   R@ OLD-DIRECTIVE   ELSE
-    R@ NEW-DIRECTIVE   R@ WHERE-LABEL ROLL-LABEL THEN R> DROP ;
+    R@ NEW-DIRECTIVE   R@ WHERE-LABEL ROLL-LABEL THEN R> DROP ;
 : COMMENT ( a n x -- )   >R  S" \ " $,  DUP >R  OVER ALLOT  $+!
     R> $@  R> DIRECTIVE ;
 : :COMMENT ( x -line- )   [CTRL] J PARSE $, $@ ROT COMMENT ;
@@ -1295,12 +1315,12 @@ MAX-LABEL ' .PAY$ ' .MDIRECTIVE LABELSTRUCT MCOMMENT-LABELS  LABELS !BAG
 \D S" MIES" 2 COMMENT
 \D S" POPI
 \ \D JOPI"
-\D 123 COMMENT
+\D 123 COMMENT
 : PRINT-DIRECTIVE MCOMMENT-LABELS  HOST>TARGET  >LABEL DUP IF
     CR   .PAY _ THEN DROP ;
 
 \D 12 PRINT-DIRECTIVE CR  \ Should give nothing, not found!
-\D 12 0 HOST>TARGET - PRINT-DIRECTIVE CR
+\D 12 0 HOST>TARGET - PRINT-DIRECTIVE CR
 
 \D .LABELS CR
 \D SORT-LABELS
@@ -1310,7 +1330,7 @@ MAX-LABEL ' .PAY$ ' .MDIRECTIVE LABELSTRUCT MCOMMENT-LABELS  LABELS !BAG
 \D 12 FIND-LABEL  LABELS[] .PAY CR
 \D 12 1- FIND-LABEL  LABELS[] .PAY CR
 \D 12 >LABEL .PAY CR
-\D 12 1- >LABEL H. CR
+\D 12 1- >LABEL H. CR
 [DEFINED] ForCiForth [IF]
     REQUIRE NEW-IF
 [THEN]
@@ -1322,17 +1342,17 @@ CREATE TABLE2 256 ALLOT      TABLE2 256 ERASE
 1 CTRL I TABLE2 + C!
 1 CTRL J TABLE2 + C!
 1 CTRL M TABLE2 + C!
-1 CTRL L TABLE2 + C!
+1 CTRL L TABLE2 + C!
 : IS-CTRL   TABLE2 + C@ 1 = ;
 
-\D S" EXPECT 0 -1 :" TYPE CHAR A IS-CTRL .   CTRL J IS-CTRL . CR 11 <?>
+\D S" EXPECT 0 -1 :" TYPE CHAR A IS-CTRL .   CTRL J IS-CTRL . CR 11 <?>
 : IS-PRINT   TABLE2 + C@ 1 > ;
 
 \D S" EXPECT 0 -1 -1 :" TYPE CTRL A IS-PRINT .
-\D CHAR A IS-PRINT . BL IS-PRINT . CR 12 <?>
+\D CHAR A IS-PRINT . BL IS-PRINT . CR 12 <?>
 CREATE ACCU 100 ALLOT           ACCU 100 ERASE
 
-\ \D S" Expect " TYPE  """ AA""""AA """ TYPE CHAR : EMIT " AA""AA " S" $" TYPE CR 13 <?>
+\ \D S" Expect " TYPE  """ AA""""AA """ TYPE CHAR : EMIT " AA""AA " S" $" TYPE CR 13 <?>
 : .ACCU   ACCU $@
     OVER C@ BL = OVER 1 = AND IF  2DROP  S"  BL" TYPE  ELSE
         DUP 1 > IF  SPACE [CHAR] " EMIT SPACE TYPE [CHAR] " EMIT  ELSE
@@ -1341,7 +1361,7 @@ CREATE ACCU 100 ALLOT           ACCU 100 ERASE
 
 \D S" EXPECT " TYPE  S" XY :" TYPE  S" XY" ACCU $! .ACCU CR 14 <?>
 \D S" EXPECT BL :" TYPE   S"  " ACCU $!   .ACCU CR 15 <?>
-\D S" EXPECT CHAR Y :" TYPE   S" Y" ACCU $!   .ACCU CR 16 <?>
+\D S" EXPECT CHAR Y :" TYPE   S" Y" ACCU $!   .ACCU CR 16 <?>
 : .B-CLEAN   DUP .0? 0 <# BL HOLD #S #> TYPE ;
 : .C   .ACCU SPACE DUP IS-CTRL IF  S" CTRL " TYPE  [CHAR] @ + EMIT
     ELSE  .B-CLEAN  THEN  ;
@@ -1349,34 +1369,34 @@ CREATE ACCU 100 ALLOT           ACCU 100 ERASE
 \D S" EXPECT CTRL J :" TYPE  CTRL J .C CR 17 <?>
 \D S" EXPECT 0: " TYPE  0 .C CR 18 <?>
 \D S" EXPECT 9A: " TYPE  HEX 9A .C CR 19 <?> DECIMAL
-\D S" EXPECT 0FA: " TYPE  HEX FA .C CR 20 <?> DECIMAL
+\D S" EXPECT 0FA: " TYPE  HEX FA .C CR 20 <?> DECIMAL
 
 \ FIXME: to be renamd in WHERE-FLUSH
 VARIABLE NEXT-CUT       \ Host address where to separate db etc. in chunks.
 VARIABLE CUT-SIZE    16 CUT-SIZE !   \ Chunks for data-disassembly.
 
-: ACCU-$C+   DUP C@ ACCU $C+   ACCU @ 64 = IF 1+ ELSE 2 + THEN NEXT-CUT ! ;
-: .TARGET-ADDRESS S" ( " TYPE DUP HOST>TARGET 8 H.R S"  )   " TYPE ;
+: ACCU-$C+   DUP C@ ACCU $C+   ACCU @ 64 = IF 1+ ELSE 2 + THEN NEXT-CUT ! ;
+: .TARGET-ADDRESS S" ( " TYPE DUP HOST>TARGET 8 H.R S"  )   " TYPE ;
 : CR-ADORNED
     PRINT-OLD-COMMENT:
     DUP PRINT-DIRECTIVE
     CR 'ADORN-ADDRESS 2@ - IF  .TARGET-ADDRESS  THEN
-    ADORN-WITH-LABEL ;
-: NEXT-CUT?   NEXT-CUT @ =  DUP IF CUT-SIZE @ NEXT-CUT +! THEN ;
+    ADORN-WITH-LABEL ;
+: NEXT-CUT?   NEXT-CUT @ =  DUP IF CUT-SIZE @ NEXT-CUT +! THEN ;
 : CR+GENERIC   2>R DUP =EQU-LABEL >R DUP NEXT-CUT?   R> OR IF
     DUP CR-ADORNED  2R@ TYPE THEN REMEMBER-COMMENT: 2R> 2DROP ;
 
 : CR+$         2>R DUP =EQU-LABEL >R DUP NEXT-CUT?   R> OR IF .ACCU
-    DUP CR-ADORNED  2R@ TYPE THEN REMEMBER-COMMENT: 2R> 2DROP ;
+    DUP CR-ADORNED  2R@ TYPE THEN REMEMBER-COMMENT: 2R> 2DROP ;
 : CR+dn   S"   " CR+GENERIC ;
 : CR+db   S"   db " CR+GENERIC ;
 : CR+dw   S"   dw " CR+GENERIC ;
 : CR+dl   S"   dl " CR+GENERIC ;
-: CR+d$   S"   d$ " CR+$ ;
+: CR+d$   S"   d$ " CR+$ ;
 0 VALUE CURRENT-RANGE \ current range pointer
 
 : RANGE-FIELD ( u size -- u' )   CREATE  OVER , +
-    DOES> ( -- a )   @ CURRENT-RANGE + ;
+    DOES> ( -- a )   @ CURRENT-RANGE + ;
 
 0
     2 CELLS RANGE-FIELD RANGE-RESERVED
@@ -1397,20 +1417,20 @@ CONSTANT |RANGE|
     'RANGE-SECTION @ TO CURRENT-SECTION ;
 : .PAY-RANGE   CELL+ @ DUP RANGE-SECTION
     RANGE-START 8 H.R SPACE  RANGE-END 8 H.R  S"  BY " TYPE
-    RANGE-XT >BODY %ID.  %ID. ;
+    RANGE-XT >BODY %ID.  %ID. ;
 
 20 BAG RANGE-TYPES  \ Contains dea of dumper, creator, alternating.
 
-: ARE-COUPLED   >BODY SWAP >BODY  RANGE-TYPES BAG+! RANGE-TYPES BAG+! ;
-: CREATOR-XT   RANGE-XT >BODY RANGE-TYPES BAG-WHERE CELL+ @ ;
-: MAKE-CURRENT ( n -- )   LABELS[] CELL+ @ RANGE-SECTION ;
+: ARE-COUPLED   >BODY SWAP >BODY  RANGE-TYPES BAG+! RANGE-TYPES BAG+! ;
+: CREATOR-XT   RANGE-XT >BODY RANGE-TYPES BAG-WHERE CELL+ @ ;
+: MAKE-CURRENT ( n -- )   LABELS[] CELL+ @ RANGE-SECTION ;
 : DECOMP-RANGE   MAKE-CURRENT RANGE-START 8 H.R SPACE RANGE-END 8 H.R SPACE
     CURRENT-RANGE >NFA @ $@  CREATOR-XT >NFA @ $@
     2OVER S" NONAME" COMPARE 0= IF
         1- TYPE ." - "  2DROP
     ELSE  TYPE SPACE  TYPE
-    THEN  CR ;
-MAX-LABEL ' .PAY-RANGE ' DECOMP-RANGE LABELSTRUCT RANGE-LABELS  LABELS !BAG
+    THEN  CR ;
+MAX-LABEL ' .PAY-RANGE ' DECOMP-RANGE LABELSTRUCT RANGE-LABELS  LABELS !BAG
 : RANGE ( ad1 ad2 dea1 a n -- )   S" CREATE " PAD $!  PAD COUNT + OVER
     2SWAP PAD $+!  PAD $@ EVALUATE  HERE DUP >R  |RANGE| DUP ALLOT  ERASE
     $, R@ >NFA !  CURRENT-RANGE R@ >LFA !  R> TO CURRENT-RANGE
@@ -1419,7 +1439,7 @@ MAX-LABEL ' .PAY-RANGE ' DECOMP-RANGE LABELSTRUCT RANGE-LABELS  LABELS !BAG
     CURRENT-SECTION 'RANGE-SECTION !
     DOES>  RANGE-SECTION ;
 
-: ANON-RANGE ( ad1 ad2 dea1 -- )   -warning >R  NONAME$ RANGE  R> +warning ;
+: ANON-RANGE ( ad1 ad2 dea1 -- )   -warning >R  NONAME$ RANGE  R> +warning ;
 
 0 VALUE DISASSEMBLERS
 0 VALUE RANGE-RANGES
@@ -1433,44 +1453,44 @@ CONSTANT |DISASSEMBLER|
     ALLOT  ERASE  RESTORE-INPUT THROW  BL WORD $@ $, R@ >NFA !
     DISASSEMBLERS R@ >LFA !  R@ >DIS: !  R> TO DISASSEMBLERS
     DOES> ( a1 a2 -- )   >R TARGET>HOST SWAP TARGET>HOST
-        DUP NEXT-CUT !  R> >DIS: @ EXECUTE ;
+        DUP NEXT-CUT !  R> >DIS: @ EXECUTE ;
 : RANGE: ( xt -- )   SAVE-INPUT  CREATE  HERE DUP >R  |DISASSEMBLER| DUP
     ALLOT  ERASE  RESTORE-INPUT THROW  BL WORD $@ $, R@ >NFA !
     RANGE-RANGES R@ >LFA !  R@ >DIS: !  R> TO RANGE-RANGES
-    DOES> ( a1 a2 -- )   >R BL WORD COUNT  R> >DIS: @ EXECUTE ;
-: (D-R-T) ( a2 a1 -- )   SWAP DISASSEMBLE-RANGE ;
-' (D-R-T) DIS: D-R-T ( a1 a2 -- )
-: -dc ( a n -- )   2>R ['] D-R-T 2R> RANGE ;
-' -dc RANGE: -dc: ( -name- )
-: -dc- ( a n -- )   -warning >R  NONAME$ -dc  R> +warning ;
-' D-R-T  ' -dc:  ARE-COUPLED
-: (DUMP-N) ( a2 a1 -- )   DUP CR+dn - .LABEL/. S"  RESB" TYPE CR   ;
-' (DUMP-N) DIS: DUMP-N ( a1 a2 -- )
-: -dn ( a n -- )   2>R ['] DUMP-N 2R> RANGE ;
-' -dn RANGE: -dn: ( -name- )
-: -dn- ( a n -- )   -warning >R  NONAME$ -dn  R> +warning ;
-' DUMP-N  ' -dn:  ARE-COUPLED
-: (DUMP-B) ( a2 a1 -- )   DO  I DUP CR+db C@ .B-CLEAN  LOOP     PRINT-OLD-COMMENT: CR ;
-' (DUMP-B) DIS: DUMP-B ( a1 a2 -- )
-: -db ( a n -- )   2>R ['] DUMP-B 2R> RANGE ;
-' -db RANGE: -db: ( -name- )
-: -db- ( a n -- )   -warning >R  NONAME$ -db  R> +warning ;
-' DUMP-B  ' -db:  ARE-COUPLED \ Register the decompiler.
-: W. 4 H.R SPACE ;
+    DOES> ( a1 a2 -- )   >R BL WORD COUNT  R> >DIS: @ EXECUTE ;
+: (D-R-T) ( a2 a1 -- )   SWAP DISASSEMBLE-RANGE ;
+' (D-R-T) DIS: D-R-T ( a1 a2 -- )
+: -dc ( a n -- )   2>R ['] D-R-T 2R> RANGE ;
+' -dc RANGE: -dc: ( -name- )
+: -dc- ( a n -- )   -warning >R  NONAME$ -dc  R> +warning ;
+' D-R-T  ' -dc:  ARE-COUPLED
+: (DUMP-N) ( a2 a1 -- )   DUP CR+dn - .LABEL/. S"  RESB" TYPE CR   ;
+' (DUMP-N) DIS: DUMP-N ( a1 a2 -- )
+: -dn ( a n -- )   2>R ['] DUMP-N 2R> RANGE ;
+' -dn RANGE: -dn: ( -name- )
+: -dn- ( a n -- )   -warning >R  NONAME$ -dn  R> +warning ;
+' DUMP-N  ' -dn:  ARE-COUPLED
+: (DUMP-B) ( a2 a1 -- )   DO  I DUP CR+db C@ .B-CLEAN  LOOP     PRINT-OLD-COMMENT: CR ;
+' (DUMP-B) DIS: DUMP-B ( a1 a2 -- )
+: -db ( a n -- )   2>R ['] DUMP-B 2R> RANGE ;
+' -db RANGE: -db: ( -name- )
+: -db- ( a n -- )   -warning >R  NONAME$ -db  R> +warning ;
+' DUMP-B  ' -db:  ARE-COUPLED \ Register the decompiler.
+: W. 4 H.R SPACE ;
 : (DUMP-W) ( a2 a1 -- )   DO  I DUP CR+dw @ W.  2 +LOOP
-    PRINT-OLD-COMMENT: CR ;
-' (DUMP-W) DIS: DUMP-W ( a1 a2 -- )
-: -dw ( a n -- )   2>R ['] DUMP-W 2R> RANGE ;
-' -dw RANGE: -dw: ( -name- )
-: -dw- ( a n -- )   -warning >R  NONAME$ -dw  R> +warning ;
-' DUMP-W  ' -dw:  ARE-COUPLED
+    PRINT-OLD-COMMENT: CR ;
+' (DUMP-W) DIS: DUMP-W ( a1 a2 -- )
+: -dw ( a n -- )   2>R ['] DUMP-W 2R> RANGE ;
+' -dw RANGE: -dw: ( -name- )
+: -dw- ( a n -- )   -warning >R  NONAME$ -dw  R> +warning ;
+' DUMP-W  ' -dw:  ARE-COUPLED
 : (DUMP-L) ( a2 a1 -- )   DO  I DUP CR+dl @ .LABEL/.  4 +LOOP
-    PRINT-OLD-COMMENT: CR ;
-' (DUMP-L) DIS: DUMP-L ( a1 a2 -- )
-: -dl ( a n -- )   2>R ['] DUMP-L 2R> RANGE ;
-' -dl RANGE: -dl: ( -name- )
-: -dl- ( a n -- )   -warning >R  NONAME$ -dl  R> +warning ;
-' DUMP-L  ' -dl:  ARE-COUPLED
+    PRINT-OLD-COMMENT: CR ;
+' (DUMP-L) DIS: DUMP-L ( a1 a2 -- )
+: -dl ( a n -- )   2>R ['] DUMP-L 2R> RANGE ;
+' -dl RANGE: -dl: ( -name- )
+: -dl- ( a n -- )   -warning >R  NONAME$ -dl  R> +warning ;
+' DUMP-L  ' -dl:  ARE-COUPLED
 : (DUMP-$) ( a2 a1 -- )
     DO  I CR+d$
         I C@ IS-PRINT   IF I ACCU-$C+ ELSE I C@ .C THEN
@@ -1481,59 +1501,59 @@ CONSTANT |DISASSEMBLER|
 \D 0 C, 1 C, BL C, 2 C, 3 C,
 \D HERE
 \D S" EXPECT  ``3 0 0 0 'AAP' XX ^J ^M 'AA P' 0 1 BL 2 3 '':" TYPE
-\D SWAP (DUMP-$) CR  'ADORN-ADDRESS !  22 <?>
-' (DUMP-$) DIS: DUMP-$ ( a1 a2 -- )
-: -d$ ( a n -- )   2>R ['] DUMP-$ 2R> RANGE ;
-' -d$ RANGE: -d$: ( -name- )
-: -d$- ( a n -- )   -warning >R  NONAME$ -d$  R> +warning ;
-' DUMP-$  ' -d$:  ARE-COUPLED
+\D SWAP (DUMP-$) CR  'ADORN-ADDRESS !  22 <?>
+' (DUMP-$) DIS: DUMP-$ ( a1 a2 -- )
+: -d$ ( a n -- )   2>R ['] DUMP-$ 2R> RANGE ;
+' -d$ RANGE: -d$: ( -name- )
+: -d$- ( a n -- )   -warning >R  NONAME$ -d$  R> +warning ;
+' DUMP-$  ' -d$:  ARE-COUPLED
 ' 2DROP DIS: IGNORE ( a1 a2 -- )
 : -ignore ( a n -- )   2>R ['] IGNORE 2R> RANGE ;
 ' -ignore RANGE: -ignore: ( -name- )
-: -ignore- ( a n -- )   -warning >R  NONAME$ -ignore  R> +warning ;
+: -ignore- ( a n -- )   -warning >R  NONAME$ -ignore  R> +warning ;
 : .HOW-FIT ( a1 a2 -- )   2DUP = IF  2DROP  ELSE  > IF
             S" \ WARNING: This range overlaps with the previous one."  ELSE
             S" \ WARNING: There is hole between this range and the previous one"
-    THEN  CR TYPE CR  THEN ;
-: HOW-FIT ( a -- a' )   RANGE-START .HOW-FIT  RANGE-END ;
-: HOW-FIT-END ( a -- )   TARGET-END .HOW-FIT ;
+    THEN  CR TYPE CR  THEN ;
+: HOW-FIT ( a -- a' )   RANGE-START .HOW-FIT  RANGE-END ;
+: HOW-FIT-END ( a -- )   TARGET-END .HOW-FIT ;
 : DISASSEMBLE-ALL ( -- )   TARGET-START  RANGE-LABELS DO-LAB
         I CELL+ @ RANGE-SECTION  HOW-FIT RANGE-DECODE
-    LOOP-LAB  HOW-FIT-END   HOST-END CR-ADORNED ;
+    LOOP-LAB  HOW-FIT-END   HOST-END CR-ADORNED ;
 
 \ ------------------- Generic again -------------------
 
 : (ADORN-ADDRESS)   DUP CR-ADORNED   REMEMBER-COMMENT: ;
-' (ADORN-ADDRESS) 'ADORN-ADDRESS !
+' (ADORN-ADDRESS) 'ADORN-ADDRESS !
 : INIT-ALL   THE-REGISTER DO-BAG  I @ TO CURRENT-LABELSTRUCT  LABELS !BAG
-    LOOP-BAG  INIT-COMMENT: ;
+    LOOP-BAG  INIT-COMMENT: ;
 : SORT-ALL   THE-REGISTER DO-BAG  I @ TO CURRENT-LABELSTRUCT  SORT-LABELS
-    LOOP-BAG ;
-: DECOMP-ONE  LAB-UPB 1+ 1 ?DO  I DECOMP  LOOP ;
+    LOOP-BAG ;
+: DECOMP-ONE  LAB-UPB 1+ 1 ?DO  I DECOMP  LOOP ;
 : DECOMP-ALL   THE-REGISTER DO-BAG  I @ TO CURRENT-LABELSTRUCT  DECOMP-ONE
-    LOOP-BAG ;
+    LOOP-BAG ;
 : MAKE-CUL  S" HEX" TYPE CR  TARGET-START 8 H.R
-    S"  -ORG-" TYPE CR DECOMP-ALL ;
-: SHOW-REGISTER   THE-REGISTER DO-BAG  I @ %ID.  LOOP-BAG ;
+    S"  -ORG-" TYPE CR DECOMP-ALL ;
+: SHOW-REGISTER   THE-REGISTER DO-BAG  I @ %ID.  LOOP-BAG ;
 : DISASSEMBLE-TARGET ( -- )   TARGET-START . S"  ORG" TYPE CR
-    DISASSEMBLE-ALL ;
+    DISASSEMBLE-ALL ;
 -warning
 : DISASSEMBLE-TARGET ( -- )   S" [ASM HEX BITS-32" TYPE CR  DISASSEMBLE-TARGET CR ;
-+warning
++warning
 VARIABLE DEFAULT-DISASSEMBLY
 ' -d$- DEFAULT-DISASSEMBLY !
-: -ddef- DEFAULT-DISASSEMBLY @ EXECUTE ;
+: -ddef- DEFAULT-DISASSEMBLY @ EXECUTE ;
 
 ALSO ASSEMBLER
 
 : (D-R-T-16) ( a2 a1 -- )   BITS-16 CR S" BITS-16" TYPE  SWAP DISASSEMBLE-RANGE
-    BITS-32 CR S" BITS-32" TYPE ;
-' (D-R-T-16) DIS: D-R-T-16 ( a1 a2 -- )
-: -dc16 ( a n -- )   2>R ['] D-R-T-16   2R> RANGE ;
-' -dc16 RANGE: -dc16: ( -name- )
-: -dc16- ( a n -- )   -warning >R  NONAME$ -dc16  R> +warning ;
+    BITS-32 CR S" BITS-32" TYPE ;
+' (D-R-T-16) DIS: D-R-T-16 ( a1 a2 -- )
+: -dc16 ( a n -- )   2>R ['] D-R-T-16   2R> RANGE ;
+' -dc16 RANGE: -dc16: ( -name- )
+: -dc16- ( a n -- )   -warning >R  NONAME$ -dc16  R> +warning ;
 
-' D-R-T-16  ' -dc16:  ARE-COUPLED
+' D-R-T-16  ' -dc16:  ARE-COUPLED
 
 DEFINITIONS
 
@@ -1542,21 +1562,21 @@ DEFINITIONS
 \D HEX
 \D S" EXPECT 34 12 " TYPE 1234 PAD ! PAD AS-POINTER !
 \D ' IB, >BODY DUP AS-@+ . AS-@+ . CR 23 <?>
-\D DECIMAL
+\D DECIMAL
 : AS-S-@+ ( xt -- )   >CNT @ >R  AS-POINTER @ R@ MC@-S  R> AS-POINTER +! ;
 
 \D HEX
 \D S" EXPECT -1 12 " TYPE 12FF PAD ! PAD AS-POINTER !
 \D ' IB, >BODY DUP AS-S-@+ . AS-S-@+ . CR
-\D DECIMAL
-VARIABLE LATEST-OFFSET
-: .COMMA-LABEL   DUP AS-@+ .LABEL/. %ID. ;
-: ID.-NO() ( xt -- )   >NFA @ $@  2 - SWAP 1 + SWAP TYPE SPACE ;
-: NEXT-INSTRUCTION  >CNT @ AS-POINTER @ + ;
-: GET-OFFSET   AS-POINTER @ SWAP >CNT @ MC@-S DUP LATEST-OFFSET ! ;
-: GOAL-RB   DUP GET-OFFSET SWAP NEXT-INSTRUCTION + ;
+\D DECIMAL
+VARIABLE LATEST-OFFSET
+: .COMMA-LABEL   DUP AS-@+ .LABEL/. %ID. ;
+: ID.-NO() ( xt -- )   >NFA @ $@  2 - SWAP 1 + SWAP TYPE SPACE ;
+: NEXT-INSTRUCTION  >CNT @ AS-POINTER @ + ;
+: GET-OFFSET   AS-POINTER @ SWAP >CNT @ MC@-S DUP LATEST-OFFSET ! ;
+: GOAL-RB   DUP GET-OFFSET SWAP NEXT-INSTRUCTION + ;
 : .BRANCH/.  EQU-LABELS   ~LABEL OVER IF .~LABEL ID.-NO() ELSE
-    2DROP DUP GET-OFFSET . %ID. THEN  ;
+    2DROP DUP GET-OFFSET . %ID. THEN  ;
 : .COMMA-REL
     DUP  DUP GOAL-RB HOST>TARGET  .BRANCH/.
     >CNT @ AS-POINTER +! ;
@@ -1577,18 +1597,18 @@ VARIABLE LATEST-OFFSET
 ' .COMMA-LABEL  ' IB,   >BODY >DIS !  ( immediate byte data)
 ' .COMMA-LABEL  ' L,    >BODY >DIS !  ( immediate data : address/offset )
 ' .COMMA-LABEL  ' W,    >BODY >DIS !  ( immediate data : address/offset )
-' .COMMA-LABEL  ' B,    >BODY >DIS !  ( immediate byte : address/offset )
+' .COMMA-LABEL  ' B,    >BODY >DIS !  ( immediate byte : address/offset )
 0 BAG UNCONDITIONAL-TRANSFERS
     ' CALL, , ' CALLFAR, , ' CALLFARO, , ' CALLO, , ' INT, , ' INT3, , ' INTO, ,
     ' IRET, , ' JMP, , ' JMPFAR, , ' JMPFARO, , ' JMPO, , ' JMPS, , ' RET+, ,
     ' RET, , ' RETFAR+, , ' RETFAR, ,
-HERE UNCONDITIONAL-TRANSFERS ! 100 CELLS ALLOT         \ Allow to put more here
+HERE UNCONDITIONAL-TRANSFERS ! 100 CELLS ALLOT         \ Allow to put more here
 0 BAG JUMPS
     ' CALL, , ' J, , ' JCXZ, , ' JMP, , ' JMPS, , ' J|X, ,
     ' LOOP, , ' LOOPNZ, , ' LOOPZ, ,
-HERE JUMPS ! 100 CELLS ALLOT         \ Allow to put more here
+HERE JUMPS ! 100 CELLS ALLOT         \ Allow to put more here
 
-PREVIOUS DEFINITIONS
+PREVIOUS DEFINITIONS
 ( $Id: crawl.frt,v 1.36 2009/03/26 09:07:17 albert Exp $ )
 ( Copyright{2000}: Albert van der Horst, HCC FIG Holland by GNU Public License)
 ( Uses Richard Stallmans convention. Uppercased word are parameters.    )
@@ -1598,223 +1618,309 @@ PREVIOUS DEFINITIONS
     REQUIRE BAG
 [THEN]
 
-\ : \D ;
-
 : INSERT-EQU 2>R DUP EQU-LABELS WHERE-LABEL SWAP 2R> LABELED
-    ROLL-LABEL ;
-: INSERT-EQU-INVENT DUP INVENT-NAME INSERT-EQU ;
+    ROLL-LABEL ;
+: INSERT-EQU-INVENT DUP INVENT-NAME INSERT-EQU ;
 : ?INSERT-EQU?    EQU-LABELS DUP >LABEL IF DROP ELSE INSERT-EQU-INVENT THEN ;
 
-\D EQU-LABELS LABELS !BAG
-\D S" EXPECT: empty " TYPE EQU-LABELS .LABELS  CR
-\D 42 ?INSERT-EQU?
-\D S" EXPECT: L00000042 added " TYPE EQU-LABELS .LABELS     CR
-\D 42 ?INSERT-EQU?
-\D S" EXPECT: L00000042 NOT added again " TYPE EQU-LABELS .LABELS     CR 24 <?>
+EQU-LABELS LABELS !BAG
 
-\D HEX
-\D RANGE-LABELS       LABELS !BAG
-\D 4FE 510 -dc-
-\D 520 530 -dc: oops
-\D 530 570 -dc-
-\D 560 590 -db: bytes
-\D S" EXPECT: 4 ranges :" TYPE CR .LABELS CR 25 <?>
-\D DECIMAL
+HEX
+
+: TEST-?INSERT-EQU?
+    assert( EQU-LABELS LABELS |BAG| 0= )
+    42 ?INSERT-EQU?
+    assert( EQU-LABELS LABELS |BAG| 2 = )
+    42 ?INSERT-EQU?
+    assert( EQU-LABELS LABELS |BAG| 2 = )
+; TEST-?INSERT-EQU?
+
+DECIMAL
+
+HEX
+
+RANGE-LABELS LABELS !BAG
+4FE 510 -dc-
+520 530 -dc: oops
+530 570 -dc-
+560 590 -db: bytes
+
+: TEST-RANGES
+    assert( LABELS |BAG| 8 = )
+; TEST-RANGES
+
+DECIMAL
 
 : COMPATIBLE?   DUP MAKE-CURRENT RANGE-XT   SWAP 1- MAKE-CURRENT RANGE-XT  = ;
 
-\D S" EXPECT: -1 :" TYPE 2 COMPATIBLE? . CR
-\D S" EXPECT: -1 :" TYPE 3 COMPATIBLE? . CR
-\D S" EXPECT: 0 :" TYPE 4 COMPATIBLE? . CR
+: TEST-COMPATIBLE?
+    assert( 2 COMPATIBLE? -1 = )
+    assert( 3 COMPATIBLE? -1 = )
+    assert( 4 COMPATIBLE? 0= )
+; TEST-COMPATIBLE?
 : RANGE-NAME LABELS[] CELL+ @ >NFA @ $@ ;
 
-\D S" EXPECT: NONAME :" TYPE 1 RANGE-NAME TYPE CR
-\D S" EXPECT: oops :" TYPE 2 RANGE-NAME TYPE CR 26 <?>
-
-[DEFINED] ForCiForth [IF]
-    \D REQUIRE H.
-[THEN]
-
+: TEST-RANGE-NAME
+    assert( 1 RANGE-NAME S" NONAME" COMPARE 0= )
+    assert( 2 RANGE-NAME S" oops" COMPARE 0= )
+; TEST-RANGE-NAME
 : NEW-RANGE-START OVER MAKE-CURRENT RANGE-START  OVER MAKE-CURRENT RANGE-START
     MIN ;
 
-\D  S" EXPECT 520 : " TYPE 2 3 NEW-RANGE-START 8 H.R 2DROP CR
+HEX
+
+: TEST-NEW-RANGE-START
+    assert( 2 3 NEW-RANGE-START NIP NIP 520 = )
+; TEST-NEW-RANGE-START
+
+DECIMAL
 : NEW-RANGE-END OVER MAKE-CURRENT RANGE-END  OVER MAKE-CURRENT RANGE-END
     MAX ;
 
-\D  S" EXPECT 590 : " TYPE 3 4 NEW-RANGE-END  8 H.R 2DROP CR 27 <?>
+HEX
+
+: TEST-NEW-RANGE-END
+    assert( 3 4 NEW-RANGE-END NIP NIP 590 = )
+; TEST-NEW-RANGE-END
+
+DECIMAL
 : REPLACE  OVER >R REMOVE-LABEL REMOVE-LABEL R> ROLL-LABEL ;
 
-\D  S" EXPECT 1 LESS : " TYPE 2 3 REPLACE CR .LABELS CR 28 <?>
+: TEST-REPLACE
+   assert( LABELS |BAG| 2 3 REPLACE LABELS |BAG| - 4 = )
+; TEST-REPLACE
 : SAME-ALIGN    DUP MAKE-CURRENT  RANGE-START SWAP
     1- MAKE-CURRENT   RANGE-START - RANGE-STRIDE MOD 0= ;
 
-\D INIT-ALL RANGE-LABELS  HEX
-\D 12 34 -dc-
-\D 34 65 -db: AAP
-\D 38 80 -dl-
-\D 82 90 -dl-
-\D 88 94 -dl-
+HEX
 
-\D S" EXPECT: -1 :" TYPE 2 SAME-ALIGN . CR
-\D S" EXPECT: -1 :" TYPE 3 SAME-ALIGN . CR \ Must become 0
-\D S" EXPECT: -1 :" TYPE 4 SAME-ALIGN . CR
+INIT-ALL RANGE-LABELS
+12 34 -dc-
+34 65 -db: AAP
+38 80 -dl-
+82 90 -dl-
+88 94 -dl-
+
+DECIMAL
+
+: TEST-SAME-ALIGN
+    assert( 2 SAME-ALIGN -1 = )
+    assert( 3 SAME-ALIGN -1 = ) \ Must become 0
+    assert( 4 SAME-ALIGN -1 = )
+; TEST-SAME-ALIGN
 : END+START DUP MAKE-CURRENT RANGE-START SWAP 1- MAKE-CURRENT RANGE-END SWAP ;
 
-\D S" EXPECT: 34 34 :" TYPE 2 END+START SWAP . . CR
-\D S" EXPECT: 65 38 :" TYPE 3 END+START SWAP . . CR
+HEX
+
+: TEST-END+START
+    assert( 2 END+START 34 = SWAP 34 = AND )
+    assert( 3 END+START 38 = SWAP 65 = AND )
+; TEST-END+START
+
+DECIMAL
 : OVERLAP? END+START > ;
 
-\D S" EXPECT: 0 :" TYPE 2 OVERLAP? . CR
-\D S" EXPECT: -1 :" TYPE 3 OVERLAP? . CR
-\D S" EXPECT: 0 :" TYPE 4 OVERLAP? . CR
+: TEST-OVERLAP?
+    assert( 2 OVERLAP? 0= )
+    assert( 3 OVERLAP? -1 = )
+    assert( 4 OVERLAP? 0= )
+; TEST-OVERLAP?
 : OVERLAP-OR-BORDER? END+START >= ;
 
-\D S" EXPECT: -1 :" TYPE 2 OVERLAP-OR-BORDER? . CR
-\D S" EXPECT: -1 :" TYPE 3 OVERLAP-OR-BORDER? . CR
-\D S" EXPECT: 0 :" TYPE 4 OVERLAP-OR-BORDER? . CR
+: TEST-OVERLAP-OR-BORDER?
+    assert( 2 OVERLAP-OR-BORDER? -1 = )
+    assert( 3 OVERLAP-OR-BORDER? -1 = )
+    assert( 4 OVERLAP-OR-BORDER? 0= )
+; TEST-OVERLAP-OR-BORDER?
 : GAP? END+START < ;
 
-\D S" EXPECT: 0 :" TYPE 2 GAP? . CR
-\D S" EXPECT: 0 :" TYPE 3 GAP? . CR
-\D S" EXPECT: -1 :" TYPE 4 GAP? . CR
+: TEST-GAP?
+    assert( 2 GAP? 0 = )
+    assert( 3 GAP? 0= )
+    assert( 4 GAP? -1 = )
+; TEST-GAP?
 : IS-NAMED ( n -- )   RANGE-NAME NONAME$ $= 0= ;
 
-\D S" EXPECT: -1 :" TYPE 2 IS-NAMED . CR
-\D S" EXPECT: 0 :" TYPE 3 IS-NAMED . CR
+: TEST-IS-NAMED
+    assert( 2 IS-NAMED -1 = )
+    assert( 3 IS-NAMED 0= )
+; TEST-IS-NAMED
 : COLLAPSE ( i -- )   DUP MAKE-CURRENT  RANGE-END OVER 1- MAKE-CURRENT
     RANGE-END MAX RANGE-END!  REMOVE-LABEL ;
 
-\D S" EXPECT: 5 82 94 4 :" TYPE
-\D LAB-UPB . 5 COLLAPSE 4 MAKE-CURRENT RANGE-START . RANGE-END .  LAB-UPB . CR
+HEX
+
+: TEST-COLLAPSE
+    assert( LAB-UPB 5 = ) 5 COLLAPSE 4 MAKE-CURRENT
+    assert( RANGE-START 82 = )
+    assert( RANGE-END 94 = )
+    assert( LAB-UPB 4 = )
+; TEST-COLLAPSE
+
+DECIMAL
 : TRIM-RANGE ( i -- )   DUP MAKE-CURRENT  RANGE-START SWAP 1- MAKE-CURRENT
     RANGE-END! ;
 
-\D 90 1000 -dl-
-\D S" EXPECT: 82 90 :" TYPE 5 TRIM-RANGE 4 MAKE-CURRENT
-\D RANGE-START . RANGE-END .  CR
+HEX
+
+90 1000 -dl-
+
+: TEST-TRIM-RANGE
+    5 TRIM-RANGE 4 MAKE-CURRENT
+    assert( RANGE-START 82 = ) assert( RANGE-END 90 = )
+; TEST-TRIM-RANGE
+
+DECIMAL
 : COMBINE ( n -- )
     DUP OVERLAP-OR-BORDER? OVER IS-NAMED 0= AND IF DUP COLLAPSE THEN
     DUP OVERLAP? OVER IS-NAMED AND IF DUP TRIM-RANGE THEN  DROP ;
 
-\D INIT-ALL
-\D 10  30 -dl-
-\D 20  40 -dl-
-\D 30 50  -dl: aap
-\D 60 80  -dl-
-\D 90 100 -dl: noot
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 5 COMBINE LAB-UPB . CR
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 4 COMBINE LAB-UPB . CR
-\D S" EXPECT: 5 5 20 30 :" TYPE LAB-UPB . 3 COMBINE LAB-UPB . 2 MAKE-CURRENT
-\D RANGE-START . RANGE-END . CR
-\D S" EXPECT: 5 4 10 30 :" TYPE LAB-UPB . 2 COMBINE LAB-UPB . 1 MAKE-CURRENT
-\D RANGE-START . RANGE-END . CR
+HEX
+
+INIT-ALL
+10  30 -dl-
+20  40 -dl-
+30  50 -dl: aap0
+60  80 -dl-
+90 100 -dl: noot
+
+: TEST-COMBINE
+    assert( LAB-UPB 5 = ) 5 COMBINE assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 4 COMBINE assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 3 COMBINE assert( LAB-UPB 5 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 30 = )
+    assert( LAB-UPB 5 = ) 2 COMBINE assert( LAB-UPB 4 = )
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+; TEST-COMBINE
+
+DECIMAL
 : KILL-OVERLAP ( i -- )   DUP SAME-ALIGN  OVER COMPATIBLE? AND IF
         DUP COMBINE  THEN  DROP ;
 
-\D INIT-ALL
-\D 10  30 -dl-
-\D 20  40 -dl-
-\D 30 50  -dl: aap
-\D 60 80  -dl-
-\D 90 100 -dl: noot
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 5 KILL-OVERLAP LAB-UPB . CR
-\D S" EXPECT: 5 5 :" TYPE LAB-UPB . 4 KILL-OVERLAP LAB-UPB . CR
-\D S" EXPECT: 5 5 20 30 :" TYPE LAB-UPB . 3 KILL-OVERLAP LAB-UPB .
-\D 2 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 5 4 10 30 :" TYPE LAB-UPB . 2 KILL-OVERLAP LAB-UPB .
-\D 1 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D INIT-ALL
-\D 10  30 -dl-
-\D 20  28 -db-
-\D 30 70  -dl: aap
-\D 60 80  -dl-
-\D 7F 10F -dl-
+HEX
+
+INIT-ALL
+10  30 -dl-
+20  40 -dl-
+30  50 -dl: aap1
+60  80 -dl-
+90 100 -dl: noot1
+
+: TEST-KILL-OVERLAP-1
+    assert( LAB-UPB 5 = ) 5 KILL-OVERLAP assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 4 KILL-OVERLAP assert( LAB-UPB 5 = )
+    assert( LAB-UPB 5 = ) 3 KILL-OVERLAP assert( LAB-UPB 5 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 30 = )
+    assert( LAB-UPB 5 = ) 2 KILL-OVERLAP assert( LAB-UPB 4 = )
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+; TEST-KILL-OVERLAP-1
+
+INIT-ALL
+10  30 -dl-
+20  28 -db-
+30  70 -dl: aap2
+60  80 -dl-
+7F 10F -dl-
+
 \ The following is actually wrong because the aligning is not tested yet.
-\D S" EXPECT: 5 4 60 10F :" TYPE LAB-UPB . 5 KILL-OVERLAP LAB-UPB .
-\D 4 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 4 3 30 10F :" TYPE LAB-UPB . 4 KILL-OVERLAP LAB-UPB .
-\D 3 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 3 3 20 28 :" TYPE LAB-UPB . 3 KILL-OVERLAP LAB-UPB .
-\D 2 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 3 3 10 30 :" TYPE LAB-UPB . 2 KILL-OVERLAP LAB-UPB .
-\D 1 MAKE-CURRENT RANGE-START . RANGE-END . CR
+: TEST-KILL-OVERLAP-2
+    assert( LAB-UPB 5 = ) 5 KILL-OVERLAP assert( LAB-UPB 4 = )
+    4 MAKE-CURRENT assert( RANGE-START 60 = ) assert( RANGE-END 10F = )
+    assert( LAB-UPB 4 = ) 4 KILL-OVERLAP assert( LAB-UPB 3 = )
+    3 MAKE-CURRENT assert( RANGE-START 30 = ) assert( RANGE-END 10F = )
+    assert( LAB-UPB 3 = ) 3 KILL-OVERLAP assert( LAB-UPB 3 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 28 = )
+    assert( LAB-UPB 3 = ) 2 KILL-OVERLAP assert( LAB-UPB 3 = )
+    1 MAKE-CURRENT assert( RANGE-START 10 = ) assert( RANGE-END 30 = )
+; TEST-KILL-OVERLAP-2
+
+DECIMAL
 : FILL-GAP ( i -- )   DUP GAP? IF   DUP END+START -ddef-
         DUP 1+ LAB-UPB MAX KILL-OVERLAP
         DUP KILL-OVERLAP  THEN  DROP ;
 
-\D S" EXPECT: 3 4 28 30 :" TYPE LAB-UPB . 3 FILL-GAP LAB-UPB .
-\D 4 MAKE-CURRENT RANGE-START . RANGE-END . CR
-\D S" EXPECT: 4 4 20 28 :" TYPE LAB-UPB . 2 FILL-GAP LAB-UPB .
-\D 2 MAKE-CURRENT RANGE-START . RANGE-END . CR
+HEX
+
+: TEST-FILL-GAP
+    assert( LAB-UPB 3 = ) 3 FILL-GAP assert( LAB-UPB 4 = )
+    4 MAKE-CURRENT assert( RANGE-START 28 = ) assert( RANGE-END 30 = )
+    assert( LAB-UPB 4 = ) 2 FILL-GAP assert( LAB-UPB 4 = )
+    2 MAKE-CURRENT assert( RANGE-START 20 = ) assert( RANGE-END 28 = )
+; TEST-FILL-GAP
+
+DECIMAL
 : CLEANUP-RANGES ( -- )   RANGE-LABELS
-    2 LAB-UPB 2DUP <= IF  DO  I KILL-OVERLAP  -1 +LOOP  THEN ;
+    2 LAB-UPB 2DUP <= IF  DO  I KILL-OVERLAP  -1 +LOOP  THEN ;
 : PLUG-FIRST ( -- )   1 MAKE-CURRENT
     TARGET-START RANGE-START 2DUP <> IF
-        -ddef- _ _  THEN  2DROP ;
+        -ddef- _ _  THEN  2DROP ;
 : PLUG-LAST ( -- )   LAB-UPB MAKE-CURRENT
     RANGE-END TARGET-END 2DUP <> IF
-        -ddef- _ _  THEN  2DROP ;
+        -ddef- _ _  THEN  2DROP ;
 : PLUG-SPECIAL ( -- )   LAB-UPB IF  PLUG-LAST PLUG-FIRST  ELSE
-    TARGET-START TARGET-END -ddef-  THEN ;
+    TARGET-START TARGET-END -ddef-  THEN ;
 : PLUG-HOLES ( -- )   CURRENT-SECTION  RANGE-LABELS LAB-UPB 1+ 2
     2DUP > IF  DO  I FILL-GAP  LOOP  ELSE  2DROP  THEN
     SORT-LABELS  PLUG-SPECIAL  SORT-LABELS
-    TO CURRENT-SECTION ;
+    TO CURRENT-SECTION ;
 
 ALSO ASSEMBLER
 
-1000 BAG STARTERS
+1000 BAG STARTERS
 VARIABLE (R-XT)
-: REQUIRED-XT (R-XT) @ ;
+: REQUIRED-XT (R-XT) @ ;
 : NORMAL-DISASSEMBLY ['] D-R-T (R-XT) ! BITS-32 ;
-  NORMAL-DISASSEMBLY
+  NORMAL-DISASSEMBLY
 : IN-CURRENT-CODE? ( -- f )   RANGE-START RANGE-END WITHIN
-    RANGE-XT REQUIRED-XT =  AND ;
-: IN-CODE-N? ( i -- f ) MAKE-CURRENT IN-CURRENT-CODE? ;
+    RANGE-XT REQUIRED-XT =  AND ;
+: IN-CODE-N? ( i -- f ) MAKE-CURRENT IN-CURRENT-CODE? ;
 : IN-CODE?  DUP 0 = IF 2DROP 0 ELSE   \ Not present.
         2DUP IN-CODE-N? IF 2DROP -1 ELSE
             DUP 1 = IF 2DROP 0 ELSE   \ Previous not present.
-                1- IN-CODE-N? THEN THEN THEN ;
-: KNOWN-CODE?   RANGE-LABELS DUP WHERE-LABEL LAB-UPB MIN IN-CODE? ;
-: IN-CODE-SPACE?   TARGET-START TARGET-END WITHIN ;
-: STARTER?   DUP KNOWN-CODE? 0=  SWAP IN-CODE-SPACE? AND ;
-: JUMP-TARGET   AS-POINTER @   LATEST-OFFSET @  + HOST>TARGET ;
+                1- IN-CODE-N? THEN THEN THEN ;
+: KNOWN-CODE?   RANGE-LABELS DUP WHERE-LABEL LAB-UPB MIN IN-CODE? ;
+: IN-CODE-SPACE?   TARGET-START TARGET-END WITHIN ;
+: STARTER?   DUP KNOWN-CODE? 0=  SWAP IN-CODE-SPACE? AND ;
+: JUMP-TARGET   AS-POINTER @   LATEST-OFFSET @  + HOST>TARGET ;
 : ANALYSE-INSTRUCTION   LATEST-INSTRUCTION @ JUMPS IN-BAG? IF
     JUMP-TARGET DUP ?INSERT-EQU?
-    STARTER? IF JUMP-TARGET STARTERS SET+ THEN THEN ;
-: COLLAPSE(I1) RANGE-LABELS
+    STARTER? IF JUMP-TARGET STARTERS SET+ THEN THEN ;
+: COLLAPSE[I1] RANGE-LABELS
     DUP LAB-UPB < IF DUP 1+ KILL-OVERLAP THEN
     DUP 1 > IF DUP KILL-OVERLAP THEN
     DROP ;
 
-\D LABELS !BAG
-\D 4FE 520 -dc-
-\D 520 530 -dc: oops
-\D 52A 570 -dc-
-\D 560 590 -db: bytes \D .LABELS
-\D S" EXPECT 1 LESS : " TYPE 2 COLLAPSE(I1) CR .LABELS CR 29 <?>
+HEX
+LABELS !BAG
+4FE 520 -dc-
+520 530 -dc: oops1
+52A 570 -dc-
+560 590 -db: bytes1
+DECIMAL
+
+: TEST-COLLAPSE[I1]
+    assert( LABELS |BAG| 2 COLLAPSE[I1] LABELS |BAG| - 2 = )
+; TEST-COLLAPSE[I1]
 : INSERT-RANGE   OVER RANGE-LABELS WHERE-LABEL >R
-    REQUIRED-XT ANON-RANGE   R@ ROLL-LABEL   R> COLLAPSE(I1) ;
+    REQUIRED-XT ANON-RANGE   R@ ROLL-LABEL   R> COLLAPSE[I1] ;
 : CRAWL-ONE  DUP >R TARGET>HOST BEGIN
         (DISASSEMBLE) ANALYSE-INSTRUCTION DUP HOST-END >=
         LATEST-INSTRUCTION @ UNCONDITIONAL-TRANSFERS IN-BAG? OR
-    UNTIL R> SWAP HOST>TARGET INSERT-RANGE ;
-: ?CRAWL-ONE? DUP STARTER? IF CRAWL-ONE _ THEN DROP ;
-: (CRAWL)   BEGIN STARTERS BAG? WHILE STARTERS BAG@- ?CRAWL-ONE? REPEAT ;
+    UNTIL R> SWAP HOST>TARGET INSERT-RANGE ;
+: ?CRAWL-ONE? DUP STARTER? IF CRAWL-ONE _ THEN DROP ;
+: (CRAWL)   BEGIN STARTERS BAG? WHILE STARTERS BAG@- ?CRAWL-ONE? REPEAT ;
 : CRAWL   DUP ?INSERT-EQU?   RANGE-LABELS SORT-LABELS
-    STARTERS DUP !BAG BAG+!   SHUTUP (CRAWL) ;
-: NEW-LABEL? ( a -- )   DUP PLAUSIBLE-LABEL? IF  ?INSERT-EQU? _  THEN  DROP ;
-: ADD-L-LABELS ( l h -- )   SWAP DO  I L@ NEW-LABEL?  0 CELL+ +LOOP ;
+    STARTERS DUP !BAG BAG+!   SHUTUP (CRAWL) ;
+: NEW-LABEL? ( a -- )   DUP PLAUSIBLE-LABEL? IF  ?INSERT-EQU? _  THEN  DROP ;
+: ADD-L-LABELS ( l h -- )   SWAP DO  I L@ NEW-LABEL?  0 CELL+ +LOOP ;
 : ALL-L-LABELS ( -- )   CURRENT-SECTION  RANGE-LABELS DO-LAB
         I CELL+ @ RANGE-SECTION  RANGE-XT ['] DUMP-L = IF
             RANGE-START RANGE-END ADD-L-LABELS  THEN
-    LOOP-LAB  TO CURRENT-SECTION ;
-: CRAWL16  ['] D-R-T-16 (R-XT) ! BITS-16 CRAWL NORMAL-DISASSEMBLY ;
+    LOOP-LAB  TO CURRENT-SECTION ;
+: CRAWL16  ['] D-R-T-16 (R-XT) ! BITS-16 CRAWL NORMAL-DISASSEMBLY ;
 
-PREVIOUS
-: \D ; 
-\ Copyright (c) 2010 Dennis Ruffer
+PREVIOUS
+\ Copyright (c) 2012 Dennis Ruffer
 
 \ Copyright (c) 2010 Dennis Ruffer
 
@@ -1920,7 +2026,7 @@ CREATE [nz] 4 ,
         36 CFBLOCK  HERE DUP cfca !  cfc 36 BLOCKS - DUP ALLOT
         MOVE  cfca @ 36 nblk @ OVER - BLOCK-RANGE
         nblk @ BLOCKS CODE-SPACE + CP !
-    THEN ;
+    THEN ;
 
 : SIGN-EXTEND ( x n -- x' )  32 SWAP - DUP >R
     LSHIFT  R> 0 DO  2/  LOOP ;
@@ -1929,7 +2035,7 @@ CREATE [nz] 4 ,
 : !-LE ( x a -- )   4 1C!-LE ;
 
 : W@-BE ( a -- x )   2 1C@-BE ;
-: W!-BE ( x a -- )   2 1C!-BE ;
+: W!-BE ( x a -- )   2 1C!-BE ;
 
 : ?? ( "name" -- flag )  BL WORD FIND SWAP DROP 0= 0= ;
 : uses ( flag -- )  0= IF POSTPONE \ THEN ;
@@ -1965,7 +2071,7 @@ ASSEMBLER
 : -icons ( a n -- )   2>R ['] DIS-ICONS 2R> RANGE ;
 ' -icons RANGE: -icons: ( -name- )
 : -icons- ( a n -- )   -warning >R  NONAME$ -icons  R> +warning ;
-' DIS-ICONS  ' -icons:  ARE-COUPLED
+' DIS-ICONS  ' -icons:  ARE-COUPLED
 : UNPACK ( n -- n' chr )   DUP  DUP 0<
     IF       1 LSHIFT DUP 0<
         IF   6 LSHIFT SWAP 25 RSHIFT 63 AND  16 -    \ 11xxxxx.. 16-47
@@ -2000,7 +2106,7 @@ VARIABLE PHERE
     PADDECODE  R> PHERE @ OVER -  DUP PAD C@ + PAD C! ;
 
 : @NAME ( a -- a' n )   @-LE PRESHIFT PAD| PADCOUNT
-    ?DUP 0= IF  DROP S" _"  THEN  PAD| ;
+    ?DUP 0= IF  DROP S" _"  THEN  PAD| ;
 Files  FILE Words.dbf  FILE= Words.dbf
 
 ( Bytes  records   origin             name )
@@ -2094,7 +2200,7 @@ Assem
             Assem  S" LABEL X_" PAD PLACE  PAD APPEND
             PAD COUNT EVALUATE
         THEN
-    LOOP ;
+    LOOP ;
 
 : DUMP-NAMES ( a2 a1 -- )   DO  I DUP S" names " CR+$
         @NAME TYPE SPACE  0 CELL+ +LOOP  CR ;
@@ -2135,7 +2241,7 @@ VARIABLE curcolor   0 curcolor ! \ color of current token
     OVER 14 =   OVER 14 <> AND IF  S"  {" PAD+     THEN   \ ~b ->  b
     SWAP curcolor ! ;
 
-: NEWC ( new -- )  ( DUP curcolor @ XOR IF ) TRANSITION ( THEN ) DROP ;
+: NEWC ( new -- )  ( DUP curcolor @ XOR IF ) TRANSITION ( THEN ) DROP ;
 : gnn ( a -- a' n )   DUP >R  CELL+  R> @-LE ;
 : n32 ( a x -- a' n )   DROP gnn ;
 : n27 ( n -- n' )   2/ 2/ 2/ 2/ 2/ ;
@@ -2157,7 +2263,7 @@ DECIMAL
     IF  DUP C@ 32 - SWAP C!  ELSE  DROP  THEN ;
 : CAPS ( addr len -- )   0 ?DO  DUP 1CAP 1+  LOOP  DROP ;
 
-TRUE CONSTANT SHOW-UNKNOWN
+FALSE CONSTANT SHOW-UNKNOWN
 
 : .WORD ( n -- )   0 capext !  PAD+BL  PADCOUNT 2DROP ;
 : .BLUE ( n -- )   0 capext !  PAD+BL  PADCOUNT
@@ -2203,7 +2309,7 @@ HEX
     DUP 0D = IF DROP 0D NEWC .GREY      EXIT THEN \ gre compiler feedback
     DUP 0E = IF DROP 0E NEWC .BLUE      EXIT THEN \ blu display word
     DROP         .COMMENT# ;          \ $F commented number
-DECIMAL
+DECIMAL
 : ABLOCK ( a -- )   DUP 1020 + SWAP  0 curcolor !
     BEGIN  2DUP >  OVER @ 0= 0=  AND WHILE  gnn .TOKEN
     REPEAT  6 NEWC  2DROP ;   \ dummy color to mark end of block
@@ -2241,9 +2347,9 @@ DECIMAL
 : -blocks ( a n -- )   2>R ['] DIS-BLOCKS  2R> RANGE ;
 ' -blocks RANGE: -blocks: ( -name- )
 : -blocks- ( a n -- )   -warning >R  NONAME$ -blocks  R> +warning ;
-' DIS-BLOCKS  ' -blocks:  ARE-COUPLED
+' DIS-BLOCKS  ' -blocks:  ARE-COUPLED
 
-PREVIOUS
+PREVIOUS
 \ Copyright (c) 2010 Dennis Ruffer
 
 FALSE CONSTANT STACK-DEBUG
@@ -2289,7 +2395,7 @@ FALSE CONSTANT STACK-DEBUG
     DUP STACK-CLEAR? IF  DROP 0
     ELSE  STACK-PULL  THEN ;
 
-: STACK-CLEAR ( stack -- )   DUP CELL+ SWAP ! ;
+: STACK-CLEAR ( stack -- )   DUP CELL+ SWAP ! ;
 
 ?? ForGForth uses ALSO ASSEMBLER
 
@@ -2346,7 +2452,7 @@ ICON-ROWS 1+ |ICON-ROW| * CONSTANT |ICON-BUFFER|
         IF  SAVE-ROW  1 #ICON-COL +!
         ELSE  2DROP  SAVE-ICONS  R> BASE !  EXIT
         THEN
-    AGAIN ;
+    AGAIN ;
 VARIABLE CFEND                    \ address of last colorForth token in block
 VARIABLE NBITS                    \ number of bits left in token
 VARIABLE WORDLEN  0 WORDLEN !    \ size of current ASCII word name
@@ -2372,8 +2478,8 @@ VARIABLE 1STCAP  TRUE 1STCAP !    \ 1st letter that can be capitalized
 : .AFPTR ( -- )   SOURCE DUP >R TYPE                \ display text location
     CR 27 SPACES  >IN @ DUP R@ - IF  DUP WORDLEN @ + R@ - 1-
         IF  1-  THEN  THEN  R> DROP  WORDLEN @ - SPACES
-    WORDLEN @ 0 DO  S" ^" TYPE  LOOP ;
-TRUE CONSTANT TESTING
+    WORDLEN @ 0 DO  S" ^" TYPE  LOOP ;
+FALSE CONSTANT TESTING
 
 : ADDN ( n -- )   TESTING IF  DUP CP @ @-LE -    \ add a fully formed token
         IF  .CFPTR  DUP 8 H.R S" <>" TYPE CP @ @-LE 8 H.R SPACE .AFPTR
@@ -2410,7 +2516,7 @@ HEX
     IF  LARGEN R> + ADDN EXIT  THEN
     5 LSHIFT SMALLN R> + + ;
 
-DECIMAL
+DECIMAL
 
 : SETCOLOR ( n _ -- )   CREATE , DOES> @ curcolor ! ;   \ define format words
 
@@ -2442,7 +2548,7 @@ DECIMAL
         ELSE  24 XOR 5 ( 10xxx 8-15 )
         THEN
     ELSE  80 + 7 ( 11xxxxx 16-47 )
-    THEN ;
+    THEN ;
 : SHORTPACK ( n cf huf len -- cf huf' n' len' )   >R ROT R@ NBITS @ >
     IF  OVER DUP  R@ NBITS @ -  DUP >R RSHIFT  R@ LSHIFT XOR ( ??? ) drop 0
         IF  R> DROP  ADDC  0  curcolor @ SAVECOLOR STACK-PUSH  0 curcolor !
@@ -2478,11 +2584,13 @@ DECIMAL
     BEGIN  BL WORD COUNT  DUP WORDLEN !  ?DUP WHILE
             S" _" 2OVER COMPARE 0= IF
                 2DROP 0 ADDN  ELSE  ADDWORD  THEN
-    REPEAT  DROP ;
+    REPEAT  DROP ;
+FALSE CONSTANT SHOW-#TOKENS
+
 : ENDBLOCK ( -- )   \ finish up the block by filling it with null tokens
     CFEND @ CP @ - 4 /MOD DUP >R 0< OR ABORT" bad pointers"
-    .CFPTR S" tokens processed ok" TYPE  0 curcolor !
-    R> 1+ 0 DO  0 ADDN  LOOP ;
+    SHOW-#TOKENS IF  .CFPTR S" tokens processed ok" TYPE
+    THEN  0 curcolor !  R> 1+ 0 DO  0 ADDN  LOOP ;
 
 GET-CURRENT ( * )   WORDLIST DUP CONSTANT AF-VOC   SET-CURRENT
 
@@ -2524,7 +2632,7 @@ GET-CURRENT ( * )   WORDLIST DUP CONSTANT AF-VOC   SET-CURRENT
 : )   SAVECOLOR STACK-PULL curcolor ! ;                \ restore color
 : (   curcolor @ SAVECOLOR STACK-PUSH  9 curcolor ! ;    \ comment
 
-( * ) SET-CURRENT
+( * ) SET-CURRENT
 : +TOKEN ( str len -- )   \ process ASCII word
     2DUP AF-VOC SEARCH-WORDLIST
     IF  EXECUTE  2DROP  EXIT  THEN
@@ -2549,12 +2657,12 @@ GET-CURRENT ( * )   WORDLIST DUP CONSTANT AF-VOC   SET-CURRENT
 : shadow{ ( n -- )   DUP 1 AND 0=   \ start shadow block
     IF  CR  8 SPACES S" Even shadow block  " TYPE
         7 WORDLEN !  .AFPTR  THEN
-    CBLOCK ;
+    CBLOCK ;
 
 : D# ( -n- n )   BASE @ DECIMAL  0 0 BL WORD COUNT
     >NUMBER ABORT" Invalid number" 2DROP  SWAP BASE ! ;
 
-PREVIOUS
+PREVIOUS
 [DEFINED] ForCiForth [IF]
     REQUIRE #-PREFIX    \ In behalf of user.
     REQUIRE ARGC    \ In behalf of building an executable.
@@ -2562,24 +2670,24 @@ PREVIOUS
 
 : WRITE-ONE-SECTION ( handle -- handle )
     >R  FILE-OFFSET 0 R@ REPOSITION-FILE THROW
-    CODE-SPACE CP @ OVER - R@ WRITE-FILE THROW  R> ;
+    CODE-SPACE CP @ OVER - R@ WRITE-FILE THROW  R> ;
 : WRITE-SECTIONS ( handle -- handle )   SECTION-REGISTRY DO-BAG
         I @ TO CURRENT-SECTION  WRITE-ONE-SECTION
-    LOOP-BAG ;
-: OPEN-IT ( a n -- handle )   R/W CREATE-FILE THROW ;
-: CLOSE-IT ( handle -- )   CLOSE-FILE THROW ;
+    LOOP-BAG ;
+: OPEN-IT ( a n -- handle )   R/W CREATE-FILE THROW ;
+: CLOSE-IT ( handle -- )   CLOSE-FILE THROW ;
 
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
-    : SOURCE-AS ( -- a n )   BL WORD COUNT ;
-    : TARGET-AS ( -- a n )   BL WORD COUNT ;
+    : SOURCE-AS ( -- a n )   BL WORD COUNT ;
+    : TARGET-AS ( -- a n )   BL WORD COUNT ;
 [THEN]
 [DEFINED] ForCiForth [IF]
-    : SOURCE-AS ( -- a n )   1 ARG[] ;
-    : TARGET-AS ( -- a n )   2 ARG[] ;
+    : SOURCE-AS ( -- a n )   1 ARG[] ;
+    : TARGET-AS ( -- a n )   2 ARG[] ;
 [THEN]
 
-: WRITE-IT ( a n -- )   OPEN-IT  WRITE-SECTIONS  CLOSE-IT ;
+: WRITE-IT ( a n -- )   OPEN-IT  WRITE-SECTIONS  CLOSE-IT ;
 VARIABLE file.cf    \ colorForth source
 VARIABLE file.cfo   \ colorForth source reproduced
 VARIABLE file.cul   \ consultant file
@@ -2591,7 +2699,7 @@ VARIABLE file.dsm   \ disassembled output
     DUP 4 + ALLOT  R@ PLACE  R@ COUNT  S" .cf" R> APPEND
     S" .cfo" 2OVER  HERE DUP file.cfo ! make-filename
     S" .cul" 2OVER  HERE DUP file.cul ! make-filename
-    S" .dsm" 2SWAP  HERE DUP file.dsm ! make-filename ;
+    S" .dsm" 2SWAP  HERE DUP file.dsm ! make-filename ;
 : PARSE-ASM ( -- )
     BEGIN BEGIN  BL WORD DUP C@
             WHILE  FIND IF  EXECUTE
@@ -2606,30 +2714,30 @@ VARIABLE file.dsm   \ disassembled output
                     THEN
                 THEN
             REPEAT
-        DROP REFILL 0= UNTIL ;
+        DROP REFILL 0= UNTIL ;
 : [ASM ( -- )   BASE @ >R  GET-ORDER
     POSTPONE ONLY POSTPONE FORTH POSTPONE ALSO POSTPONE ASSEMBLER
     SAVE-INPUT  FIRSTPASS  2 0 DO  DEPTH >R  PARSE-ASM  CR  DEPTH R> -
         IF  .S  TRUE ABORT" Stack depth error"  THEN
         I 0= IF  SECONDPASS  RESTORE-INPUT THROW  THEN
-    LOOP  SET-ORDER  R> BASE ! ;
-: cias ( -- )   SOURCE-AS INCLUDED  TARGET-AS WRITE-IT ;
+    LOOP  SET-ORDER  R> BASE ! ;
+: cias ( -- )   SOURCE-AS INCLUDED  TARGET-AS WRITE-IT ;
 : FETCHED ( a n -- )   GET-FILE DUP CODE-LENGTH @ > ABORT" Too big!"
-    CODE-SPACE SWAP  2DUP + CP !  MOVE ;
-: FETCH ( -- )   BL WORD COUNT FETCHED ;
+    CODE-SPACE SWAP  2DUP + CP !  MOVE ;
+: FETCH ( -- )   BL WORD COUNT FETCHED ;
 
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
-    : TARGET-DIS ( -- a n )   BL WORD COUNT ;
+    : TARGET-DIS ( -- a n )   BL WORD COUNT ;
 [THEN]
 [DEFINED] ForCiForth [IF]
-    : TARGET-DIS ( -- a n )   2 ARG[] ;
+    : TARGET-DIS ( -- a n )   2 ARG[] ;
     REQUIRE DUMP
 [THEN]
 
 : CONSULTED ( a n -- )   INIT-ALL  HEX  INCLUDED ( file)  SORT-ALL
-    PLUG-HOLES  ALL-L-LABELS  DISASSEMBLE-TARGET  DECIMAL ;
-: CONSULT ( -- )   BL WORD COUNT CONSULTED ;
+    PLUG-HOLES  ALL-L-LABELS  DISASSEMBLE-TARGET  DECIMAL ;
+: CONSULT ( -- )   BL WORD COUNT CONSULTED ;
 
 [DEFINED] ForSwiftForth
 [DEFINED] ForGForth OR [IF]
@@ -2638,24 +2746,24 @@ VARIABLE file.dsm   \ disassembled output
         file.cf @ COUNT FETCHED  file.cul @ COUNT CONSULTED ;
     : cfas ( -- )   BL WORD COUNT make-filenames
         TESTING IF  file.cf @ COUNT FETCHED  THEN
-        file.dsm @ COUNT INCLUDED  file.cfo @ COUNT WRITE-IT ;
+        file.dsm @ COUNT INCLUDED  file.cfo @ COUNT WRITE-IT ;
 [THEN]
 [DEFINED] ForCiForth [IF]
-    : cidis ( -- )   1 ARG[] FETCHED TARGET-DIS CONSULTED ;
+    : cidis ( -- )   1 ARG[] FETCHED TARGET-DIS CONSULTED ;
 [THEN]
 
 : RESTORE-ALL ( -- )   '?ERROR RESTORED  'SECTION RESTORED
     'TYPE RESTORED ;
-RESTORE-ALL
+RESTORE-ALL
 
 [DEFINED] ForCiForth [IF]
     : INTERACTIVE    'OK DUP >DFA @ SWAP >PHA = IF 0 LIST OK THEN
-        ASSEMBLER   0 ORG   QUIT ;
+        ASSEMBLER   0 ORG   QUIT ;
     : HANDLE-ARG   ARGC 1 = IF INTERACTIVE THEN
-        ARGC ( 2) 3 4 WITHIN 0= 13 ?ERROR ;
-    : CONTAINS-D?    2DUP &D $I >R  &d $I R>  OR ;
-    "forth.lab" BLOCK-FILE $!
-    'TASK >DFA @   '.SIGNON >DFA !
+        ARGC ( 2) 3 4 WITHIN 0= 13 ?ERROR ;
+    : CONTAINS-D?    2DUP &D $I >R  &d $I R>  OR ;
+    "forth.lab" BLOCK-FILE $!
+    'TASK >DFA @   '.SIGNON >DFA !
     : MAIN   RESTORE-ALL  DEFAULT-SEGMENT HANDLE-ARG
-        0 ARG[] CONTAINS-D? IF cidis ELSE cias THEN ;
-[THEN]
+        0 ARG[] CONTAINS-D? IF cidis ELSE cias THEN ;
+[THEN]

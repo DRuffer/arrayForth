@@ -6,22 +6,33 @@ VARIABLE nw-file-id
 
 VARIABLE LAST-END  0 LAST-END !
 
-CREATE file-input-buffer   1024 ALLOT
+VARIABLE file-buffer  0 file-buffer !
+: last-file-buffer ( -- a )   file-buffer @ ;
+: last-file-position ( -- a )   file-buffer @ CELL+ ;
+: file-input-buffer ( -- a )   file-buffer @ 3 CELLS + ;
 
 CREATE 'CREATE  40 ALLOT  HERE CONSTANT CREATE'
+
+: push-buffer ( -- )  file-buffer @
+    1024 3 CELLS + ALLOCATE THROW DUP file-buffer ! !
+    nw-file-id @ FILE-POSITION THROW last-file-position 2! ;
+
+: pop-buffer ( -- )   last-file-position 2@  last-file-buffer @
+    file-buffer @ FREE THROW  file-buffer !
+    nw-file-id @ REPOSITION-FILE THROW ;
 
 : $CREATE ( a n -- )   S" CREATE " DUP >R  'CREATE SWAP MOVE
     'CREATE R@ + OVER >R  2DUP + CREATE' > ABORT" Name too long!"
     SWAP MOVE  'CREATE R> R> + EVALUATE
-    DOES>  DUP 2 CELLS + 2@  ROT 2@ 1 <?>
+    DOES>  DUP 2 CELLS + 2@  ROT 2@
         2OVER 2OVER D< ABORT" Unfinished symbol"
-        nw-file-id @ 2 <?> REPOSITION-FILE THROW  BEGIN
+        push-buffer  nw-file-id @ REPOSITION-FILE THROW  BEGIN
             file-input-buffer 1024 nw-file-id @ READ-LINE THROW
-            0= ABORT" Truncated symbol"  >R CR file-input-buffer R@ TYPE
-            nw-file-id @ FILE-POSITION THROW
-            2OVER D< WHILE
-                file-input-buffer R> EVALUATE
-        REPEAT  R> DROP ;
+            0= ABORT" Truncated symbol"
+            CR file-input-buffer OVER TYPE
+            file-input-buffer SWAP EVALUATE
+            2DUP nw-file-id @ FILE-POSITION THROW D<=
+        UNTIL  R> DROP 2DROP  pop-buffer ;
 
 : find-nw-symbols ( -- )
     BEGIN  nw-file-id @ FILE-POSITION THROW
@@ -48,4 +59,4 @@ CREATE 'CREATE  40 ALLOT  HERE CONSTANT CREATE'
 
 : notangle ( -name.nw- ) \ Start parsing NoWeb file
     BL WORD COUNT R/O OPEN-FILE THROW  nw-file-id !
-    find-nw-symbols ;
+    push-buffer  find-nw-symbols  pop-buffer ;

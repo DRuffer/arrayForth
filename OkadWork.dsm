@@ -8,7 +8,7 @@ BITS-16
 BITS-32
 ( 00200002 )   :SectorsPerTrack   dw 0000 
 \ 0B40 = 2880 512-byte sectors = 1.44MB floppy   
-( 00200004 )   :SectorsToLoad   dw 020A 
+( 00200004 )   :SectorsToLoad   dw 0250 
 ( 00200006 )   :UnusedStore   dw 0000 
 ( 00200008 )   :NumberOfHeads   dw 0000 
 ( 0020000A )   :BootDrive   dw 0000 \ e.g. 80 is DOS C:, 01 is floppy B:
@@ -3505,8 +3505,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 }icons
 
 ( 00204800 )               D# 18 code{ 
- :# ns -522 :# nblk 1440 :# nc 15 ( 144a12 01g 42c/01w/22a copyright
- 2009-2011 greenarrays,inc ) { , }
+ :# ns -592 :# nblk 1440 :# nc 17 ( 144a12 02a 42c/22a ) { , }
+ ( copyright { FB2F } greenarrays,inc ) { , }
  [ d# 20 load d# 22 load d# 24 load ] ( colors ) [ d# 28 load ]
 : abuf [ d# 10000 ] ; { * }
 : cbuf [ d# 29000 ] ; { , }
@@ -3646,28 +3646,29 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 ( 00206000 )               D# 24 code{ 
  ( - compiled macros )
-: 2/ ( n-n ) h# F8D1 2, ; { -cr }
+: 2/ ( n-n ) h# F8D1 2, ; { * }
 : time ( -n ) < ?dup > h# 310F 2, ;
-: 7push h# 57 1, ; { -cr }
+: 7push h# 57 1, ; { * }
 : 7pop h# 5F 1, ; [ forth ]
-: @ @ ; { -cr }
-: ! ! ; { -cr }
-: + + ; { -cr }
-: - - ;
-: */ */ ; { -cr }
-: * * ; { -cr }
-: / / ; { -cr }
+: @ @ ; { * }
+: ! ! ; { * }
+: + + ; { * }
+: - - ; { * }
+: */ */ ; { * }
+: * * ; { * }
+: / / ;
+: /mod /mod ; { * }
 : 2/ 2/ ;
-: dup dup ; { -cr }
-: drop drop ; { -cr }
+: dup dup ; { * }
+: drop drop ; { * }
 : nip ( ab-b ) nip ;
-: over over ; { -cr }
-: swap swap ; { -cr }
+: over over ; { * }
+: swap swap ; { * }
 : and and ;
-: or or ; { -cr }
-: +or +or ; { -cr }
+: or or ; { * }
+: +or +or ; { * }
 : +! +! ;
-: exit 7pop 7pop ; { -cr }
+: exit 7pop 7pop ; { * }
 : negate ( n-n ) - d# 1 + ;
 : min ( nn-n ) less if drop ; then swap drop ;
 : abs ( n-u ) dup negate
@@ -3675,10 +3676,11 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : v+ ( vv-v ) push u+ pop + ;
 : loads ( bn ) for dup push load pop d# 2 + next drop ;
 : writes ( acn ) for write next drop drop ;
+: thru ( fl ) over negate + 2/ d# 1 + loads ;
 : reads ( acn ) for read next drop drop ; [ macro ]
 : dann < then > ;
-: then ( a-a ) here over negate + d# 128 + { cr }
- d# -256 and drop if abort dann < dann > ; [ forth ] }block
+: then ( a-a ) here over negate + d# 128 + { , .. }
+      d# -256 and drop if abort dann < dann > ; [ forth ] }block
 
 ( 00206400 )               D# 25 shadow{ 
 : 2/ ( arithmetic right shift )
@@ -3691,6 +3693,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : v+ ( add 2-vectors )
 : exit ( terminates interpretation of a block. )
 : loads ( load successive blocks )
+: thru ( loads first thru last block inclusive )
 : nc ( number of cylinders booted and saved )
 : writes ( address, cylinder, cylinder count )
 : reads ( address, cylinder, count. ) [ floppy access note do not hit
@@ -3781,8 +3784,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : b! h# D88B 2, < drop > ;
 : c! h# C88B 2, < drop > ;
 : 2*d h# C3A50F 3, ;
-: 2*c h# E0D3 2, ; [ forth ] :# na 24 :# nb 8 :# h 67510272 :# an 0
- :# aa 74623108 :# nz 4
+: 2*c h# E0D3 2, ; [ forth ] :# na 14 :# nb 9 :# h 70070272 :# an 0
+ :# aa 74632146 :# nz 4
 : ?new [ na ] @ dup and drop if ; then
 : new [ aa ] @ @ [ an ] ! d# 1 [ aa ] +! d# 32 [ na ] ! ;
 : shift ( n-n ) dup negate dup [ nb ] +! [ na ] +! c! [ an ] @ 2*d
@@ -3867,7 +3870,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : fopen ( af-h ) push push d# 0 d# 32 ( exist ) d# 3 d# 0 { F } [ d# 3 ]
  { , }
  pop pop swap [ d# 4 ] * fcreate ; { , }
- :# flng 30 [ flng d# 4 * dup ]
+ :# flng 1629 [ flng d# 4 * dup ]
 : frd ( anh-n ) push push push [ d# 0 + ] pop pop swap { , }
  pop fread { * }
 : frw? ( ok-n ) if drop [ flng ] @ then ;
@@ -4005,7 +4008,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  for symmetry with kbd. ) }block
 
 ( 0020C000 )               D# 48 code{ 
- ( dump ) [ empty ] :# x 75678960 :# y -79635296
+ ( dump ) [ empty ] :# x 75751424 :# y -79635296
 : 5-8 d# 8 /mod d# 32 /mod d# 32 /mod h# 100 * + h# 100 * + h# 100
  * swap d# 4 * + ;
 : one dup @ dup 5-8 h. space h. space dup h. cr ;
@@ -4231,7 +4234,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  in block ) }block
 
 ( 00210000 )               D# 64 code{ 
- ( - more ) :# fmask -16 :# fnn -999030764 { cr }
+ ( - more ) :# fmask -16 :# fnn -350002672 { cr }
  :# fna 67146240 :# fbits 4104 [ d# 18 block fna ! ]
 : +shad ( a-a ) dup [ fna ] @ or d# 256 and + ;
 : 1word ( -n ) word [ words ] @
@@ -4520,7 +4523,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( to a log file ) [ in windows ] }block
 
 ( 00214000 )               D# 80 code{ 
- ( qx ) :# ?qxc 271547905 :# qb 0 [ d# 82 load ]
+ ( qx ) :# ?qxc 271554200 :# qb 1320 [ d# 82 load ]
 : ?c ( n-n ) green dup [ blk ] @ or drop if white then ;
 : !qx [ ?qxc ] assign ?c ; [ !qx ] { , , }
 : nx [ qb ] @ d# 120 + { * }
@@ -4547,7 +4550,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  block is displayed in green }block
 
 ( 00214800 )               D# 82 code{ 
- ( - formatting ) :# ws 271547521
+ ( - formatting ) :# ws 271547565
 : tab/2 ( xy ) push [ d# 11 ] * [ d# 3 ] + pop [ d# 15 ] * [ d# 3 ]
  + { cr }
  over lm at ; { -cr }
@@ -4747,7 +4750,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 00217000 )               D# 92 code{ 
- ( - compare ) :# cvec 271553540
+ ( - compare ) :# cvec 271553606
 : blink [ cvec ] assign ( n ) dup other [ blk ] ! edit ;
 : var ( nnxx-nnd ) push push d# 1 + d# 1 u+ pop pop
 : *1 ( nnxx-nnd ) or ;
@@ -4850,7 +4853,12 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 00219000 )               D# 100 code{ 
- }block
+ ( show bin occupancy ) [ empty compile ]
+: ?any ( nn-nn ) dup nn-n 2* h# 8000 + block d# 0 d# 64 for { , ... }
+      over @ h# 61FC or +or d# 1 u+ next nip d# 0 + { , }
+ drop if dup d# 100 mod swap then ;
+: row ( nn ) d# 18 for ?any d# 1 + next drop ;
+: chk d# 0 d# 18 for dup d# 1 + next drop ; }block
 
 ( 00219400 )               D# 101 shadow{ 
  }block
@@ -5013,7 +5021,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 ( 0021C800 )               D# 114 code{ 
  ( - umbilical ) :# sport 3 [ d# 1 sport ! ]
 : rsh ( ni-n ) d# 0 + if for 2/ next ; then drop ;
-: sdat align create [ d# 24576 rez ] :# bi 30
+: sdat align create [ d# 24576 rez ] :# bi 1629
 : -stream d# 0 [ bi ] ! ;
 : stream ( -b ) [ sdat a-b ] ;
 : /str ( -b ) [ bi ] @ [ stream ] + ; { br }
@@ -5052,22 +5060,21 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  present! ) }block
 
 ( 0021D000 )               D# 116 code{ 
- ( - com port management ) { cr }
- :# dflg 4113 [ h# 1011 dflg ! ] { cr }
+ ( - com port management ) { , }
+ :# dflg 4113 [ h# 1011 dflg ! ] { , }
  :# bps 921600 [ d# 115200 bps ! ]
 : dcb ( n-a ) align strng [ here d# 32 + h ! ]
 : @dcb d# 0 dcb [ dh ] @ rdcb drop ; [ d# 0 d# 0 dcb b-a d# 8 fill ]
 : !dcb [ dflg ] @ [ d# 8 dcb ] 4! d# 0 dcb [ dh ] @ wdcb drop ;
 : /dcb @dcb !dcb ;
-: baud ( n ) @dcb [ d# 4 dcb ] 4! ( bits ) d# 8 [ d# 18 dcb ] 1! { cr }
- ( np/1sb ) d# 0 [ d# 19 dcb ] 2! !dcb ; { br }
-
-: +ser ( -ok ) snam r/w fopen [ dh ] ! if { cr }
+: baud ( n ) @dcb [ d# 4 dcb ] 4! ( bits ) d# 8 [ d# 18 dcb ] 1! { , }
+ ( np/1sb ) d# 0 [ d# 19 dcb ] 2! !dcb ; { , , }
+: +ser ( -ok ) snam r/w fopen [ dh ] ! if { , }
  [ bps ] @ baud d# 1 ; then d# 0 ;
 : -ser [ dh ] @ [ d# 0 ] + if fclose d# 0 then [ dh ] ! ;
-: ctl! ( n ) [ dh ] @ fesc drop ;
-: reset ( lo ) [ d# 4 ] ctl! [ d# 500000 ] for next ( hi ) [ d# 3 ]
- ctl! ; }block
+: ctl! ( n ) [ dh ] @ fesc drop ; :# ?reset 0 [ d# 1 ?reset ! ]
+: reset [ ?reset ] @ d# 0 + if ( lo ) [ d# 4 ] ctl! { , .. }
+      [ d# 500000 ] for next ( hi ) [ d# 3 ] ctl! then drop ; }block
 
 ( 0021D400 )               D# 117 shadow{ 
 : dcb ( structure controls mode of a com port. )
@@ -5076,11 +5083,11 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : @dcb ( and ) !dcb ( read and write com port control. ) [ dflg ] ( is
  always included in the setting. )
 : /dcb ( sets dflg without changing anything else )
-: baud ( sets baud rate and character framing. ) { br }
-
+: baud ( sets baud rate and character framing. ) { , , }
 : +ser ( opens serial; true if good, handle in dh. )
 : -ser ( closes the handle. )
-: reset ( resets chip. no inversion in rx line. ) }block
+: reset ( resets chip. no inversion in rx line. ) { , }
+ [ set ] ?reset [ zero to prevent resetting in ] talk }block
 
 ( 0021D800 )               D# 118 code{ 
  ( - node { 588F } boot frames )
@@ -5154,7 +5161,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  loading ide. ) }block
 
 ( 0021E800 )               D# 122 code{ 
- ( - boot target adjacent ) :# 'wall 271579048
+ ( - boot target adjacent ) :# 'wall 271579132
 : swall ( nn-i ) over over or [ d# 1 ] and drop if or [ d# 2 ] and
  ; then { 14F } [ d# 100 ] / swap { 14F } [ d# 100 ] / or [ d# 2 ]
  and [ d# 1 ] + ;
@@ -5194,7 +5201,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : astk ( queries target stack nondestructively. ) }block
 
 ( 0021F000 )               D# 124 code{ 
- ( - stream components ) :# 'pth 67894616
+ ( - stream components ) :# 'pth 67896348
 : nstream ( an-n'w ) swap [ 'pth ] ! [ d# -2 ] + -if [ d# 0 ] pop drop
  ; then ( pre ) [ d# 2 ] ;
 : ?path ( i-n ) [ 'pth ] @ + @ ;
@@ -5233,7 +5240,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  to ) p. }block
 
 ( 0021F800 )               D# 126 code{ 
- ( - umbilical plumbing ) :# 'foc 271580094
+ ( - umbilical plumbing ) :# 'foc 271580178
 : using ( nn ) wall port [ vport ] ! ;
 : avail ( n-p ) [ d# 1000 ] mod nn-n idle ; { br }
 
@@ -5568,8 +5575,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 ( 00224000 )               D# 144 code{ 
  ( arrayforth tm and okad tools and designs ) { cr }
  ( copyright 2009-2012 greenarrays, inc. ) { cr }
- :# cuco 5 :# testb 0 :# dh 272 [ d# 0 dh ! ] { cr }
- :# first -1 [ d# -1 first ! ] :# orgn 206 [ d# 0 orgn ! ]
+ :# cuco 5 :# testb 0 :# dh 0 [ d# 0 dh ! ] { cr }
+ :# first -1 [ d# -1 first ! ] :# orgn 0 [ d# 0 orgn ! ]
 : compile [ d# 146 ] load ;
 : recompile compile [ orgn ] @ load lis ;
 : softsim { -cr }
@@ -5660,9 +5667,9 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( boot loader ) [ d# 1238 load ] { , }
  ( display ) [ d# 1276 d# 6 loads d# 1248 load d# 1288 d# 2 loads ]
  { , }
- ( preserve variables ) :# nmem 8 :# n2mem 0
+ ( preserve variables ) :# nmem 0 :# n2mem 0
 : nm2m [ nod2 ] @ !node [ n2mem ] @ mem ! { , ... }
-      [ nod ] @ !node [ nmem ] @ mem ! ; :# big 100
+      [ nod ] @ !node [ nmem ] @ mem ! ; :# big 2
 : puka ( nn-a ) nn-n 2* h# 8000 + block ;
 : code ( nn nn ) puka push puka pop d# 64 move ; { , }
  ( keyboard ) [ d# 1292 d# 2 loads ] { , }
@@ -5763,7 +5770,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 ( 00227000 )               D# 156 code{ 
  ( big letters ) [ macro ]
 : *byte h# C80F 2, ; [ forth ]
-: clr [ aper d# 2 + ] ; :# sz 14 :# cur 5579776 [ d# 14 sz ! ]
+: clr [ aper d# 2 + ] ; :# sz 14 :# cur 6217744 [ d# 14 sz ! ]
 : ptab ( xy ) d# 1024 * + [ aper @ d# 4 / ] + [ cur ] ! ;
 : center ( n ) [ sz ] @ d# -24 * d# 768 + 2/ ptab ;
 : table d# 12 * [ d# 12 block ] + ;
@@ -5894,7 +5901,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 0022B000 )               D# 172 code{ 
- ( - crc ) :# ad1 27816 :# ad2 21146 [ macro ] { br }
+ ( - crc ) :# ad1 14840 :# ad2 50699 [ macro ] { br }
 
 : 2/s ?lit h# E8C1 2, 1, ; { -cr }
 : 1@ h# 8A 2, ; [ forth ]
@@ -5949,7 +5956,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 ( 0022C000 )               D# 176 code{ 
  ( cf-html ) [ empty -nat ] { cr }
  :# pad 278806528 [ abuf block d# 4 * pad ! ] { cr }
- :# hld 280317057 [ pad @ hld ! d# 178 d# 6 loads ]
+ :# hld 278838904 [ pad @ hld ! d# 178 d# 6 loads ]
 : estyle ,link ,t1cr ( cfhtml.css '? ) ;
 : .hdr [ pad ] @ [ hld ] ! ,t1cr ( @html? @head? ) istyle { cr }
  ( estyle ) ,t1cr ( @/head? @body? @table? ) ;
@@ -6401,12 +6408,10 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( user f18 code ) [ reclaim ] { br }
 
  ( softsim example ) [ reclaim d# 0 node d# 1342 load ] { cr }
- ( practical example pwm code ) [ reclaim d# 842 load ] { cr }
- ( initial test pwm code ) [ reclaim d# 852 d# 3 loads ] { cr }
- ( initial potentiometer ) [ reclaim d# 858 load ] { cr }
- ( initial wire code ) [ reclaim d# 860 load ] { cr }
- ( initial scaler ) [ reclaim d# 862 load ] { cr }
- ( averaging code ) [ reclaim d# 864 load ] }block
+ ( practical example pwm code ) [ reclaim d# 842 load ] { br }
+
+ ( sha256 reclaim { 708F } { AF } loads ) { , }
+ ( greg n1 object { 76CF } load ) }block
 
 ( 00232400 )               D# 201 shadow{ 
  ( use this load block to compile your code ) { cr }
@@ -6419,14 +6424,16 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 ( 00232800 )               D# 202 code{ 
  ( ga application tools )
-: a-com [ d# 3 ] ; { * }
-: a-bps d# 921600 ;
-: c-com [ d# 10 ] ; { * }
+: a-com [ d# 3 { CF } ] ; { * }
+: a-bps d# 921600 { EA600F } ;
+: c-com [ d# 5 { 10F } ] ; { * }
 : c-bps d# 921600 ;
 : host d# 206 ; { * }
 : target d# 208 ; { , }
  ( modules ) { * }
-: sram [ d# 264 ] ; { , }
+: sram [ d# 264 ] ; { * }
+: pf [ d# 360 ] ; { * }
+: ether [ d# 720 ] ; { , }
  ( utils ) { * }
 : streamer [ d# 282 ] ; { * }
 : loader [ d# 210 ] ; { , , }
@@ -6544,7 +6551,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( 2. describe the application using +node et al. 3. ) [ ship ] }block
 
 ( 00235000 )               D# 212 code{ 
- ( - configuration tables ) :# com 135
+ ( - configuration tables ) :# com 133
 : tabl pop 2/ 2/ [ com ] @ + ;
 : jsr h# E8 dst ; ( call has been clobbered already )
 : table ( nn ) < align > jsr tabl for dup , next drop ;
@@ -6589,7 +6596,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  the stack at load time ) }block
 
 ( 00235800 )               D# 214 code{ 
- ( - routing ) :# 'rte 67894617
+ ( - routing ) :# 'rte 67899128
 : route ( i ) 'pths + @ [ 'rte ] ! ;
 : active ( -n ) [ 'rte ] @ @ ;
 : follower ( -n ) [ 'rte ] @ [ d# 1 ] + @ ;
@@ -6620,22 +6627,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( softsim configuration ) { , , }
  ( spi boot testbed { 9B8F } { 4F } loads ) { , }
  ( sync boot testbed 'addr,len' { 99CF } load ) { , , }
- ( smtm ) [ d# 0 +node d# 0 /ram d# 0 /p ] { , ... }
-      [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... { C8F } }
-      ( +node { C8F } /ram { F } { 2F } /stack { 25F } /p ) { , ... }
-      [ d# 709 +node d# 709 /ram h# 19 /p ] { , ... }
-      [ d# 609 +node d# 609 /ram d# 0 /p ] { , ... }
-      [ d# 509 +node d# 509 /ram d# 0 /p ] { , ... }
-      [ d# 508 +node d# 508 /ram d# 0 /p ] { , ... }
-      [ d# 507 +node d# 507 /ram d# 0 /p ] { , ... }
-      [ d# 506 +node d# 506 /ram d# 0 /p ] { , ... }
-      [ d# 505 +node d# 505 /ram d# 0 /p ] { , ... }
-      [ d# 504 +node d# 504 /ram d# 0 /p ] { , ... }
-      [ d# 503 +node d# 503 /ram d# 0 /p ] { , ... }
-      [ d# 502 +node d# 502 /ram d# 0 /p ] { , ... }
-      [ d# 501 +node d# 501 /ram d# 0 /p ] { , }
+ ( smtm ) [ d# 0 +node d# 0 /ram d# 0 /p ] { , }
  ( /command test ) [ d# 400 +node d# 0 /ram h# 25 /a h# 12 /b ] { , }
  [ d# 9 d# 8 d# 7 d# 6 d# 5 d# 4 d# 3 d# 2 d# 1 h# 12345 d# 10 /stack
  h# A9 /p ] { , , }
@@ -6805,7 +6797,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : /stack ( specify stack initialization ) }block
 
 ( 0023D000 )               D# 244 code{ 
- ( - framer ) :# 'pth 67891668
+ ( - framer ) :# 'pth 67891722
 : b-a ( b-a ) [ d# 3 ] + 2/ 2/ ; { -cr }
 : a-b ( a-b ) 2* 2* ;
 : create ( -a ) pop b-a ;
@@ -6815,7 +6807,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : follower ( -n ) [ 'pth ] @ [ d# 1 ] + @ ;
 : +route ( n ) [ 'pth ] +! active nn-n [ com ] ! ; { br }
 
- :# wd 75753449
+ :# wd 75760552
 : 'stream ( -a ) [ nnc d# 2 * h# 8000 + block d# 1 + ] ; { cr }
  ( clear ) [ 'stream d# 1 + wd ! ]
 : stream ( -ac ) [ 'stream d# 1 + ] dup [ wd ] @ - + - { , }
@@ -6899,8 +6891,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : scrub ( n ) +node [ d# -1 ] dup dup /part { cr }
  d# -1 /a io /b warm /p ;
 : fresh begin active scrub [ d# 1 ] +route { cr }
- active dup and drop -until ; { br }
-
+ active dup and drop -until d# 708 +node h# AA /p ; { , , }
 : /root ( a' a c b ) push push push { cr }
  h# 10000 +or !18 pop dup !18 pop dup !18 { cr }
  [ d# 0 ] + if pop +ram ; then drop drop pop drop ; }block
@@ -6932,8 +6923,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  h# F0000 and d# 64 / ;
 : ersall [ h# 21 ] call ;
 : ers32 [ h# 18 ] call ;
-: ers [ dest ] @ pause { cr }
- [ d# 0 ] + drop if ersall ; then ers32 ;
+: ers [ dest ] @ 2* 2* [ h# 1E ] r! ers32 ;
 : read ( a-a' ) dup expand lit' lit' [ h# C ] call [ d# -2 ] + ;
 : r ( d-dw ) [ d# 2 ] + rdrop [ h# 25 ] call upd ;
 : check [ dest ] @ read [ len ] @ for { cr }
@@ -6943,7 +6933,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  [ talk ] ( check a-com ) [ d# 0 d# 705 hook h# 0 d# 64 d# 1613 boot ]
  { cr }
  [ .boot pause wait ] ( *** remove noboot jumper ) { cr }
- ( ers ) [ .erasing pause ersall chill ] ( check ) [ overlay ] }block
+ ( ers ) [ .erasing pause ] ( ersall ) [ ers chill ] { , }
+ ( check ) [ overlay ] }block
 
 ( 0023EC00 )               D# 251 shadow{ 
  ( erasing flash ) { br }
@@ -6956,13 +6947,21 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( flash writer { 24F } bit ) [ overlay ] { cr }
  [ d# 7 + d# -8 and len ! dest ! source ! ] { cr }
  [ serial load -canon ] { cr }
- [ a-com sport ! a-bps bps ! !nam talk ] { br }
+ [ a-com sport ! a-bps bps ! !nam ] ( talk ) { br }
 
+: esc key? esc ; { * }
+: wait esc d# 0 [ keych ] ! ; { cr }
+ [ nores d# 285 list ] { cr }
+ [ .noboot pause wait ] ( ** install noboot jumper ) { cr }
+ [ talk ] ( check a-com ) [ d# 0 d# 705 hook h# 0 d# 64 d# 1613 boot ]
+ { , }
+ [ .boot pause wait ] ( *** remove noboot jumper ) { , }
+ [ .erasing pause ] ( erase 1st 32k ) { , ... }
+      [ d# 0 h# 1E r! h# 18 call chill ] { , , }
  [ d# 0 d# 705 hook h# 0 d# 64 d# 1609 boot focus ] { cr }
  [ d# 0 d# 706 hook h# 0 d# 64 d# 1610 boot ] { br }
 
- ( flash commands { 97CF } ) [ d# 2 fh load ] { br }
-
+ ( flash commands { 97CF } ) [ d# 2 fh load ] { , }
  [ d# 285 list nosay ] { cr }
  [ .burning pause burn chill ] { cr }
  [ .checking pause check ] { cr }
@@ -7026,8 +7025,10 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( writing flash { 10F } bits ) [ overlay ] { cr }
  [ len ! dest ! source ! ] { cr }
  [ serial load -canon ] { cr }
- [ a-com sport ! a-bps bps ! !nam talk ] { br }
-
+ [ a-com sport ! a-bps bps ! !nam ] ( talk ) { , }
+ [ nores d# 285 list d# 0 d# 705 hook h# 0 d# 64 d# 1613 boot ] { , }
+ [ .erasing pause ] ( erase 2nd 32k ) { , ... }
+      [ h# 20000 h# 1E r! h# 18 call chill ] { , , }
  ( flash commands { 988F } ) [ d# 2 fh load ] { br }
 
  [ d# 0 d# 705 hook d# 0 d# 64 d# 1611 boot ] { cr }
@@ -7064,7 +7065,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : check ( -t ) [ dest ] @ read drop { cr }
  [ source ] @ [ len ] @ for 2@+ { 73F } [ h# 3B ] call [ h# 3F ] r@
  or { cr }
- drop if pop drop fail ; then -next drop fair ; }block
+ drop if pop drop fail ; then -next drop good ; }block
 
 ( 00241400 )               D# 261 shadow{ 
  ( reading and writing flash ) { br }
@@ -7095,7 +7096,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : entire align create [ d# 705 d# 701 to d# 700 d# 0 to ] { , }
  [ d# 1 d# 17 to d# 117 d# 101 to d# 201 d# 217 to d# 317 d# 301 to ]
  { , }
- [ d# 401 d# 417 to d# 517 d# 501 to d# 601 d# 617 to d# 717 d# 709
+ [ d# 401 d# 417 to d# 517 d# 501 to d# 601 d# 617 to d# 717 d# 706
  to ] { , }
  [ d# -1 , ] { , , }
  ( retain asynch boot ) [ d# 708 +node h# AA /p ] }block
@@ -7147,7 +7148,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  { , }
  [ d# 211 d# 217 to d# 317 d# 301 to d# 401 d# 417 to d# 517 d# 501
  to ] { , }
- [ d# 601 d# 617 to d# 717 d# 709 to d# -1 , ] { , , }
+ [ d# 601 d# 617 to d# 717 d# 706 to d# -1 , ] { , , }
 : s708 align create [ d# 708 d# 701 to d# 700 d# 0 to ] { , }
  [ d# 1 d# 6 to d# 106 d# 101 to d# 201 d# 208 to d# 108 d# 109 to ]
  { , }
@@ -7280,8 +7281,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : poll ( mix ) then io a! { , }
  ^ 1E ^ begin drop over over @ or and until { , }
  ^ 21 ^ over over and if ( mixt ) ^ 23 ^ and and ( mt ) { , .. }
-      dup h# 10000 and if right ahead [ swap ] then { , .. }
-      ^ 28 ^ drop h# 1000 over and if left ahead [ swap ] { , .. }
+      dup h# 1000 and if left ahead [ swap ] then { , .. }
+      ^ 28 ^ drop h# 10000 over and if right ahead [ swap ] { , .. }
       ^ 2D ^ then drop { 801F } dup up then then { , ... }
       ^ 2F ^ ( mtba ) a! and or dup ! ( m ) [ ' re ] end { , }
  ^ 31 ^ then drop 2* 2* -if right cmds ; { , }
@@ -7290,7 +7291,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 ( 00245400 )               D# 277 shadow{ 
  ( node { D6F } full capability version. ) { , }
- ( polls for master requests and delivers stimuli ) { , }
+ ( polls for master requests and delivers stimuli )
+: priority [ is ether/108, vm/106, snorkel/207 ] { , }
  ( all requests are atomic. passes ) ex@ ( and ) ex! { , }
  ( requests on to node 007, performs ) cx? ( locally using those primitives.
  the command and stimulus mask ) [ m ] ( is maintained on the stack. )
@@ -7368,7 +7370,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 ( 00246800 )               D# 282 code{ 
  ( streamer ) { cr }
- :# source 75751425 :# dest 0 :# len 2024
+ :# source 303005696 :# dest 32768 :# len 4607
 : stream ( -an ) [ source ] @ [ len ] @ ;
 : 18burn ( sdn ) [ d# -30 fh ] load ;
 : burn ( sdn ) [ d# -24 fh ] load ;
@@ -7397,55 +7399,52 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( its state when overlay was defined ) }block
 
 ( 00247000 )               D# 284 code{ 
- ( flash utilties feedback ) { cr }
- :# loaded 848 :# result 0 { cr }
- :# 'say 271552571 :# 'ask 271552227
+ ( flash utilties feedback ) { , }
+ :# result 0 :# 'say 271552498 { , }
+ :# 'ask 271552293 :# 'at 271553181
 : nosay [ 'say ] assign nop ; [ nosay ]
 : noask [ 'ask ] assign nop ; [ noask ]
+: noat [ 'ask ] assign nop ; [ noat ]
 : .now blu [ 'say ] xqt ;
 : .ask blu [ 'ask ] xqt ;
-: .at. blu silver [ loaded ] @ . ;
+: .at. blu [ 'at ] xqt ;
 : chs ( ...n ) for emit next ; [ d# 2 fh load ]
-: .res blu [ result ] @ { cr { -11 } }
- [ d# 0 ] + -if .fair ; then { cr { F } }
- [ d# -1 ] + -if drop .good ; then { cr { 2F } }
+: .res blu [ result ] @ { , { F } }
+ [ d# -1 ] + -if drop .good ; then { , { 2F } }
  [ d# -1 ] + -if drop .fail ; then ;
-: fair d# -1 [ result ] ! ;
-: good d# 0 [ result ] ! ;
+: good d# 0 [ result ] ! ; { * }
 : fail d# 1 [ result ] ! ;
-: nores d# 2 [ result ] ! ; :# leng 2023 [ d# 36 leng ! ]
-: .str blu silver .' ( stream ) space .' ( length ) { , ... }
-      space [ leng ] @ . .' ( words ) space { , ... }
-      [ leng ] @ d# 18 d# 8 */ . .' ( bytes ) space ; }block
+: nores d# 2 [ result ] ! ; :# leng 4096 [ d# 36 leng ! ]
+: .str blu silver .' ( stream ) space .' ( length ) { , }
+ space [ leng ] @ . .' ( words ) space { , }
+ [ leng ] @ d# 18 d# 8 */ . .' ( bytes ) space ;
+: .nucleus [ 'at ] assign blu silver { , }
+ .' ( nucleus ) space ;
+: .stream [ 'at ] assign blu silver { , }
+ .' ( boot ) space .' ( stream ) space ; }block
 
 ( 00247400 )               D# 285 shadow{ 
- ( flash utilities ) { br .str cr .at. cr .ask cr .now br .res }
+ ( flash utilities ) { , , .str , , .now , .at. , , .res , .ask }
       }block
 
 ( 00247800 )               D# 286 code{ 
  ( - flash utilities feedback )
-: .erasing noask ( nores ) [ 'say ] assign silver { cr }
- ( erasing ) d# 0 h# D h# 6 h# 7 h# 8 h# 5 h# 1 h# 4 d# 8 chs ;
-: .burning noask ( nores ) [ 'say ] assign silver { cr }
- ( burning ) d# 0 h# D h# 6 h# 7 h# 6 h# 1 h# 16 h# 13 d# 8 chs ;
-: .checking noask ( nores ) [ 'say ] assign silver { cr }
- ( checking ) d# 0 h# D h# 6 h# 7 h# 24 h# A h# 4 h# 14 h# A d# 9 chs
- ;
-: .fair silver ( so far ) d# 0 h# 1 h# 5 h# E d# 0 h# 3 h# 8 d# 7 chs
- { cr }
- ( so good ) d# 0 h# 10 h# 3 h# 3 h# D d# 0 h# 3 h# 8 d# 8 chs ;
-: .good green ( good ) d# 0 h# 10 h# 3 h# 3 h# D d# 5 chs ;
+: .erasing noask [ 'say ] assign silver { , }
+ .' ( erasing ) space ;
+: .burning noask [ 'say ] assign silver { , }
+ .' ( burning ) space ;
+: .checking noask [ 'say ] assign silver { , }
+ .' ( checking ) space ;
+: .good green .' ( success ) space ;
 : .fail red ( fail ) d# 0 h# C h# 7 h# 5 h# E d# 5 chs ;
-: .boot nosay ( nores ) [ 'ask ] assign green { cr }
- ( remove ) d# 0 h# 4 h# 11 h# 3 h# 9 h# 4 h# 1 d# 7 chs
-: .j26 { cr }
- ( j26 ) d# 0 h# 1E h# 1A h# 22 d# 4 chs { cr }
- ( then ) d# 0 h# 6 h# 4 h# 14 h# 2 d# 5 chs { cr }
- ( press ) d# 0 h# 8 h# 8 h# 4 h# 1 h# 12 d# 6 chs { cr }
- ( key ) d# 0 h# B h# 4 h# 24 d# 4 chs ;
-: .noboot nosay ( nores ) [ 'ask ] assign green { cr }
- ( install ) d# 0 h# C h# C h# 5 h# 2 h# 8 h# 6 h# 7 d# 8 chs .j26
- ; }block
+: .boot nosay [ 'ask ] assign green .' ( remove ) space
+: .j26 .' ( j26 ) space .' ( then ) space { , }
+ .' ( press ) space .' ( key ) space ;
+: .noboot nosay [ 'ask ] assign green { , }
+ .' ( install ) space .j26 ;
+: .cont nosay [ 'ask ] assign green { , }
+ .' ( press ) space .' ( space ) space .' ( to ) space { , }
+ .' ( burn ) space .' ( new ) space .' ( nucleus ) space ; }block
 
 ( 00247C00 )               D# 287 shadow{ 
  }block
@@ -8018,147 +8017,162 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( spi speedup ) [ d# 290 load ] { , , }
  ( serial wires ) [ d# 102 node h# 20 org ] { , }
 : start @ !b start ; ^ 21 ^ [ d# 1709 bin ] { , }
- ( ganglia ) [ d# 6 fh load ] ( snorkel ) [ d# 10 fh load ] { , }
- ( spi ) [ d# 44 fh load ] }block
+ ( ganglia ) [ d# 44 fh load ] ( snorkel ) [ d# 48 fh load ] { , }
+ ( spi ) [ d# 50 fh load ] { , }
+ ( ethernet cluster mk1 ) [ ether load ] }block
 
 ( 0025A400 )               D# 361 shadow{ 
  ( this load block compiles the f18 code for all nodes in the polyforth
  vm. ) }block
 
 ( 0025A800 )               D# 362 code{ 
- }block
+ ( - load descriptors ) { , }
+: l, ( nn ) dup +node d# 100 /mod d# 1 and 2* swap d# 1 and + d# 1714
+ + push d# 32 d# 32 pop /part ( warm ) h# A9 /p ;
+: ganglia nns for i d# -1 + n-nn l, next ; { , , }
+ ( sea of mk1 ) [ ganglia ] { , }
+ ( snorkel mk1 ) [ d# 207 +node d# 1605 /ram up /b h# 37 /p ] { , , }
+ ( sram cluster mk1 ) [ sram d# 2 + load ] { , }
+ ( virtual machine ) [ d# 2 fh load ] { , }
+ ( serial terminal ) [ d# 4 fh load ] { , }
+ ( additional i/o ) [ d# 6 fh load ] { , }
+ ( clock nodes ) [ exit ] { , .. }
+      [ d# 517 +node d# 517 /ram io /b h# 200 /p ] { , .. }
+      [ d# 516 +node d# 516 /ram left dup /a /p right /b ] { , }
+ ( ethernet cluster mk1 ) [ exit ] { , .. }
+      [ ether d# 2 + load ] }block
 
 ( 0025AC00 )               D# 363 shadow{ 
- }block
+ ( this block describes entire chip's loading for polyforth boot environment. )
+ { , , }
+ ( suitable for use with ide loader, streamer, ) { , }
+ ( and softsim. ) { , , }
+ ( all nodes not otherwise programmed are loaded with ganglia for ad
+ hoc routing. ) { , , }
+ ( the sram cluster is invoked here for complete documentation although
+ it has been loaded ) { , }
+ ( earlier and is excluded from the path used by the main stream. )
+ { , , }
+ [ enable loading of clock nodes if you have ftdi or ether clock connected
+ to 517. ] { , , }
+ [ enable loading of ether cluster if you have ] { , }
+ [ nic hardware attached to right side of chip. ] }block
 
 ( 0025B000 )               D# 364 code{ 
- }block
+ ( -- virtual machine ) { br }
+
+ ( buds ) [ d# 205 +node d# 1705 /ram up /b d# 1 /p ] { indent }
+      [ d# 5 +node d# 1704 /ram down /b d# 1 /p ] { indent }
+      [ d# 206 +node d# 1702 /ram up /b right { 2F } /p ] { indent }
+      [ d# 6 +node d# 1701 /ram down /b d# 1 /p ] { br }
+
+ ( bitsy ) [ d# 105 +node d# 1703 /ram ] { indent }
+      [ h# FFE0 h# 15555 ] ( 'cold ) [ d# 1 d# 3 /stack ] { indent }
+      [ left /b right /a h# 31 /p ] { br }
+
+ ( stack ) [ d# 106 +node d# 1700 /ram ] { indent }
+      [ h# FFFF d# 0 d# 0 d# 3 /stack ] { indent }
+      [ right /b left /p ] }block
 
 ( 0025B400 )               D# 365 shadow{ 
  }block
 
 ( 0025B800 )               D# 366 code{ 
- ( generate ganglia ) { , , }
- [ d# 700 node h# 20 org reclaim ] { , }
- ( rlud ) r--- --l- ---u -d-- [ d# 2 fh load ] { , }
- [ d# 1716 bin ] ^ 40 ^ { , , }
- [ d# 701 node h# 20 org reclaim ] { , }
- ( rlud ) --l- r--- ---u -d-- [ d# 2 fh load ] { , }
- [ d# 1717 bin ] ^ 40 ^ { , , }
- [ d# 600 node h# 20 org reclaim ] { , }
- ( rlud ) r--- --l- -d-- ---u [ d# 2 fh load ] { , }
- [ d# 1714 bin ] ^ 40 ^ { , , }
- [ d# 601 node h# 20 org reclaim ] { , }
- ( rlud ) --l- r--- -d-- ---u [ d# 2 fh load ] { , }
- [ d# 1715 bin ] ^ 40 ^ }block
+ ( -- serial terminal ) { br }
+
+: /wire ( io ) h# 20 d# 1 [ d# 1709 ] /part /b /a [ h# 20 ] /p ; { br }
+
+ [ d# 104 +node d# 1708 /ram h# 20 /p ] { cr }
+ [ d# 103 +node left right /wire ] { cr }
+ [ d# 102 +node right left /wire ] { cr }
+ [ d# 101 +node left right /wire ] { cr }
+ [ d# 100 +node d# 1706 /ram h# 20 /p ] { br }
+
+ [ d# 204 +node left up /wire ] { cr }
+ [ d# 203 +node right left /wire ] { cr }
+ [ d# 202 +node left right /wire ] { cr }
+ [ d# 201 +node right left /wire ] { cr }
+ [ d# 200 +node d# 1707 /ram h# 20 /p ] }block
 
 ( 0025BC00 )               D# 367 shadow{ 
- ( background nodes are filled by default with ) { , }
- ( ganglia, routing code in { 41F } to { 7FF } thus they ) { , }
- ( may support either ide or neural messaging ) { , }
- ( until node is programmed some other way. ) { , , }
- ( routing directions are geographic. ) { , ... }
-      ( coded direction rlud 0123 ) { , , }
- ( four bins hold node orientations... ) { , ... { D68F } { C8F } .. { D6AF } { CAF }
- , ... { D64F } }
-      ( 000 ) { .. { D66F } }
-      ( 001 ) { , , }
- ( routing note- step count is relative to the node first receiving
- one of these messages. if ) { , }
- ( all counts zero will deliver to its neighbor ) { , }
- ( in direction indicated by two lsb of path. a ) { , }
- ( turn to deliver to right neighbor of turner ) [ is not expressible ]
- ( because whole field zero. ) { , }
- [ third run must never have count d# 8 or more! ] }block
+ }block
 
 ( 0025C000 )               D# 368 code{ 
- ( - ganglion template ) { , , }
- ( a whence b whither ) { , }
- ( msg is focus call path cin-1 cout-1 code ) { , , { 41F } }
- ( org rlud r--- --l- ---u -d-- )
-: aim ^ 24 ^ ( p-pa ) dup d# 3 and h# 20 or b! @b dup b! !b { , }
- @p ; ( / pump ) leap
-: whither ^ 2A ^ ( p ) d# -4 . + aim !b ( path ) !b { , }
- ( cnts ) @ dup push !b @ dup push !b
-: payload ^ 30 ^ begin @ !b unext { , ... }
-      begin @b ! unext ;
-: /8 ^ 32 ^ ( n-n ) 2/ 2/ 2/ ;
-: pump ^ 33 ^ then pop a! @ dup
-: turn ( pp ) h# 3C and if drop whither ; then { , ... }
-      drop dup h# FC0 and if drop /8 /8 dup turn ; { , }
- then drop aim ( cnts ) @ push @ push payload ; { , }
- ^ 40 ^ }block
+ ( -- additional i/o ) { , }
+ ( spi ) [ d# 705 +node d# 1606 /ram io /b h# A9 /p ] { , }
+ ( async bootable ) [ d# 708 +node h# AA /p ] }block
 
 ( 0025C400 )               D# 369 shadow{ 
- ( ganglia route messages much like chuck's 'sea' delivers exchanges
- of { 2F } or more word out and ) { , { 2F } }
- ( or more word reply to arbitrary nodes with ) { , }
- ( source routing. message structure is... ) { , , .. }
-      focus call ( to port ) [ always there ] { , .. .. }
-      pump call [ interganglion only ] { , .. .. }
-      path ( see below ) [ inter only ] { , .. .. }
-      reply count ( words-1 ) [ inter only ] { , .. .. }
-      payload count ( words-1 ) [ inter only ] { , .. }
-      payload [ always there ] { , .. }
-      reply [ always there ] { , , }
- ( path has { 6F } 6-bit runs low order taken first ) { , }
- ( run encoded nnnndd path has 3 runs, ) { , ... }
-      ( 2-bit direction rlud 0123 ) { , ... }
-      ( 4-bit count 1-relative zero deliver immed ) { , ... ... }
-      ( 3rd run must be lt { 10F } ) { , }
- ( example from 708 to 617 go down 1 and right 8 ) { , ... }
-      ( 8 0 1 3 packed as 807 ) [ in octal. ] { , , }
- ( when an exchange is finished all ) { , }
- ( ganglia are back where they were ) { , }
- ( on receipt of focusing call. ) }block
+ ( loads the spi node with flash support in both ) { .. }
+      ( ide and spi boot procedures. ) { , }
+ ( when loading from spi, the async boot node is ) { .. }
+      ( loaded with ganglion but the line here runs ) { .. }
+      ( it at cold, thus allowing ide ops. for just ) { .. }
+      ( ganglion, comment this line; to program it ) { , .. }
+      ( otherwise, override later with your own boot ) { .. }
+      ( descriptors. ) { , , }
+ [ spi boot ] ( may load every node in the chip. ) { , }
+ [ ide boot ] ( may load every node in the chip ) [ with ] { , .. }
+      [ the ] sole exception [ of node 708. ] }block
 
 ( 0025C800 )               D# 370 code{ 
- ( - snorkel ) [ reclaim d# 108 node d# 0 org ]
-: mk! ( fp'm )
-: /! ( an-a ) ^ 00 ^ push dup - !b over - !b pop !b ;
-: a+ ^ 03 ^ ( ap-ap+ ) push d# 1 . + h# 10000 over and if { , ... }
-      or d# 1 then pop . + ;
-: +@ ^ 0B ^ ( a-an ) a+ { * }
-: /@ ^ 0C ^ ( a-an ) dup !b over !b @b ;
-: @w ^ 0E ^ ( a-a'u ) /@ d# 7 for 2* 2* unext { , ... }
-      push +@ pop or ;
-: dma ^ 14 ^ ( x/r ) a+ @w push +@ push +@ pop begin { , ... }
-      pop pop dup push over push push drop ex { , }
- next pop drop drop drop ( func ) +@ push ;
-: x16 ^ 20 ^ ( x ) dma /@ ! a+ ;
-: r16 ^ 23 ^ ( x ) dma @ /! a+ ;
-: x18 ^ 26 ^ ( x ) dma @w ! a+ ;
-: r18 ^ 29 ^ ( x ) dma @ dup push d# 7 push { , ... }
-      begin 2/ 2/ unext d# 3 and /! a+ pop /! a+ ;
-: fin ^ 33 ^ ( x ) dup /! ( +three ) dup - h# 8000 mk!
-: idle ^ 37 ^ ( begin ) @b d# 2 dup dup or /@ ( until ) { , ... }
-      push dup /! pop over @w a! ( func ) +@ push ; { , }
- ^ 40 ^ [ d# 1605 bin reclaim exit ] }block
+ ( - host ide with pf running ) [ empty compile ] { , , }
+ [ serial load ] { , }
+ ( customize ) [ -canon d# 0 fh orgn ! d# 0 ?reset ! ] { , }
+ [ a-com sport ! a-bps bps ! !nam ] { , , }
+ ( paths ) [ d# 2 fh load ] { , }
+ ( select one... ) [ pfonly ] ( pfeth ) [ 'pths d# 2 + ! ] { , , }
+: dac ( n ) h# 155 and io r! ; { , , }
+ ( canon load ) }block
 
 ( 0025CC00 )               D# 371 shadow{ 
- to activate snorkel ( wait till ) [ mmptr ] ( zero then write addr
- of a ) [ sequence/x ] ( to it and stim. ) { , }
- [ mmptr ] ( zeroed after stim and you may queue 2nd ) [ x ] ( by writing
- and posting another stim. ) { , , }
- x ( has { 4F } wd ) [ port address ] ( followed by one or more ) [ function/arg
- groups. ] ( all x ) { * }
-: must { * }
-: be ( in bottom 64k of memory! ) { , , }
- function/arg group ( is { 2F } word ) [ jump adr ] ( in snork followed
- by ) [ args ] ( if any. ) [ funcs ] ( are... ) { , }
- x/r 16/18 ( count18, adr20 ) { , }
- fin ( done-flg awaken? ) { , , }
- ( if focusing call desired it must be first word in first transmit. )
- [ nothing about this code ] { , }
- [ depends on using ganglia ... can source ide or any other reasonable
- protocol including direct stream or ad hoc node to node transfer. ]
+ ( this load block compiles and configures the ) { , }
+ ( ide for the host chip on the eval board, for ) { , }
+ ( debugging f18 code in the rest of the chip after polyforth has been
+ loaded. ) { , , }
+ ( regardless of how pf was booted ... ide or spi flash ... you will
+ load this code and say talk to get started. the reset line is disabled
+ for talk in this mode so that we don't kill pf. ) { , , }
+ [ canon load ] ( restores mapping of canonical words onto the f18.
+ comment this if you wish to use the 'r-words' for all f18 operations. )
  }block
 
 ( 0025D000 )               D# 372 code{ 
- }block
+ ( -- residual paths ) { , }
+: pfonly align create [ d# 708 d# 716 to d# 717 d# 17 to ] { , }
+ [ d# 16 d# 616 to d# 615 d# 15 to d# 14 d# 614 to d# 613 d# 13 to ]
+ { , }
+ [ d# 12 d# 612 to d# 611 d# 11 to d# 10 d# 610 to d# 609 d# 109 to ]
+ { , }
+ [ d# 108 d# 608 to d# 607 d# 707 to d# 706 d# 606 to d# 605 d# 604
+ to ] { , }
+ [ d# 704 d# 701 to d# 700 d# 300 to d# 301 d# 601 to d# 602 d# 603
+ to ] { , }
+ [ d# 503 d# 506 to d# 507 d# 307 to d# 306 d# 406 to d# 405 d# 305
+ to ] { , }
+ [ d# 304 d# 404 to d# 403 d# 303 to d# 302 d# 502 to d# -1 , ] { ,
+ , }
+: pfeth align create [ d# 708 d# 717 to d# 617 d# 609 to ] { , }
+ [ d# 509 d# 515 to d# 415 d# 409 to d# 309 d# 313 to d# 213 d# 208
+ to ] { , }
+ [ d# 308 d# 608 to d# 607 d# 707 to d# 706 d# 606 to d# 605 d# 604
+ to ] { , }
+ [ d# 704 d# 700 to d# 600 d# 300 to d# 301 d# 307 to d# 507 d# 506
+ to ] { , }
+ [ d# 406 d# 405 to d# 505 d# 504 to d# 404 d# 403 to d# 603 d# 601
+ to ] { , }
+ [ d# 501 d# 401 to d# 402 d# 502 to d# -1 , ] }block
 
 ( 0025D400 )               D# 373 shadow{ 
- }block
+ ( maximum coverage paths usable after pf loaded, with or without ether+clock. )
+ { , , }
+: pfonly ( covers all nodes not loaded by the base ) { .. }
+      ( poly boot. it does not cover 205, { 19CF } which ) { .. }
+      ( must have discrete paths. ) { , , }
+: pfeth ( covers all nodes but { 340F } after pf, ether ) { .. }
+      ( and clock are all loaded. 205, { 19CF } and { 340F } ) { ,
+ .. }
+      ( must have discrete paths. ) }block
 
 ( 0025D800 )               D# 374 code{ 
  ( pf.16 stack ) [ h# 0 org ]
@@ -8521,6 +8535,125 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  the recv queue before the new ) pos bit delay ( arrives. ) }block
 
 ( 00265000 )               D# 404 code{ 
+ ( generate ganglia ) { , , }
+ [ d# 700 node h# 20 org reclaim ] { , }
+ ( rlud ) r--- --l- ---u -d-- [ d# 2 fh load ] { , }
+ [ d# 1716 bin ] ^ 40 ^ { , , }
+ [ d# 701 node h# 20 org reclaim ] { , }
+ ( rlud ) --l- r--- ---u -d-- [ d# 2 fh load ] { , }
+ [ d# 1717 bin ] ^ 40 ^ { , , }
+ [ d# 600 node h# 20 org reclaim ] { , }
+ ( rlud ) r--- --l- -d-- ---u [ d# 2 fh load ] { , }
+ [ d# 1714 bin ] ^ 40 ^ { , , }
+ [ d# 601 node h# 20 org reclaim ] { , }
+ ( rlud ) --l- r--- -d-- ---u [ d# 2 fh load ] { , }
+ [ d# 1715 bin ] ^ 40 ^ }block
+
+( 00265400 )               D# 405 shadow{ 
+ ( background nodes are filled by default with ) { , }
+ ( ganglia, routing code in { 41F } to { 7FF } thus they ) { , }
+ ( may support either ide or neural messaging ) { , }
+ ( until node is programmed some other way. ) { , , }
+ ( routing directions are geographic. ) { , ... }
+      ( coded direction rlud 0123 ) { , , }
+ ( four bins hold node orientations... ) { , ... { D68F } { C8F } .. { D6AF } { CAF }
+ , ... { D64F } }
+      ( 000 ) { .. { D66F } }
+      ( 001 ) { , , }
+ ( routing note- step count is relative to the node first receiving
+ one of these messages. if ) { , }
+ ( all counts zero will deliver to its neighbor ) { , }
+ ( in direction indicated by two lsb of path. a ) { , }
+ ( turn to deliver to right neighbor of turner ) [ is not expressible ]
+ ( because whole field zero. ) { , }
+ [ third run must never have count d# 8 or more! ] }block
+
+( 00265800 )               D# 406 code{ 
+ ( - ganglion template ) { , , }
+ ( a whence b whither ) { , }
+ ( msg is focus call path cin-1 cout-1 code ) { , , { 41F } }
+ ( org rlud r--- --l- ---u -d-- )
+: aim ^ 24 ^ ( p-pa ) dup d# 3 and h# 20 or b! @b dup b! !b { , }
+ @p ; ( / pump ) leap
+: whither ^ 2A ^ ( p ) d# -4 . + aim !b ( path ) !b { , }
+ ( cnts ) @ dup push !b @ dup push !b
+: payload ^ 30 ^ begin @ !b unext { , ... }
+      begin @b ! unext ;
+: /8 ^ 32 ^ ( n-n ) 2/ 2/ 2/ ;
+: pump ^ 33 ^ then pop a! @ dup
+: turn ( pp ) h# 3C and if drop whither ; then { , ... }
+      drop dup h# FC0 and if drop /8 /8 dup turn ; { , }
+ then drop aim ( cnts ) @ push @ push payload ; { , }
+ ^ 40 ^ }block
+
+( 00265C00 )               D# 407 shadow{ 
+ ( ganglia route messages much like chuck's 'sea' delivers exchanges
+ of { 2F } or more word out and ) { , { 2F } }
+ ( or more word reply to arbitrary nodes with ) { , }
+ ( source routing. message structure is... ) { , , .. }
+      focus call ( to port ) [ always there ] { , .. .. }
+      pump call [ interganglion only ] { , .. .. }
+      path ( see below ) [ inter only ] { , .. .. }
+      reply count ( words-1 ) [ inter only ] { , .. .. }
+      payload count ( words-1 ) [ inter only ] { , .. }
+      payload [ always there ] { , .. }
+      reply [ always there ] { , , }
+ ( path has { 6F } 6-bit runs low order taken first ) { , }
+ ( run encoded nnnndd path has 3 runs, ) { , ... }
+      ( 2-bit direction rlud 0123 ) { , ... }
+      ( 4-bit count 1-relative zero deliver immed ) { , ... ... }
+      ( 3rd run must be lt { 10F } ) { , }
+ ( example from 708 to 617 go down 1 and right 8 ) { , ... }
+      ( 8 0 1 3 packed as 807 ) [ in octal. ] { , , }
+ ( when an exchange is finished all ) { , }
+ ( ganglia are back where they were ) { , }
+ ( on receipt of focusing call. ) }block
+
+( 00266000 )               D# 408 code{ 
+ ( - snorkel ) [ reclaim d# 207 node d# 0 org ]
+: mk! ( fp'm )
+: /! ( an-a ) ^ 00 ^ push dup - !b over - !b pop !b ;
+: a+ ^ 03 ^ ( ap-ap+ ) push d# 1 . + h# 10000 over and if { , ... }
+      or d# 1 then pop . + ;
+: +@ ^ 0B ^ ( a-an ) a+ { * }
+: /@ ^ 0C ^ ( a-an ) dup !b over !b @b ;
+: @w ^ 0E ^ ( a-a'u ) /@ d# 7 for 2* 2* unext { , ... }
+      push +@ pop or ;
+: dma ^ 14 ^ ( x/r ) a+ @w push +@ push +@ pop begin { , ... }
+      pop pop dup push over push push drop ex { , }
+ next pop drop drop drop ( func ) +@ push ;
+: x16 ^ 20 ^ ( x ) dma /@ ! a+ ;
+: r16 ^ 23 ^ ( x ) dma @ /! a+ ;
+: x18 ^ 26 ^ ( x ) dma @w ! a+ ;
+: r18 ^ 29 ^ ( x ) dma @ dup push d# 7 push { , ... }
+      begin 2/ 2/ unext d# 3 and /! a+ pop /! a+ ;
+: fin ^ 33 ^ ( x ) dup /! ( +three ) dup - h# 8000 mk!
+: idle ^ 37 ^ ( begin ) @b { 4F } d# 4 dup dup or /@ ( until ) { ,
+ ... }
+      push dup /! pop over @w a! ( func ) +@ push ; { , }
+ ^ 40 ^ [ d# 1605 bin reclaim exit ] }block
+
+( 00266400 )               D# 409 shadow{ 
+ to activate snorkel ( wait till ) [ mmptr ] ( zero then write addr
+ of a ) [ sequence/x ] ( to it and stim. ) { , }
+ [ mmptr ] ( zeroed after stim and you may queue 2nd ) [ x ] ( by writing
+ and posting another stim. ) [ mmptr ] { , }
+ ( defined in idle, { 4F } for node 108, { 8F } for 207. ) { , , }
+ x ( has { 4F } wd ) [ port address ] ( followed by one or more ) [ function/arg
+ groups. ] ( all x ) { * }
+: must { * }
+: be ( in bottom 64k of memory! ) { , , }
+ function/arg group ( is { 2F } word ) [ jump adr ] ( in snork followed
+ by ) [ args ] ( if any. ) [ funcs ] ( are... ) { , }
+ x/r 16/18 ( count18, adr20 ) { , }
+ fin ( done-flg awaken? ) { , , }
+ ( if focusing call desired it must be first word in first transmit. )
+ [ nothing about this code ] { , }
+ [ depends on using ganglia ... can source ide or any other reasonable
+ protocol including direct stream or ad hoc node to node transfer. ]
+ }block
+
+( 00266800 )               D# 410 code{ 
  ( spi flash sst25wf080 ) [ reclaim d# 705 node d# 0 org ]
 : entry ^ 00 ^ pop a! ( delay ) @
 : nxt ^ 01 ^ ( d-d ) @ push ex . nxt ; { , , }
@@ -8545,7 +8678,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
       then +slob ! next done ; { , }
  ^ 3E ^ [ d# 1606 bin reclaim ] }block
 
-( 00265400 )               D# 405 shadow{ 
+( 00266C00 )               D# 411 shadow{ 
  ( timing roughly { 6AF } ns 19.2 mhz read clock ) { , }
  ( clk low 16.5 ns 30. mhz so this is good for ) { , }
  ( all sst25wfxxx parts as well. with mk1 sram ) { , }
@@ -8564,7 +8697,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : slowin ( given nbyt-1 receives nbyt bytes from ) { , ... }
       ( the device. used for slow mmc. ) }block
 
-( 00265800 )               D# 406 code{ 
+( 00267000 )               D# 412 code{ 
  ( minimal spi ) [ reclaim d# 705 node d# 0 org ] { , }
  ( working before speed up )
 : entry ^ 00 ^ pop a! ( delay ) @
@@ -8580,7 +8713,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
       then +byte ! next done ; { , }
  ^ 1B ^ [ d# 1606 bin reclaim ] }block
 
-( 00265C00 )               D# 407 shadow{ 
+( 00267400 )               D# 413 shadow{ 
  ( minimal code but slow; timing roughly { 80F } ns or 15.4 mhz read
  clock, low { 3EF } ns; write { 98F } ns or 13.2 mhz. when delay is
  zero. addl delay about { 8F } ns per count. ) { , }
@@ -8591,24 +8724,6 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : out ( given nbyt-1 sends nbyt bytes to device. )
 : bytin ( given nbyt-1 receives nbyt bytes from ) { , ... }
       ( the device ) [ and ends operation. ] }block
-
-( 00266000 )               D# 408 code{ 
- }block
-
-( 00266400 )               D# 409 shadow{ 
- }block
-
-( 00266800 )               D# 410 code{ 
- }block
-
-( 00266C00 )               D# 411 shadow{ 
- }block
-
-( 00267000 )               D# 412 code{ 
- }block
-
-( 00267400 )               D# 413 shadow{ 
- }block
 
 ( 00267800 )               D# 414 code{ 
  }block
@@ -8764,14 +8879,14 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( custom routes ) [ d# 2 fh load sram d# 4 + load ] { , }
  ( select ) [ pfp0 'pths ! pfp1 'pths d# 1 + ! ] { , ... }
       [ s708 'pths d# 2 + ! ] { , }
- ( vm build tools ) [ d# 4 fh load d# 12 fh load ] { , , }
+ ( vm build tools ) [ d# 4 fh load d# 14 fh load ] { , , }
  ( sram ) [ d# 6 fh load d# 1 ship ] { , }
 : !img ( n ) push [ fbuf ] d# 0 begin over 2@ swab { , }
  over sm swap [ d# 2 ] + s1+ next drop drop ;
 : !nuc [ chr ] @ 2/ [ d# 1 ] + !img ; { , ... }
       [ d# 1 d# 108 hook !nuc ] { . }
       [ unfoc d# 1 -hook ] { , , }
- ( rest ) [ d# 470 load ] { . }
+ ( rest ) [ pf d# 2 + load ] { . }
       [ d# 2 ship ] { . }
       [ panel upd ?ram ] { , }
  }block
@@ -8789,6 +8904,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( - custom ide paths ) { , , }
 : pfp0 align create [ d# 708 d# 707 to d# 607 d# 207 to ] { , }
  [ d# 206 d# 205 to d# -1 , ] { , , }
+: pfp0 align create [ d# 708 d# 308 to d# 309 d# 315 to d# -1 , ] { ,
+ , }
 : pfp1 align create ( sram ) [ d# 708 d# 108 to d# 107 d# 7 to ] { , }
  [ d# 8 d# 9 to d# -1 , ] }block
 
@@ -8855,25 +8972,49 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 00273000 )               D# 460 code{ 
- ( install pf in flash ) [ empty ] { , , }
- [ compile streamer load ] { , }
- [ d# 0 fh loaded ! nores ] { , , }
- ( read pfdisk.blk ) [ d# 2 fh load ] { , ... }
-      [ fbuf source ! d# 4607 len ! ] { , }
- ( display nuc length ) { , ... }
-      [ len @ d# 1 + d# 2 * d# 8 d# 18 */ leng ! ] { , , }
- [ h# 8000 stream nip ers ] { , ... }
-      ( burn nucleus ) [ stream h# 8000 swap burn ] { , , }
- ( generate boot stream ) [ d# 4 fh load ] }block
+ ( install pf in flash ) { , , }
+ [ empty ] ( 1st pass ) [ compile streamer load ] { cr }
+ [ framer load ] ( the stream ) [ d# 466 load ] { br }
+
+ [ empty ] ( 2nd pass ) [ compile streamer load ] { cr }
+ [ framer load ] ( the stream ) [ d# 466 load ] { br }
+
+ [ .stream ] { cr }
+ ( write stream into flash ) { cr }
+ ( display stream length ) [ strlen leng ! ] { , }
+ [ stream d# 0 swap 18burn ] { , }
+ ( ask permission to burn nucleus as well )
+: esc key? esc ;
+: ?cont esc [ keych ] @ d# 0 [ keych ] ! { , ... }
+      [ h# 7F ] and [ h# 20 ] or drop if noask exit ; then ; { , }
+ [ .cont pause ?cont ] { , ... }
+      ( erase and burn nucleus ) [ d# 462 load ] }block
 
 ( 00273400 )               D# 461 shadow{ 
+ ( pf stream ) { br }
+
+ ( two passes required to calculate address ) { cr }
+ ( to resume booting from after loading sram ) { cr }
+ ( and compile it into node { 582F } ) }block
+
+( 00273800 )               D# 462 code{ 
+ ( - burn pf nucleus ) { , }
+ [ empty compile streamer load ] { , }
+ [ .nucleus nores ] { , , }
+ ( read pfdisk.blk ) [ d# 464 load ] { , ... }
+      [ fbuf source ! d# 4607 len ! ] { , }
+ ( display nuc length ) { , ... }
+      [ len @ d# 1 + d# 2 * d# 8 d# 18 */ leng ! ] { , , ... }
+      ( burn nucleus ) [ stream h# 8000 swap burn ] }block
+
+( 00273C00 )               D# 463 shadow{ 
  ( load this block to install polyforth for flash booting. just follow
  instructions. ) { , , }
  ( burns nucleus to flash starting at 32k then ) { , }
  ( generates and burns full chip boot stream. ) }block
 
-( 00273800 )               D# 462 code{ 
- ( - read pf nucleus ) :# ft 0 :# chr 9216
+( 00274000 )               D# 464 code{ 
+ ( -- read pf nucleus ) :# ft 0 :# chr 9216
 : a-b ( a-b ) 2* 2* ; { * }
 : b-a ( b-a ) [ d# 3 ] + 2/ 2/ ; { , }
 : fbuf ( -a ) [ nnc d# 2 * h# 8000 + block a-b ] ; { , , }
@@ -8884,32 +9025,11 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  [ named ] ( pf/pfdisk.blk ) { , , }
  [ @nuc ] }block
 
-( 00273C00 )               D# 463 shadow{ 
+( 00274400 )               D# 465 shadow{ 
  }block
 
-( 00274000 )               D# 464 code{ 
- ( - burn pf boot stream ) { cr }
- [ empty ] ( 1st pass ) [ compile streamer load ] { cr }
- [ framer load ] ( the stream ) [ d# 2 fh load ] { br }
-
- [ empty ] ( 2nd pass ) [ compile streamer load ] { cr }
- [ framer load ] ( the stream ) [ d# 2 fh load ] { br }
-
- [ d# 0 fh loaded ! ] { cr }
- ( write stream into flash ) { cr { F } }
- ( stream nip ers ) { cr }
- ( display stream length ) [ strlen leng ! ] { , }
- [ stream d# 0 swap 18burn ] }block
-
-( 00274400 )               D# 465 shadow{ 
- ( pf stream ) { br }
-
- ( two passes required to calculate address ) { cr }
- ( to resume booting from after loading sram ) { cr }
- ( and compile it into node { 582F } ) }block
-
 ( 00274800 )               D# 466 code{ 
- ( -- generate pf stream ) { br }
+ ( - generate pf stream ) { br }
 
  ( speedup ) { indent }
       [ d# 0 d# 0 d# 3 d# 1608 /root ] { br }
@@ -8919,15 +9039,14 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( flash to sram ) [ d# 2 fh load ] { , }
  [ frame adjust ] ( resume point ) { , , }
  [ fresh ] ( residual ) [ sram d# 4 + load s705 course ] { , ... }
-      ( rest of chip ) [ d# 470 load ] { , ... }
-      ( retain asynch boot ) [ d# 708 +node h# AA /p ] { , , }
+      ( rest of chip ) [ pf d# 2 + load ] { , , }
  [ frame ] }block
 
 ( 00274C00 )               D# 467 shadow{ 
  }block
 
 ( 00275000 )               D# 468 code{ 
- ( --- load polyforth nucleus ) { , }
+ ( -- load polyforth nucleus ) { , }
 : /nwire ( in out ) /b /a d# 0 d# 4 [ d# 1711 ] /part d# 0 /p ; { ,
  , }
  [ d# 705 +node d# 1710 /ram h# 19 /p ] { , }
@@ -8945,71 +9064,25 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 00275800 )               D# 470 code{ 
- ( pf load descriptors ) { , }
-: l, ( nn ) dup +node d# 100 /mod d# 1 and 2* swap d# 1 and + d# 1714
- + push d# 32 d# 32 pop /part ( warm ) h# A9 /p ;
-: ganglia nns for i d# -1 + n-nn l, next ; { , , }
- ( sea of ) [ ganglia ] { , }
- ( snorkel ) [ d# 108 +node d# 1605 /ram left /b h# 37 /p ] { , , }
- ( sram cluster mk1 ) [ sram d# 2 + load ] { , }
- ( virtual machine ) [ d# 2 fh load ] { , }
- ( serial terminal ) [ d# 4 fh load ] { , }
- ( additional i/o ) [ d# 6 fh load ] }block
+ }block
 
 ( 00275C00 )               D# 471 shadow{ 
- ( this block describes entire chip's loading for polyforth boot environment. )
- { , , }
- ( suitable for use with ide loader, streamer, ) { , }
- ( and softsim. ) { , , }
- ( all nodes not otherwise programmed are loaded with ganglia for ad
- hoc routing. ) { , , }
- ( the sram cluster is invoked here for complete documentation although
- it has been loaded ) { , }
- ( earlier and is excluded from the path used by the main stream. )
  }block
 
 ( 00276000 )               D# 472 code{ 
- ( - virtual machine ) { br }
-
- ( buds ) [ d# 205 +node d# 1705 /ram up /b d# 1 /p ] { indent }
-      [ d# 5 +node d# 1704 /ram down /b d# 1 /p ] { indent }
-      [ d# 206 +node d# 1702 /ram up /b right { 2F } /p ] { indent }
-      [ d# 6 +node d# 1701 /ram down /b d# 1 /p ] { br }
-
- ( bitsy ) [ d# 105 +node d# 1703 /ram ] { indent }
-      [ h# FFE0 h# 15555 ] ( 'cold ) [ d# 1 d# 3 /stack ] { indent }
-      [ left /b right /a h# 31 /p ] { br }
-
- ( stack ) [ d# 106 +node d# 1700 /ram ] { indent }
-      [ h# FFFF d# 0 d# 0 d# 3 /stack ] { indent }
-      [ right /b left /p ] }block
+ }block
 
 ( 00276400 )               D# 473 shadow{ 
  }block
 
 ( 00276800 )               D# 474 code{ 
- ( - serial terminal ) { br }
-
-: /wire ( io ) h# 20 d# 1 [ d# 1709 ] /part /b /a [ h# 20 ] /p ; { br }
-
- [ d# 104 +node d# 1708 /ram h# 20 /p ] { cr }
- [ d# 103 +node left right /wire ] { cr }
- [ d# 102 +node right left /wire ] { cr }
- [ d# 101 +node left right /wire ] { cr }
- [ d# 100 +node d# 1706 /ram h# 20 /p ] { br }
-
- [ d# 204 +node left up /wire ] { cr }
- [ d# 203 +node right left /wire ] { cr }
- [ d# 202 +node left right /wire ] { cr }
- [ d# 201 +node right left /wire ] { cr }
- [ d# 200 +node d# 1707 /ram h# 20 /p ] }block
+ }block
 
 ( 00276C00 )               D# 475 shadow{ 
  }block
 
 ( 00277000 )               D# 476 code{ 
- ( - additional i/o ) { , }
- ( spi ) [ d# 705 +node d# 1606 /ram io /b h# A9 /p ] }block
+ }block
 
 ( 00277400 )               D# 477 shadow{ 
  }block
@@ -9632,10 +9705,10 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  if pop pop drop pop drop return ; { cr }
  then drop ;
 : write ( n ) ^ 0C ^ ( out ) h# 15555 !b ! ;
-: 50ns ( -n ) ^ 0E ^ d# 18 { 42F } for unext ( ; )
+: 50ns ( -n ) ^ 0E ^ d# 18 for unext ( ; )
 : sample ( -n ) ^ 11 ^ ( in ) h# 14555 !b .. @ ( out ) h# 15555 !b
  ;
-: 300ns ( -n ) ^ 15 { ECF } ^ d# 87 for unext sample ;
+: 300ns ( -n ) ^ 15 ^ d# 124 { AEF } for unext sample ;
 : once ( n-n' ) ^ 18 ^ { cr }
  dup write 50ns d# 0 chk ^ 1C ^ 300ns over chk ^ 1E ^ { cr }
  d# 0 write 50ns over chk ^ 22 ^ 300ns d# 0 chk ^ 25 ^ 2* ;
@@ -9654,7 +9727,6 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  [ address h# 4 ] ( tests active node given arg which is ending io
  value. ) [ note purpose is to control wr bit setting and if the bit
  does not work in either node the test will fail in one of em. ] { cr }
- parameter ( is ignored ) { cr }
  ( error code { F } for success, ) { cr }
  ( test's return address for failure ) { br }
 
@@ -11146,7 +11218,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( g144-smtm-self-tet-mem-random ) }block
 
 ( 002A5000 )               D# 660 code{ 
- ( tb001 ide pretest ) [ empty serial load ] { br }
+ ( tb001 ide pretest ) [ empty compile serial load ] { br }
 
  ( customize ) [ -canon d# 660 orgn ! ] { cr }
  [ a-com sport ! a-bps bps ! !nam ] { br }
@@ -11301,28 +11373,25 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : pre ( runs full set of pre-tests ) }block
 
 ( 002A7800 )               D# 670 code{ 
- ( tb001 ide creepers ) [ empty serial load ] { br }
-
- ( customize ) [ -canon d# 670 orgn ! ] { cr }
- [ a-com sport ! a-bps bps ! !nam ] { cr }
- ( functions ) [ d# 674 d# 5 loads ] { br }
-
- ( test status is ) { .pok br }
-
- ( details ) :# ph 3 :# id 2002 :# tgt 1000 :# pos 154 { cr }
- ( ------- ) :# ans 0 :# rval 39050 { cr }
- ( ------- ) :# nrun 13125 :# vval 1 { br }
-
+ ( tb001 ide creepers ) [ empty serial load ] { , }
+ ( customize ) [ -canon d# 670 orgn ! ] { , }
+ [ a-com sport ! a-bps bps ! !nam ] { , }
+ ( functions ) [ d# 674 d# 5 loads ] { , , }
+ ( test status is ) { .pok , , }
+ ( details ) :# ph 3 :# id 2002 :# tgt 1000 :# pos 154 { , }
+ ( ------- ) :# ans 0 :# rval 35978 { , }
+ ( ------- ) :# nrun 13125 :# vval 1 { , , }
 : init d# 0 [ tgt ] ! d# 0 [ pos ] ! d# 0 [ nrun ] ! d# 0 [ id ] !
- d# 0 [ rval ] ! d# 0 [ ans ] ! d# 0 [ vval ] ! d# -1 [ ph ] ! ; { cr }
- ( runner ) [ d# 684 d# 9 loads d# 672 load { 53CF } ] ( list ) { br }
-
-: run d# 670 list !p0 !p1 init pause { indent }
-      -buses d# 0 d# 1000 hook d# 0 -hook ana0 ( ; ) { cr }
- d# 0 [ ph ] ! d# 0 path z t911 t917 ta00 t913 { cr }
- d# 1 [ ph ] ! d# 1 path z !p1a { cr }
- d# 2 [ ph ] ! d# 1 path z !p1 ser70 !p1b ser07 !p1 { cr }
- d# 3 [ ph ] ! lovd d# 0 path d# 2007 runall d# 2002 runall { cr }
+ d# 0 [ rval ] ! { , .. }
+      d# 0 [ ans ] ! d# 0 [ vval ] ! d# -1 [ ph ] ! ; { , }
+ ( runner ) [ d# 684 d# 9 loads d# 672 load ] { , }
+: run d# 670 list !p0 !p1 init pause { , .. }
+      -buses d# 0 d# 1000 hook d# 0 -hook ana0 ( ; ) { , }
+ d# 0 [ ph ] ! d# 0 path z t911 t917 ta00 t913 { , }
+ d# 1 [ ph ] ! d# 1 path z !p1a { , }
+ d# 2 [ ph ] ! d# 1 path z !p1 ser70 !p1b ser07 !p1 { , }
+ d# 3 [ ph ] ! lovd d# 500 ms ( actually { 64F } on moo ) { , .. }
+      d# 0 path d# 2007 runall d# 2002 runall { , }
  d# 1 [ vval ] ! -pwr ; [ run ] }block
 
 ( 002A7C00 )               D# 671 shadow{ 
@@ -11542,7 +11611,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : -us ( nn-nn ) dup paths @ or drop ;
 : -end ( nn-nn ) dup d# -1 or drop ; { br }
 
- :# 'arg 270112297
+ :# 'arg 271594264
 : -try ( n-t ) d# 1 [ nrun ] +! test dup [ ans ] ! d# 0 or drop ;
 : ecch ( fail ) h# BAD h# BAD rip d# 1 [ vval ] ! abort ;
 : pass [ 'arg ] xqt -try if ecch then ; { br }
@@ -11681,8 +11750,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : atest ( arg-ans ) d# 1 [ nrun ] +! test dup [ rval ] ! ;
 : within ( nlh-t ) push less drop pop if drop d# 0 and ; then less
  if drop d# -1 +or ; then drop d# 0 and ;
-: pinok ( ans ) d# 16 /mod d# 16 /mod d# 24 d# 180 within { cr }
- push d# 4 d# 12 within push d# 4 d# 12 within pop and { cr }
+: pinok ( ans ) d# 16 /mod d# 16 /mod d# 16 d# 200 within { cr }
+ push d# 4 d# 13 within push d# 4 d# 13 within pop and { cr }
  pop and ( ; ) drop if ; then d# 2011 [ ans ] ! ecch ; { br }
 
 : p17 h# 30000 ;
@@ -11744,7 +11813,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 ( 002AF000 )               D# 700 code{ 
  ( - runner for { 1084F } analog test ) { br }
 
- :# 'side 270113283
+ :# 'side 271591078
 : tops [ 'side ] assign [ h# 13 ] ;
 : rights [ 'side ] assign [ h# 7 ] ;
 : stest ( arg-ans ) /many pass ;
@@ -11758,8 +11827,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 : a? ( nlhk ) push within if drop pop drop ; then { cr }
  pop [ ans ] ! ecch ;
-: /vlo d# 13000 d# 14700 ; { -cr }
-: /vhi d# 8250 d# 9350 ;
+: /vlo d# 12450 d# 14700 ; { -cr }
+: /vhi d# 7800 d# 9350 ;
 : aok ( nn ) kreep pause @off d# 0 d# 1 [ d# 1 ] a? { cr }
  @vdd /vhi [ d# 2 ] a? { cr }
  @vss /vlo [ d# 3 ] a? [ h# AA ] @ad /vhi [ d# 4 ] a? { cr }
@@ -11799,7 +11868,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
  ( test status is ) { .pok br }
 
- ( details ) :# ph 3 :# id 913 :# tgt 701 :# pos 7 { cr }
+ ( details ) :# ph 3 :# id 2013 :# tgt 701 :# pos 7 { cr }
  ( ------- ) :# ans 0 :# rval 0 { cr }
  ( ------- ) :# nrun 11520 :# vval 1 { br }
 
@@ -11875,9 +11944,9 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
  ( test status is ) { .pok br }
 
- ( details ) :# ph -1 :# id 0 :# tgt 0 :# pos 0 { cr }
+ ( details ) :# ph 3 :# id 2113 :# tgt 1001 :# pos 23 { cr }
  ( ------- ) :# ans 0 :# rval 0 { cr }
- ( ------- ) :# nrun 0 :# vval 0 { br }
+ ( ------- ) :# nrun 13124 :# vval 1 { br }
 
 : init d# 0 [ tgt ] ! d# 0 [ pos ] ! d# 0 [ nrun ] ! d# 0 [ id ] !
  d# 0 [ rval ] ! d# 0 [ ans ] ! d# 0 [ vval ] ! d# -1 [ ph ] ! ; [ init ]
@@ -11999,190 +12068,906 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  success feedback. ) }block
 
 ( 002B4000 )               D# 720 code{ 
- ( g144a12 automated testing system ) { cr }
- [ copyright c 2010-2011 ] greenarrays, inc. { cr }
- [ see db007 for ats documentation ] { br }
-
- d# 480 ( load block for f18 test code ) { indent }
-      ( compiled for bins { 708F } and up ) { cr }
- d# 482 ( f18 test code and documentation ) { cr }
- d# 560 ( f18 ats master code ide mode ) { cr }
- d# 576 ( test compilation of steven's mem-random ) { cr }
- d# 580 ( pf ats f18 code ) { cr }
- d# 660 ( load block for tb001 ats ide pretest ) { cr }
- d# 670 ( load block for tb001 ats ide creepers ) { cr }
- d# 706 ( load block for creeper control scripts ) }block
+ ( 10baset ethernet cluster mk1 ) { , , }
+ ( tx ) [ d# 8 fh d# 24 fh thru ] { , }
+ ( dma { 38F } ) [ d# 26 fh d# 32 fh thru ] { , .. }
+      ( tx ctl ) [ d# 34 fh load ] { , }
+ ( rx ) [ d# 36 fh d# 52 fh thru ] { , , }
+ ( monitor ) [ d# 54 fh d# 56 fh thru ] }block
 
 ( 002B4400 )               D# 721 shadow{ 
- }block
+ ( software-defined / bitbanged dma controller ) { , }
+ ( for full duplex { 14F } megabit ethernet. ) }block
 
 ( 002B4800 )               D# 722 code{ 
- }block
+ ( - load descriptor ) { , , }
+ ( rx ) [ d# 117 +node d# 117 /ram io /b left /a ] { , .. .. }
+      [ h# 5555 h# 5D55 left down h# 5555 h# 5D55 left down ] { , ..
+ .. }
+      [ h# 5555 h# 5D55 d# 10 /stack d# 5 /p ] { , .. }
+      [ d# 17 +node d# 17 /ram h# 200 /p ] { , .. }
+      [ d# 116 +node d# 116 /ram down /a up /b d# 0 /p ] { , .. }
+      [ d# 216 +node d# 116 /ram up /a right /b d# 0 /p ] { , .. }
+      [ d# 217 +node d# 217 /ram right /a io /b d# 0 /p ] { , }
+ ( tim ) [ d# 16 +node d# 16 /ram right /a io /b h# 3C /p ] { , }
+ ( prs ) [ d# 15 +node d# 15 /ram left /b right /a left /p ] { , }
+ ( frm ) [ d# 14 +node d# 14 /ram right /a left /b d# 4 /p ] { , }
+ ( crc ) [ d# 13 +node d# 13 /ram left /a right /b h# 212 /p ] { , }
+ ( pak ) [ d# 12 +node d# 12 /ram right /a left /b d# 0 /p ] { , }
+ ( swp ) [ d# 11 +node d# 11 /ram left /a right /b d# 0 /p ] { , }
+ ( ctl ) [ d# 10 +node d# 10 /ram right /a down /b h# 23 /p ] { , .. }
+      [ d# 110 +node d# 110 /ram down /a left /b h# 15 /p ] { , .. }
+      [ d# 109 +node d# 109 /ram left dup /p /a right /b ] { , .. }
+      [ d# 108 +node d# 1801 /ram right dup /p /a left /b ] { , , }
+ ( tx ) [ d# 4 fh load ] }block
 
 ( 002B4C00 )               D# 723 shadow{ 
  }block
 
 ( 002B5000 )               D# 724 code{ 
- }block
+ ( - residual paths ) [ exit ] { , , }
+: afeth align create [ d# 708 d# 701 to d# 700 d# 0 to ] { , }
+ [ d# 1 d# 6 to d# 106 d# 101 to d# 201 d# 208 to d# 108 d# 109 to ]
+ { , }
+ [ d# 209 d# 210 to d# 110 d# 10 to d# 11 d# 17 to d# 117 d# 111 to ]
+ { , }
+ [ d# 211 d# 217 to d# 317 d# 301 to d# 401 d# 417 to d# 517 d# 501
+ to ] { , }
+ [ d# 601 d# 617 to d# 717 d# 709 to d# -1 , ] }block
 
 ( 002B5400 )               D# 725 shadow{ 
- }block
+ ( it is not clear that there actually exists a ) { , }
+ ( single path based on { 588F } that can reach the ) { , }
+ ( rest of the chip after pf and ether have been loaded. ) }block
 
 ( 002B5800 )               D# 726 code{ 
- }block
+ ( - tx load descriptor ) { , , }
+ ( tx ) [ d# 417 +node d# 417 /ram h# 2 /p ] { , .. }
+      [ d# 317 +node d# 317 /ram h# 20000 h# 30000 over over ] { ,
+ .. .. }
+      [ over over over over over over d# 10 /stack ] { , .. .. }
+      [ io /b up /a d# 4 /p ] { , .. }
+      [ d# 316 +node d# 316 /ram left /a right /b d# 0 /p ] { , .. }
+      [ d# 315 +node d# 315 /ram left /b h# C /p ] { , .. }
+      [ d# 215 +node d# 215 /ram up /a down /b h# C /p ] { , .. }
+      [ d# 115 +node d# 115 /ram down /a io /b d# 7 /p ] { , .. }
+      [ d# 314 +node d# 314 /ram down /a right /b h# D /p ] { , .. }
+      [ d# 214 +node d# 214 /ram up /a down /b h# 27 /p ] { , .. }
+      [ d# 114 +node d# 114 /ram left /a up /b h# 20A /p ] { , .. }
+      [ d# 113 +node d# 113 /ram right /a left /b h# A /p ] { , .. }
+      [ d# 112 +node d# 112 /ram left /a right /b d# 0 /p ] { , .. }
+      [ d# 111 +node d# 111 /ram right /b left /a h# 16 /p ] { , }
+ [ exit ] { , }
+ ( mon ) [ d# 517 +node d# 517 /ram io /b h# 200 /p ] { , .. }
+      [ d# 516 +node d# 516 /ram left dup /a /p right /b ] }block
 
 ( 002B5C00 )               D# 727 shadow{ 
  }block
 
 ( 002B6000 )               D# 728 code{ 
- }block
+ { 342F } ( tx osc ) [ d# 417 node d# 0 org ] { , , }
+: drive ^ 00 ^ ( 4n ) !b !b for unext drop ;
+: init ^ 02 ^ up a! @ drop { . }
+      io b! left a! { , }
+ d# 8 dup d# 0 h# 20000 d# 9 dup h# 800 h# 30000 { , ... }
+      dup dup drop drop d# 9 for drive drive next { , }
+ h# 15555 up d# 0 h# 20000 { . }
+      h# 15555 up h# 800 h# 30000 { , ... }
+      dup dup drop drop ^ 22 ^ ( go ; )
+: go ^ 22 ^ . @ drop . !b !b a push a! ! pop a! go ; ^ 26 ^ [ reclaim
+ exit ]
+: go ^ 26 ^ ( -if ) { , }
+ . @ ( drop ) . . { , }
+ drop -if !b !b a push a! ! pop a! go ; { , .. }
+      ^ 2C ^ then ( then ) push a push h# 30 a! pop !+ { , .. .. }
+      pop !+ !+ !+ !+ !+ !+ !+ !+ !+ !+ warm ; { , }
+ ^ 34 ^ [ reclaim exit ] }block
 
 ( 002B6400 )               D# 729 shadow{ 
- }block
+ { 14F } ( mhz ceramic resonator drive. ) { , }
+ ( each { 64F } ns edge sends a return instruction ) { , }
+ ( thru up port to tx pin node { 27AF } which waits ) { , }
+ ( for the edge by simply calling the port. ) { , , }
+ ( node { 27AF } ) [ must ] ( wait faithfully for ) [ every ] ( edge )
+ { , }
+ ( to keep this oscillator running reliably. ) { , , }
+: note ( that after starting, the resonator decays in about { 14F }
+ us; so node { 27AF } starts us when it is ready to go by writing to
+ the port. ) { , , }
+ ( timing is actually quite tight in here; had to fight to keep duty
+ cycle lt { C8F } to prevent ) { , }
+ ( creep. also the resonator enthusiastically ) { , }
+ ( responds to pumping; rings have phase jitter ) { , }
+ ( so for this app with { 28F } mhz stimuli we must ) { , }
+ ( pump on every edge. ring code would be... ) { , }
+ ( ring ) ^ 22 ^ @ drop drop !b a push a! ! pop a! .. }block
 
 ( 002B6800 )               D# 730 code{ 
- }block
+ ( 317/316 tx pin ) [ d# 317 node d# 0 org ] { , , }
+: 0bit ^ 00 ^ @ drop !b @ drop !b ;
+: 1bit ^ 02 ^ drop 0bit drop ;
+: init ^ 04 ^ d# 0 dup ! ( ... )
+: sil ( 1/2bt ) ^ 06 ^ push d# 0 .. @ drop !b .. { , .. .. }
+      ^ 09 ^ begin @ drop unext .. { , .. }
+      ^ 0A ^ dup d# 15 for ^ 0C ^ d# 19999 for { , .. .. }
+      ^ 0E ^ @ drop drop . { , .. .. }
+      ^ 0F ^ @b 2* 2* . -if drop r--- { , .. }
+      ^ 13 ^ then next next drop ( ... slp ) { , }
+: slp ^ 16 ^ @ drop dup !b @ drop d# 81 sil ;
+: goose ^ 1A ^ begin drop @ drop dup !b
+: idle ^ 1C ^ @b -until { , ... }
+      drop d# 4 for @ drop unext d# 83 sil ;
+: flp ^ 22 ^ d# 1249 sil ; ^ 24 ^ { , , { 278F } }
+ ( wires instructions from { 276F } to { 27AF } ) { , }
+ [ d# 316 node d# 0 org ]
+: wir ^ 00 ^ begin begin @ !b unext unext wir ; ^ 02 ^ }block
 
 ( 002B6C00 )               D# 731 shadow{ 
- }block
+ ( manchester encoding transmitter. instructions executed in right
+ port. ) { , , }
+ bit ( sends a ) [ zero ] ( hi-lo. ) { , }
+ over bit ( sends ) [ one ] ( lo-hi. ) [ once transmission is started
+ bits must be ready before needed. ] { , }
+ idle ( ends transmit with ) [ tp-idl ] ( waveform, high for { 6F }
+ bit times then sil-ent. ) { , }
+ sil ( -ent sets hi-z, forces silence for 1/2 the number of bit times
+ given, then polls for work to do while keeping the oscillator happy. )
+ { , }
+ ( counts cycles, generating a ) [ slow link pulse ] ( if there have
+ been ) [ 16ms ] ( / 320,000 stimuli since ) { , }
+ ( last transmit or link pulse. ) { , }
+ slp ( sends the ) [ link pulse ] ( and resumes timing. ) { , }
+ ( called thru the right port for ) [ flp sequences ] { , }
+ ( during auto-negotiation. ) { , }
+ flp ( delays 62.5us to time interbit interval. ) }block
 
 ( 002B7000 )               D# 732 code{ 
- }block
+ { 276F } ( tx sel ) [ d# 315 node ] { , }
+ [ host ] { * }
+: 'rd-- h# 12195 lit ; { * }
+: '-d-- h# 12115 lit ; { , * .. .. }
+     
+: 'r--- h# 121D5 lit ; [ target d# 0 org ] { , , }
+: /slp ^ 00 ^ @p !b ; .. slp ;
+: /flp ^ 02 ^ @p !b ; .. flp ;
+: /-lnk ^ 04 ^ ( 1.25 sec ) d# 20000 for /flp next ; { , , }
+: kall ^ 09 ^ ( a ) dup a! push ex ;
+: run ^ 0C ^ 'rd-- a! @ drop io a! @ dup push ^ 11 ^ { , .. }
+      h# 2000 and if '-d-- kall then ^ 15 ^ { , .. }
+      pop 2* 2* -if 'r--- kall then run ; ^ 1A ^
+: /wd ( n ) d# 15 for /slp /flp { , ... }
+      dup d# 1 and if /slp then drop { , }
+ /flp 2/ next /slp d# 223 for /flp next ; { , , }
+: /idle ^ 2A ^ @p !b ; .. idle ;
+: /one ^ 2C ^ @p !b ; .. 1bit
+: /zer ^ 2E ^ @p !b ; .. 0bit { , }
+ ^ 30 ^ }block
 
 ( 002B7400 )               D# 733 shadow{ 
- }block
+ ( node { 276F } may be commanded by { 274F } or 215. ) { , }
+ ( to claim the node write two words of zero back to back then you
+ own it, no focus needed, ) { , }
+ ( return when done. ) }block
 
 ( 002B7800 )               D# 734 code{ 
- }block
+ ( 115/215 autonegot ) [ d# 215 node d# 0 org ] { , , }
+: !link ( n ) ^ 00 ^ @p drop !p ; { * }
+: link ( -n ) ^ 01 ^ d# -1 ;
+: attn ^ 03 ^ @p dup .. . .. ^ 05 ^ !b !b ;
+: -attn ^ 06 ^ @p !b ; .. ; { , }
+: -lnk ^ 08 ^ @p !b ; .. /-lnk
+: wd ( n ) ^ 0A ^ @p !b !b ; .. @p /wd
+: auto ^ 0C ^ begin @ dup !link { , .. .. }
+      dup { 83F } h# 4041 and { 83F } h# 4041 or until { , }
+: neg ^ 12 ^ attn -lnk d# 4 for h# 41 wd next { , .. .. }
+      d# 7 for h# 4041 wd next -attn { , .. }
+      d# 60000 { 9C40F } ( n.n ms ) for { , .. .. }
+      d# 41664 for unext next auto ; ^ 25 ^ { , , }
+ [ d# 115 node d# 0 org ]
+: !link ( n ) ^ 00 ^ @p drop !p ; { * }
+: link ( -n ) ^ 01 ^ d# -1 ;
+: pass a up a! link ! a! ;
+: done ^ 07 ^ @ !link begin { , .. }
+      @b h# 400 or dup h# 400 and if pass done ; { , .. }
+      then drop h# 2000 and until done ; { , }
+ ^ 12 ^ }block
 
 ( 002B7C00 )               D# 735 shadow{ 
- }block
+ ( node { E6F } passes new link states from 015 to { 1AEF } without
+ blocking 015 ever. suspends till new state is available then spins
+ on io to deliver it to 215. new state may be received while ) { , }
+ ( spinning and this simply replaces the state we are trying to deliver. )
+ { , , }
+ ( node { 1AEF } takes latest state from { E6F } and makes node 315
+ do the thing about it. { 1AEF } is ) { , }
+ ( not required to be timely in reading from { E6F } ) }block
 
 ( 002B8000 )               D# 736 code{ 
- }block
+ { 274F } ( tx framing ) [ d# 314 node d# 0 org ] { , , }
+: attn ^ 00 ^ @p dup .. . .. ^ 02 ^ !b !b ;
+: -attn ^ 03 ^ @p !b ; .. ; { , }
+: -lnk ^ 05 ^ @p !b ; .. /-lnk ; { , , }
+: +one ^ 07 ^ @p !b ; .. /one
+: +zer ^ 09 ^ @p !b ; .. /zer
+: +idle ^ 0B ^ @p !b .. /idle ; ( ... )
+: run ^ 0D ^ @ -if attn -lnk run ; then attn
+: pre ^ 12 ^ d# 30 for +one +zer next +one +one
+: pkt ^ 19 ^ @ -if +idle then { , .. }
+      ^ 1B ^ if +one pkt then { , .. }
+      ^ 1E ^ +zer pkt { , }
+ ^ 20 ^ [ reclaim ] }block
 
 ( 002B8400 )               D# 737 shadow{ 
+ { 276F } ( passes commands and packets, converting to bit commands,
+ adding preamble and idle pulse ) { , }
+ ( to frame packets. stimuli begin with the t.xn field value as follows... )
+ { , , .. }
+      [ -1 ] ( force renegotiation of link. ) { , , .. }
+      [ n ] ( packet of n bytes, in n*8 words. ) { , .. .. }
+      [ 0/1 ] ( data bits, multiple of 8, { 2F } per word ) { , ..
+ .. }
+      [ 1x xxxx xxxx xxxx xxxx ] ( end marker ) { , , }
  }block
 
 ( 002B8800 )               D# 738 code{ 
- }block
+ { 1ACF } ( tx delay ) [ d# 214 node d# 0 org reclaim ] { , , }
+ ^ 00 ^ ( buffer { 40F } words ) [ h# 20 org ] { , , }
+: @!+ ( an-a'n' ) ^ 20 ^ a push push dup a! { , .. }
+      h# 1 . + d# 31 and @ pop ! pop a! ; { , , }
+: run ^ 27 ^ begin @ dup !b - -until dup or
+: fill ( a-a ) ^ 2A ^ d# 31 for @ @!+ drop next { , }
+: pass ( a-a ) ^ 2E ^ @ -if { * , .. }
+     
+: purge ( a-a ) ^ 2F ^ push d# 31 for dup @!+ !b next { * , .. }
+     
+: crc ( a-a ) ^ 33 ^ d# 31 for @ !b unext pop !b run ;
+: body ( a-a ) ^ 38 ^ then @!+ !b pass ; { , }
+ ^ 3A ^ [ reclaim ] }block
 
 ( 002B8C00 )               D# 739 shadow{ 
- }block
+ { 1ACF } ( buffers bits out from crc, holding { 40F } bit times of
+ data to keep the packet flowing while calculating final crc. see crc
+ for incoming. ) { , , }
+ ( outgoing data... ) { , .. }
+      [ -1 ] ( force renegotiation of link. ) { , , .. }
+      [ n ] ( packet of n bytes follows in n*8 words ) { , .. .. }
+      [ 0/1 ] ( data bits, multiple of 8, { 2F } per word ) { , ..
+ .. }
+      [ 0/1 ] ( crc bits, { 65F } words ) { , .. .. }
+      [ 1x xxxx xxxx xxxx xxxx ] { , , }
+ ( we start a packet by notifying framer to send preamble. this gives
+ us { 80F } bit times during ) { , }
+ ( which we prime our { 40F } bit fifo. thereafter we send one bit
+ for each new bit received. upon ) { , }
+ ( receiving end packet indicator we empty the ) { , }
+ ( fifo while crc node generates the final { 40F } ) { , }
+ ( bits that we pass through. ) }block
 
 ( 002B9000 )               D# 740 code{ 
- }block
+ { E4F } ( tx crc ) [ reclaim d# 114 node d# 0 org +cy ] { , }
+: +crc ( mhlb-mhl ) ^ 00 ^ push dup . + pop or push { , .. }
+      dup . + over over and .. ^ 04 ^ if ( ** then ) { , .. .. }
+      ^ 05 ^ or h# 130 or pop h# 11DB7 or ; { , .. }
+      ^ 09 ^ ( ** ) then drop pop ;
+: run ^ 0A ^ begin @ dup !b - -until { , .. }
+      ^ 0C ^ h# 4000 clc dup dup or dup d# 31 for { , .. .. }
+      ^ 11 ^ @ dup !b d# 1 or +crc next { , .. }
+      ahead begin dup !b +crc [ swap ] then @ -until
+: trail ^ 19 ^ !b d# 31 for d# 0 +crc next { , .. }
+      ^ 1E ^ d# 3 for dup . + push dup . + pop next { , .. }
+      ^ 23 ^ d# 31 for dup . + push dup . + pop { , .. .. }
+      dup dup or dup . + d# 1 or !b next run ; { , }
+ ^ 2D ^ [ reclaim ] }block
 
 ( 002B9400 )               D# 741 shadow{ 
- }block
+ { E4F } ( calculates and attaches crc. ) { , , }
+: +crc ( inserts one bit. hl is 32-bit crc packed ) { .. }
+      ( into a { 48F } bit number, 14/18. m tests the bit ) { .. }
+      ( shifted out of high order. )
+: run ( passes link-down msg and starts crc when ) { , .. }
+      ( packet arrives. the packet ) [ must ] ( be longer ) { , .. }
+      ( than { 40F } bits due to loop structure. )
+: trail ( ends pkt by running { 40F } zeroes into the ) { , .. }
+      ( crc and then clocking it out, whole word ) { , .. }
+      ( msb first. ) { , .. }
+      [ trail takes on the order of 2.5us ] ( or { 32F } bit ) { ,
+ .. }
+      ( times before it sends the first crc bit down ) { .. }
+      ( the pipeline. ) [ hence the special delay node. ] { , , }
+ ( outgoing data... ) { , .. }
+      [ -1 ] ( force renegotiation of link. ) { , .. }
+      [ n ] ( packet of n bytes follows ) { , .. .. }
+      [ 0/1 ] ( data bits, n*8 words ) { , .. .. }
+      [ 20000 ] ( end data marker ) { , .. .. }
+      [ 0/1 ] ( crc bits, { 40F } words ) }block
 
 ( 002B9800 )               D# 742 code{ 
- }block
+ { E2F } ( tx unpack ) [ d# 113 node d# 0 org reclaim ] { , }
+: hi ( 1n-1 ) ^ 00 ^ 2/ 2/ 2/ 2/ 2/ 2/ 2/ 2/ ^ 03 ^ ( ... )
+: lo ( 1n-1 ) d# 7 for over over and !b 2/ next drop ;
+: done ^ 08 ^ h# 20000 !b ( ... )
+: run ^ 0A ^ begin @ dup !b - -until { , .. }
+      ^ 0C ^ - push d# 1 zif then { , .. }
+      ^ 0F ^ begin @ over over hi drop zif done { , .. .. }
+      ^ 13 ^ then lo ( drop ) next done ; { , , }
+ ^ 16 ^ [ reclaim ] }block
 
 ( 002B9C00 )               D# 743 shadow{ 
- }block
+ { E2F } ( passes force-down and packets. unpacks packets to bit strings. )
+ { , , }
+ ( incoming data... ) { , .. }
+      [ -1 ] ( force renegotiation of link. ) { , , .. }
+      [ n ] ( packet of n bytes follows in n/2 words ) { , .. .. }
+      [ 00 aaaa aaaa bbbb bbbb ] ( a 1st octet b 2nd ) { , , }
+ ( outgoing data... ) { , .. }
+      [ -1 ] ( force renegotiation of link. ) { , , .. }
+      [ n ] ( packet of n bytes follows in n*8 words ) { , .. .. }
+      [ 0/1 ] ( data bits, multiple of 8, { 2F } per word ) { , ..
+ .. }
+      [ 1x xxxx xxxx xxxx xxxx ] ( end marker ) }block
 
 ( 002BA000 )               D# 744 code{ 
- }block
+ { E0F } ( tx wire ) [ d# 112 node d# 0 org reclaim ] { , }
+: wire ^ 00 ^ @ !b wire ; ^ 01 ^ { , , }
+ ^ 01 ^ [ reclaim ] }block
 
 ( 002BA400 )               D# 745 shadow{ 
- }block
+ { E0F } ( is just a wire, we think. ) }block
 
 ( 002BA800 )               D# 746 code{ 
- }block
+ { D8F } ( sram master ) [ reclaim host ] { , }
+: t.cm h# 8000 lit ; { * }
+: t.pf h# 8001 lit ;
+: t.rx h# 8002 lit ; { * }
+: t.ep h# 8003 lit ;
+: t.lk h# 8004 lit ; { * }
+: t.dp h# 8005 lit ; ( double )
+: t.sk h# 8007 lit ; { * }
+: t.wk h# 8008 lit ;
+: t.xa h# 8009 lit ; { * }
+: t.xn h# 800B lit ;
+: t.pp h# 800C lit ; { * }
+: t.tt h# 800D lit ;
+: rxdm h# FF7F lit ; [ target ] { , , }
+ [ d# 108 node h# 39 org d# 278 load ] ^ 40 ^ [ d# 0 org ]
+: .ex! ( paw ) ^ 00 ^ push @ push @ pop pop ex! ;
+: .ex@ ( pa-w ) ^ 03 ^ push @ pop ex@ ! ; { , , }
+: stm ^ 06 ^ @b ! ;
+: inc ( n-n ) ^ 07 ^ d# 1 . + ;
+: +des ^ 09 ^ d# 4 t.rx x@ + rxdm and t.rx x! ( temp ; )
+: +tsk ^ 11 ^ t.wk x@ t.sk x@ x! ;
+: ?rxb ( -p,a ) ^ 16 ^ t.rx x@ t.ep x@ over or if { , .. }
+      drop dup inc x@ over x@ then ! ! ;
+: 2tal ( a ) ^ 20 ^ @ dup inc dup x@ inc dup push { , .. }
+      h# FFFF and over x! pop 2* -if { , .. .. }
+      drop drop dup x@ inc over x! { , }
+ then ; { , }
+ ^ 2E ^ [ d# 1801 bin ] ( ... ) }block
 
 ( 002BAC00 )               D# 747 shadow{ 
- }block
+ ( node { D8F } is the actual sram master. ) { , }
+ ( it supports passthru memory ops and is ) { , }
+ ( capable of being programmed for other slave ) { , }
+ ( operations. registers are ) { , , }
+ a ( and ) p ( right for instructions from { DAF } ) { , }
+ b ( left for sram controller. ) { , , }
+: .ex@ ( and ) { * }
+: .ex! ( are port called to effect our ) { , }
+ ( instructor's ) x@ x! ( etc words. )
+: stm ( waits for stimulus and informs master. )
+: inc ( increments a number. )
+: +tsk ( awakens our task. )
+: +des ( circularly increments next rxd pointer. )
+: ?rxb ( returns next rx buffer address, p zero if none available for
+ use. )
+: 2tal ( increments a double number at given addr. ) }block
 
 ( 002BB000 )               D# 748 code{ 
+ { DAF } ( dma nexus slave ) [ d# 109 node d# 0 org ] { , }
+: x! ( wa ) ^ 00 ^ dup dup or
+: ex! ( wap ) ^ 01 ^ @p !b !b .. @p .ex! .. !b !b ;
+: x@ ( a-w ) ^ 04 ^ dup dup or
+: ex@ ( ap-w ) ^ 05 ^ @p !b !b .. @p .ex@ .. !b @b ;
+: .ex! ( p.aw ) ^ 08 ^ push @ push @ pop pop ex! ;
+: .ex@ ( p.a-w ) ^ 0B ^ push @ pop ex@ ! ; { , , , }
+: /stm ^ 0E ^ @p !b .. stm .. @b ! ;
+: /?cm ( -n ) ^ 11 ^ t.cm x@ if { , .. }
+      dup dup or t.cm x! then ! ; { , }
+: /rxb ( -a,p ) ^ 18 ^ @p !b @b .. ?rxb .. @b ! ! ;
+: /2t ( a ) ^ 1B ^ @p !b .. 2tal .. @ !b ;
+: /des ^ 1E ^ @p !b ; .. +des { , }
+ ^ 20 ^ ( ... ) { , }
  }block
 
 ( 002BB400 )               D# 749 shadow{ 
- }block
+ ( node { DAF } connects dma nexus with 108, the ) { , }
+ ( actual sram master. ) { , , }
+ ( supports passthru memory ops and supports the ) { , }
+ ( nexus with some other overflow operations. ) { , }
+ ( registers are ) { , , }
+ a ( and ) p ( left for instructions from { DCF } ) { , }
+ b ( right for instructions to 108. ) { , , }
+: x@ { * }
+: x! ( etc command slave node's ) .ex@ ( and ) .ex!
+: .ex@ ( and ) { * }
+: .ex! ( are port called to effect our ) { , }
+ ( instructor's ) x@ x! ( etc words. )
+: /stm ( stim wait by { D8F } )
+: /?cm ( poll cmd ) }block
 
 ( 002BB800 )               D# 750 code{ 
- }block
+ { DCF } ( dma nexus ) [ d# 110 node d# 0 org ] { , }
+: x! ( wa ) ^ 00 ^ dup dup or
+: ex! ( wap ) ^ 01 ^ @p !b !b .. @p .ex! .. !b !b ;
+: x@ ( a-w ) ^ 04 ^ dup dup or
+: ex@ ( ap-w ) ^ 05 ^ @p !b !b .. @p .ex@ .. !b @b ;
+: /ex! ( paw ) ^ 08 ^ @ push @ push @ pop pop ex! ;
+: /ex@ ( pa-w ) ^ 0B ^ @ push @ pop ex@ ! ; { , , }
+: stm ^ 0E ^ d# 0 @p !b .. /stm ( fallthru... )
+: !live ^ 11 ^ @p drop !p ; { * }
+: live d# -1 ;
+: sel ^ 14 ^ a! @ push ;
+: -dma ^ 15 ^ stm
+: ?cmd ^ 16 ^ live if @p !b @b .. /?cm .. if { , .. }
+      ^ 1B ^ dup push 2* 2* ex then { , .. }
+      ^ 1D ^ t.pp x@ 2* 2* push then
+: poll ^ 20 ^ begin io a! h# A800 dup { , }
+ ^ 23 ^ begin drop zif ?cmd then { , }
+ ^ 25 ^ { .. }
+      @ over and until { , }
+ ^ 27 ^ 2* 2* ( .. ) -if ( tx ) right sel ^ 2A ^ then { , }
+ ^ 2A ^ 2* 2* ( .. ) -if ( rx ) down sel poll ; ^ 2E ^ then { , }
+ ^ 2E ^ 2* 2* -until @b !live ?cmd ( ; ) { , }
+: +tx ( x ) ^ 32 ^ right a! ! ; { , }
+ ^ 34 ^ ( ... ) }block
 
 ( 002BBC00 )               D# 751 shadow{ 
+ ( node { DCF } is continually active, polling its ) { , }
+ ( clients 010 and { DEF } as well as monitoring { DAF } for stimuli. )
+: poll ( polling dispatcher for rx/tx nodes and ) { , }
+ ( stimulus from pf. these functions must protect the top of stack. )
+ dma functions are...
+: /ex@ ( and ) { * }
+: /ex! ( sram ops. )
+: /live ( returns state. ) { , , }
+ ( polls at t.pp period for t.cm commands from pf ) pf commands are...
+: !live ( sets { F } no dma, { 2F } no traffic, { -11 } all up. )
+: -dma ( cmd to state { F } ) [ don't use !live for this! ]
+: +tx ( alert tx node of new function in ) t.xn { , }
  }block
 
 ( 002BC000 )               D# 752 code{ 
- }block
+ { DCF } ( continued ) { , }
+: /live ( -n ) ^ 34 ^ live ! ;
+: ,rxb ( -a,p ) ^ 36 ^ @p !b @b .. /rxb .. ! @b ! ;
+: ,2t ( a ) ^ 39 ^ @p !b .. /2t .. @ !b ;
+: ,des ^ 3C ^ @p !b ; .. /des { , }
+ ^ 3E ^ ( ... ) }block
 
 ( 002BC400 )               D# 753 shadow{ 
  }block
 
 ( 002BC800 )               D# 754 code{ 
- }block
+ { DEF } ( tx ctl ) [ d# 111 node d# 0 org ]
+: x! ( wa ) ^ 00 ^ dup dup or
+: ex! ( wap ) ^ 01 ^ @p !b !b .. /ex! .. !b !b ;
+: x@ ( a-w ) ^ 04 ^ dup dup or
+: ex@ ( ap-w ) ^ 05 ^ @p !b !b .. /ex@ .. !b @b ; { , , }
+: !pg ^ 08 ^ @p drop !p ; { * }
+: pg h# 31416 ;
+: inc ( n-n ) ^ 0B ^ d# 1 . + ;
+: done ^ 0D ^ d# 0 t.xn x! { , .. }
+      ( wake ) ^ 11 ^ t.wk x@ t.sk x@ x! ( ... )
+: run ^ 16 ^ begin @b drop t.xn x@ until { , .. .. }
+      ^ 1A ^ dup 2* 2* -if ! drop done then { , .. }
+      ^ 1E ^ drop dup ! - inc - 2/ push { , .. }
+      t.xa dup x@ !pg inc x@ begin { , .. .. }
+      ^ 26 ^ dup pg ex@ ! inc next drop done ; { , }
+ ^ 2B ^ ( ... ) }block
 
 ( 002BCC00 )               D# 755 shadow{ 
- }block
+ { DEF } ( is xmit dma control. ) [ note that b points to dma and a
+ to tx chain, reverse of normal. ] { , , }
+ +tx ( command from pf alerts us to new function found in ) t.xn ( ... )
+ { , , .. }
+      [ -1 ] ( force autonegotiation ) { , .. }
+      [ d# 0 ] ( invalid, ignored ) { , .. }
+      [ +n ] ( transmit packet of n octets starting at ) { , .. .. }
+      ( double address in ) t.xa. [ data guaranteed ] { , .. .. }
+      [ not to cross page boundary. ] { , , }
+ ( when any of these functions complete, t.xn is set zero to show done
+ and pf task is awakened. ) [ a new tx command may not be stored and
+ +tx cmd sent until ] t.xn [ is zero. dma controller will ] { , }
+ [ lock up if this protocol is violated. ] }block
 
 ( 002BD000 )               D# 756 code{ 
- }block
+ ( 010 rx ctl ) [ d# 10 node d# 0 org ] { , }
+: x! ( wa ) ^ 00 ^ dup dup or
+: ex! ( wap ) ^ 01 ^ @p !b !b .. /ex! .. !b !b ;
+: x@ ( a-w ) ^ 04 ^ dup dup or
+: ex@ ( ap-w ) ^ 05 ^ @p !b !b .. /ex@ .. !b @b ;
+: ?live ( -n ) ^ 08 ^ @p !b @b ; /live ; { , }
+: ?rxb ( a,p-ap ) ^ 0A ^ @p !b .. ,rxb .. @b @b ;
+: 2tal ( a ) ^ 0D ^ @p !b !b ; ,2t
+: +des ^ 0F ^ @p !b ; .. ,des { , , }
+: !pg ^ 11 ^ @p drop !p ; { * }
+: pg d# 0 ;
+: x!+ ( an-a' ) ^ 14 ^ over pg ex! h# 1 . + ;
+: !lk ^ 18 ^ @ ?live -if drop -if { , .. }
+      t.wk x@ t.tt x@ x! ahead [ swap ] { , .. .. }
+      then t.lk x! then then ( ... )
+: run ^ 23 ^ @ if !lk ; then ?live -if { , .. }
+      ?rxb if !pg dup d# 2 . + { , .. .. }
+      begin @ -if push drop pop x!+ @ x!+ { , .. .. .. }
+      +des run then x!+ end { , .. }
+      then ( no buffs ) t.dp 2tal then
+: toss ^ 36 ^ begin @ -until @ run ; { , }
+ ^ 38 ^ [ reclaim exit ] }block
 
 ( 002BD400 )               D# 757 shadow{ 
- }block
+ { 14F } ( is xmit dma control. incoming... ) { , , .. }
+      [ -1 ] ( status msg, next word one of two formats ) { , .. .. }
+      [ 0xxxx ] ( new link state x is { F } down, { 2F } 10hd, ) { ,
+ .. .. .. }
+      ( else last active code word received. ) { , .. .. }
+      [ -1 ] ( signal to prod timer task. ) { , , .. }
+      [ d# 0 ] ( packet as follows ) { , .. .. }
+      [ 00 aaaa aaaa bbbb bbbb ] ( a 1st octet b 2nd ) { , .. .. }
+      [ d# 10 8000 0000 0crl 0ddd ] ( where ) { , ... ... }
+      c ( crc-error ) { , ... ... }
+      r ( runt; lt { 80F } octets. ) { , ... ... }
+      l ( too long; gt { BDCF } octets. ) { , ... ... }
+      d ( number of dribble bits. ) { , .. .. }
+      [ length ] ( received in octets without dribble ) }block
 
 ( 002BD800 )               D# 758 code{ 
- }block
+ ( 011 rx byteswap ) [ d# 11 node d# 0 org reclaim ] { , , }
+: idl ^ 00 ^ @ -if !b @ !b idl ; then !b
+: pkt ^ 04 ^ h# FFFF dup dup or d# 759 push begin
+: word ( msk { F } ) ^ 08 ^ @ -if
+: sts ( w ) ^ 09 ^ push @ dup push 2/ 2/ 2/ { , .. }
+      pop d# 7 and pop or { , .. }
+      over d# -64 . + -if drop h# 20 or dup then drop { , .. }
+      over d# -1519 . + - .. -if drop h# 10 or dup then { , .. .. }
+      drop !b !b idl then { , }
+: bswap ^ 1B ^ a push dup 2* 2* a! { , .. .. }
+      d# 9 for +* unext drop over a and { , .. }
+      !b pop a! next { , }
+: lng ^ 23 ^ begin @ -until sts ; { , }
+ ^ 25 ^ [ reclaim exit ] }block
 
 ( 002BDC00 )               D# 759 shadow{ 
- }block
+ ( node { 16F } byteswaps packet data from node { 18F } ) { , }
+ ( to avoid inter-bit latency. also checks length and framing, enforcing
+ stored size limits. ) { , }
+ ( output messages... ) { , , .. }
+      [ -1 state ] ( new link state { F } down, { 2F } 10hd, ) { ,
+ .. .. }
+      ( else last active code word received. ) { , , .. }
+      [ d# 0 ] ( packet as follows ) { , .. .. }
+      [ 00 aaaa aaaa bbbb bbbb ] ( a 1st octet b 2nd ) { , .. .. }
+      [ d# 10 8000 0000 0crl 0ddd ] ( where ) { , ... ... }
+      c ( crc-error ) { , ... ... }
+      r ( runt; lt { 80F } octets. ) { , ... ... }
+      l ( too long; gt { BDCF } octets. ) { , ... ... }
+      d ( number of dribble bits. ) { , .. .. }
+      [ length ] ( received in octets without dribble ) { , , }
+ [ d# 759 ] ( limits packet size stored to { BDCF } octets ) { , }
+ ( plus one word of dribble. ) }block
 
 ( 002BE000 )               D# 760 code{ 
- }block
+ ( 012 rx pack ) [ d# 12 node d# 0 org reclaim ] { , , }
+: idl ^ 00 ^ @ -if !b @ !b idl ; then !b
+: pkt ^ 04 ^ h# 10000 dup
+: bit ( w ) ^ 06 ^ @ -if push ahead
+: flush begin drop 2/ { , .. .. }
+      [ swap ] then dup d# 1 and until drop 2/ !b { , .. }
+      pop !b @ !b idl then { , }
+: shift push dup d# 1 and if { , .. .. }
+      drop 2/ !b dup dup then drop { , .. }
+      pop if drop 2/ over or bit ; { , .. .. }
+      then drop 2/ bit ; { , }
+ ^ 19 ^ [ reclaim ] }block
 
 ( 002BE400 )               D# 761 shadow{ 
- }block
+ ( node { 18F } packs framed data into 16-bit pairs of octets, little-endian,
+ last word padded if odd output messages... ) { , , .. }
+      [ -1 state ] ( new link state { F } down, { 2F } 10hd, ) { ,
+ .. .. }
+      ( else last active code word received. ) { , , .. }
+      [ d# 0 ] ( packet as follows ) { , .. .. }
+      [ 00 bbbb bbbb aaaa aaaa ] ( a 1st octet b 2nd ) { , .. .. }
+      [ d# 10 8000 0000 0c00 0000 ] ( where ) { , ... ... }
+      c ( crc-error ) { , .. .. }
+      [ length ] ( in bits after preamble including ) { , ... ... }
+      ( any dribble bits. ) }block
 
 ( 002BE800 )               D# 762 code{ 
- }block
+ ( 013 rx crc ) [ reclaim d# 13 node d# 0 org +cy ] { , , }
+: +crc ( mhlb-mhl ) ^ 00 ^ push dup . + pop or push { , .. }
+      dup . + over over and .. ^ 04 ^ if ( ** then ) { , .. .. }
+      ^ 05 ^ or h# 130 or pop h# 11DB7 or ; { , .. }
+      ^ 09 ^ ( ** ) then drop pop ; { , }
+: check ( mhls ) ^ 0A ^ push push h# 3C000 or pop { , .. }
+      and - if h# 40 then pop or !b @ !b ( ... )
+: run ^ 12 ^ @ -if !b @ !b run ; then !b { , .. .. }
+      h# 4000 clc dup dup or dup { , .. }
+      ^ 19 ^ d# 31 for @ -if check { , .. .. }
+      ^ 1D ^ then dup !b d# 1 or +crc next ahead { , .. }
+      ^ 22 ^ begin dup !b +crc [ swap ] then @ -until { , }
+ ( done ) check ; { , }
+ ^ 26 ^ [ reclaim exit ] { , , }
+: wire ^ 31 ^ @ !b wire ; ^ 32 ^ { , }
+: !hi ^ 0A ^ @p drop !p ; { * }
+: high h# 31416 ;
+: !lo ^ 0D ^ @p drop !p ; { * }
+: low h# 31416 ; { , }
+: debug ( mhls ) push push dup !hi pop dup !lo pop }block
 
 ( 002BEC00 )               D# 763 shadow{ 
- }block
+ ( node { 1AF } passes framed data, calculating crc on packets and
+ setting crc error bit as needed. ) { , }
+ ( output messages... ) { , , .. }
+      [ -1 state ] ( new link state { F } down, { 2F } 10hd, ) { ,
+ .. .. }
+      ( else last active code word received. ) { , , .. }
+      [ d# 0 ] ( packet as follows ) { , .. .. }
+      [ 0/1 ] ( data bits, multiple of 8, { 2F } per word ) { , ..
+ .. }
+      [ d# 10 8000 0000 0c00 0000 ] ( where ) { , ... ... }
+      c ( crc-error ) { , .. .. }
+      [ length ] ( in bits after preamble including ) { , ... ... }
+      ( any dribble bits. ) { , , }
+: +crc ( inserts one bit. hl is 32-bit crc packed into a { 48F } bit
+ number, 14/18. m tests the bit ) { , }
+ ( shifted out of high order. )
+: check ( sets c status if crc is not all 1's. ) { , }
+ debug ( and variables are for testing. ) { , }
+ ** then ( swap comments to force worst ) { , }
+ ( case when measuring timings. ) }block
 
 ( 002BF000 )               D# 764 code{ 
- }block
+ ( 014 rx frame ) [ d# 14 node d# 0 org reclaim ] { , , }
+: runt ^ 00 { 50081F } ^ h# 28000 !b h# 0 !b
+: idl ^ 04 ^ @ -if !b @ !b idl ; then !b { , }
+: pre d# 7 for @ -if runt then next { , .. }
+      d# 55 for @ -if runt then { , .. .. }
+      over over and ( 1-1 ) if ( end preamble ) dup or
+: pkt @ -if h# 28000 !b drop !b idl then { , .. }
+      !b d# 1 . + pkt ;
+: -pkt then drop { , .. }
+      over over or while drop next then runt ; { , }
+ ^ 1F ^ [ reclaim ] }block
 
 ( 002BF400 )               D# 765 shadow{ 
- }block
+ ( node { 1CF } frames packets by stripping preamble ) { . }
+      ( appending two words at end. ) { , }
+ ( output messages... ) { , , .. }
+      [ -1 state ] ( new link state { F } down, { 2F } 10hd, ) { ,
+ .. .. }
+      ( else last active code word received. ) { , , .. }
+      [ d# 0 ] ( packet as follows ) { , .. .. }
+      [ 0/1 ] ( data bits, multiple of 8, { 2F } per word ) { , ..
+ .. }
+      [ d# 10 8000 0000 0000 0000 ] { , .. .. }
+      [ length ] ( in bits after preamble including ) { , ... ... }
+      ( any dribble bits. ) }block
 
 ( 002BF800 )               D# 766 code{ 
- }block
+ ( 015 rx parse ) [ d# 15 node d# 0 org reclaim ] { , , }
+: !prv ( n ) ^ 00 ^ @p drop !p ; { * }
+: prv ( -n ) ^ 01 ^ d# 0 ;
+: !link ( n ) ^ 03 ^ @p drop !p ; { * }
+: link ( -n ) ^ 04 ^ h# FFFF ; { , , }
+: negot ( n-n ) ^ 06 ^ a down a! over ! a! ;
+: report ( n ) ^ 09 ^ a io a! @ 2* -if drop a! drop ; { , .. }
+      then drop a! d# -1 ! ! ; { , , }
+: ldown ^ 10 ^ d# 1 d# 0 { * }
+: slp ( nw )
+: ?link ( nw ) over if 2/ if 2* 2* .. -while then { , .. }
+      ( wx ) ^ 17 ^ drop prv over or if drop !prv ; then { , .. }
+      ( wx ) drop link over or .. if drop dup !link { , .. .. }
+      negot { -11 } ( ! ! ) report ; { , .. }
+      then - report then then drop ;
+: -flp ( -nw ) ^ 23 ^ h# 10000 link if ; then drop d# 1 ;
+: flp1 ( n-n ) ^ 29 ^ h# 10000 or
+: flp0 ( n-n ) ^ 2B ^ 2/ push 2/ pop ; { , , }
+: sdata ^ 2D ^ dup or begin ! @b -until ! ; { , }
+ ^ 30 ^ }block
 
 ( 002BFC00 )               D# 767 shadow{ 
- }block
+ ( node { 1EF } parses incoming events from node 15, ) { , }
+ ( maintaining link state and sending refined ) { , }
+ ( events to { E6F } for negotiation and 014 for ) { , }
+ ( packet data and state changes. ) { , }
+ b [ left ] ( for incoming, ) a [ right ] ( for outgoing... ) { , .. }
+      [ nz state ] ( new link state { F } down, { 2F } 10hd, ) { ,
+ .. .. }
+      ( else last active code word received. ) { , .. }
+      [ zero ] ( packet follows... ) { , .. .. }
+      [ d# 0 ] ( data bit zero ) { , .. .. }
+      [ d# 1 ] ( data bit 1 ) { , .. .. }
+      [ negative ] ( end of packet. ) { , }
+: link ( most recent link state, changed when )
+: prv ( shows two consecutive same states. ) [ we need ] { .. }
+      [ a better noise filter than this. ]
+: negot ( sends link state value to node { E6F } )
+: report ( reports link change to host. )
+: ?link ( updates link, sends to negot and sends ) { , .. }
+      ( to node { 1CF } if state has changed. prods timer ) { .. }
+      ( task on 16ms link pulses or 100ms timeouts. ) { , , }
+: ldown { * }
+: -flp { * }
+: flp0 { * }
+: flp1 { * }
+: slp ( and ) { * }
+: sdata { , }
+ ( are called thru the port by node { 2DF } ) }block
 
 ( 002C0000 )               D# 768 code{ 
- }block
+ ( 016 rx timing ) [ d# 16 node d# 0 org ] { , }
+ ^ 00 ^ [ d# 0 org ]
+: yank ^ 00 ^ a down a! dup ! a! ;
+: ?lp ( us-us ) ^ 03 ^ dup for ( 1us ) d# 48 for ( 20.7ns ) { , .. }
+      @b 2* 2* -if drop @ ^ 09 ^ if drop { , .. .. }
+      pop drop pop - . + ; then then { , }
+ drop next next ( nada ) dup or ;
+: send ( n ) ^ 0F ^ a left a! over ! a! drop ;
+: pkt ^ 13 ^ @p .. sdata ^ 15 ^
+: !data send ( 1bt ) d# 4 for @b 2* 2* -if @ !data ; { , .. }
+      then next - yank ( idle ) ahead
+: lkp ( us-us ) ^ 1E ^ ?lp if d# 0 ?lp if pkt { , .. }
+      then drop then yank ;
+: idle ^ 26 ^ then send d# 100000 lkp if @p .. -flp
+: flps ^ 2C ^ send d# 150 lkp if d# -100 . + -if { , .. }
+      ^ 33 ^ d# 100 lkp drop .. @p flps ; flp1 { , .. }
+      ^ 38 ^ then @p flps ; flp0 { , }
+ ^ 3A ^ then @p idle ; slp { , }
+: ent ^ 3C ^ then yank @p idle ; ldown { , }
+ ^ 3F ^ [ reclaim ] }block
 
 ( 002C0400 )               D# 769 shadow{ 
- }block
+ ( node { 20F } times events from the receiver, dis- ) { , }
+ ( criminating data, flp, slp and link-down ) { , }
+ ( timeout. events passed to node { 1EF } are ) { , ... }
+      [ ldown call ] ( link down, always sent first. ) { , ... }
+      [ -flp call ] ( start of flp word ) { , ... ... }
+      [ flp0 call ] ( flp { F } bit ) { , ... ... }
+      [ flp1 call ] ( flp { 2F } bit ) { , ... ... }
+      [ slp call ] ( slow link pulse or end word ) { , ... }
+      [ sdata call ] ( packet follows... ) { , ... ... }
+      [ d# 0 ] ( data bit zero ) { , ... ... }
+      [ d# 1 ] ( data bit 1 ) { , ... ... }
+      [ negative ] ( end of packet. ) { , }
+: yank ( messages node { E8F } to enable { 1B2F } yank-down ) { .. }
+      ( of pin if it stays high several bit times. )
+: ?lp ( waits for a link pulse up to given number ) { .. }
+      ( of usec. returns us waited, { F } if no pulse. )
+: send ( passes an event word to node 015. )
+: pkt ( sends ) [ sdata ] ( followed by ) [ 0/1 ] ( events till ) { ,
+ .. }
+      [ end of packet. ]
+: idle ( is the non-stateful observer. )
+: !data ( has used { C8F } ns by the time ) { , .. }
+      ( loop starts so { AF } iterations gets ) { , .. }
+      ( us { 4F } bit times, plenty for idle ) { , .. }
+      ( w/o dribbling. ) }block
 
 ( 002C0800 )               D# 770 code{ 
- }block
+ ( 217/216/116 rx active pull-down ) { , , }
+ [ d# 217 node d# 0 org reclaim ]
+: init ^ 00 ^ h# 25555 { AAABF } h# 15555 over over over over { , .. }
+      over over over over ( hi z ) !b
+: yanker ^ 06 ^ @ { , .. }
+      d# 9 for ^ 08 ^ drop @b -while . . next ^ 0A ^ { , }
+ drop !b !b yanker ; { , }
+ then drop yanker ; ^ 0D ^ { , , }
+ ( minimal latency a-b wire ) { , }
+ [ d# 116 node d# 0 org ]
+: wir ^ 00 ^ begin begin @ !b unext unext wir ; { , }
+ ^ 02 ^ [ reclaim ] }block
 
 ( 002C0C00 )               D# 771 shadow{ 
- }block
+ ( when a device sends only the positive going ) { , }
+ ( half of a link pulse, we must yank the pin low ourselves to reset
+ the schmitt so we can see ) { , }
+ ( the next positive going link pulse. ) { , , }
+ ( node 016 sends a word of garbage 116-216-217 after seeing a link
+ or end packet pulse. ) { , , }
+ ( node { 1B2F } responds by waiting { 4F } bit times to ) { , }
+ ( let an idle pulse finish, then yanking the pin if it has remained
+ high all that time. the delay loop is nominally 18.1 ns/cycle. ) { ,
+ , }
+ note that [ 15555 is used in init to leave the ] { , }
+ [ pin in weak pulldown as a measure to reduce ] { , }
+ [ incoming noise. ideally that is taken care of outside and more symmetrically
+ so that we can leave the pin at high z. ] }block
 
 ( 002C1000 )               D# 772 code{ 
+ ( 117/017 rx pin ) [ d# 117 node d# 0 org reclaim ]
+: edge ( rise fall ) ^ 00 ^ push @b -if { , ... .. }
+      pop !b ! . drop . . ; { , }
+ then over !b ! . pop drop drop ; { , , }
+: run ^ 05 ^ edge a! @b ! d# 4 push a! { , ... }
+      begin unext run ; ^ 0A ^ { , , { 2FF } }
+ ( buffers for { 20F } and converts bits to 1/0 ) { , }
+ [ d# 17 node d# 0 org +cy ] { , }
+: wire ^ 00 ^ down a! right b! h# 20000 clc
+: pass ^ 06 ^ @ over and dup . + dup . + !b pass ; ^ 0A ^ [ reclaim ]
  }block
 
 ( 002C1400 )               D# 773 shadow{ 
- }block
+ ( the ethernet rx pin node acts as a continuous manchester decoder,
+ recovering and passing ) { , }
+ ( each data bit to an adjacent buffering node ) { , }
+ ( to eliminate jitter in its timing sequence. ) { , }
+ ( this code automatically acquires bit sync ) { , }
+ ( during frame preambles. when a link pulse is ) { , }
+ ( positive only it decodes as a single '1' in ) { , }
+ ( which case another node must drive the pin low momentarily to reset
+ the schmitts; this may ) { , }
+ ( produce a spurious '0'. ) { , , }
+: edge ( samples pin and waits for opposite state. )
+: run ( waits for the edge at the center of a bit cell, writes the
+ value of io with the data bit in position { 22F } to the buffering
+ node, then ) { , }
+ ( delays long enough that the next ) edge ( call ) { , }
+ ( will be well centered in the first half of the next bit cell, maximizing
+ margins for sampling and waiting. it is paramount that the delay )
+ { , }
+ ( never be too long since that means loss of bit sync. duty cycle
+ is always lt { C8F } pct. ) }block
 
 ( 002C1800 )               D# 774 code{ 
- }block
+ { 40AF } ( tx osc monitor ) [ d# 517 node reclaim ] { , }
+ [ d# 0 org +cy ]
+: run ^ 00 ^ left a! d# 0 dup
+: spin ^ 03 ^ d# 0 !b @ drop { , .. .. }
+      ^ 06 ^ push d# 1 . + pop d# 0 . + h# 3FFF and { , .. }
+      ^ 0B ^ h# 800 !b @ drop @b 2* 2* -if { , .. .. }
+      ^ 0F ^ drop r--- spin ; then drop spin ; { , , }
+: -clk ( -00 ) ^ 13 ^ dup or dup ( ... )
+: ask ( lh-lh ) ^ 14 ^ a push right a! { , .. }
+      over ! dup ! pop a! ; { , }
+ ^ 18 ^ ( ... ) }block
 
 ( 002C1C00 )               D# 775 shadow{ 
- }block
+ ( this node maintains a 32-bit free running ) { , }
+ ( count of cycles seen on an incoming signal. ) { , }
+ ( as used here this is a 10mhz clock. ) [ ability to jumpstart the
+ oscillator removed; it can't be done safely without polling. ] { ,
+ , }
+ ( receives requests through the ) [ right ] ( port as jump instructions.
+ always returns two 16-bit ) { , }
+ ( words... ) { , , }
+: ask ( queries the clock, returning low and high halves in that order. )
+: -clk ( zeroes the clock for time since boot. ) }block
 
 ( 002C2000 )               D# 776 code{ 
- }block
+ { 408F } ( tx osc agent ) [ d# 516 node d# 0 org +cy ] { , , }
+: @tfre ^ 00 ^ @p .. ask ; { * , .. }
+     
+: ans ^ 02 ^ !b @b @b .. ( lh ) { , .. }
+      ^ 03 ^ over push d# 1 for { , .. .. }
+      ^ 06 ^ push dup . + pop dup . + next { , .. }
+      ^ 09 ^ ( h ) ! pop ( l ) ! ; { 421F } ( org )
+: -fre ^ 0A ^ @p .. -clk ; { , .. }
+      ^ 0C ^ ans ; { , }
+ ^ 0D ^ [ reclaim ] }block
 
 ( 002C2400 )               D# 777 shadow{ 
- }block
+ ( this node translates ganglion transactions ) { , }
+ ( into the port timing protocol used to get the attention of node
+ 517. the ganglion messages, coming through ) [ left ] ( port in )
+ a, ( deliver focus ) { , }
+ ( and call to one of these routines, which talk to node { 40AF } through )
+ [ right ] ( port in ) b. { , }
+ ( each produces two 16-bit words in reply... ) { , , }
+: @tfre ( queries the clock, returning high and ) { , }
+ ( low halves in that order for storage as a dbl number in pf memory. )
+ { , , }
+: -fre ( zeroes the clock for coherent time since boot. returns two
+ words of zero. ) }block
 
 ( 002C2800 )               D# 778 code{ 
  }block
@@ -12191,22 +12976,108 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002C3000 )               D# 780 code{ 
- }block
+ ( ether test ide ) [ empty compile ] { br }
+
+ [ serial load ] { cr }
+ ( customize ) [ -canon d# 0 fh orgn ! ] { cr }
+ [ a-com sport ! a-bps bps ! !nam ] { , }
+: tstp2 align create [ d# 708 d# 508 to d# 509 d# 517 to d# -1 , ]
+: tstp2 align create [ d# 708 d# 715 to d# 716 d# 516 to d# -1 , ]
+ { , }
+ ( select ) [ tstp2 'pths d# 2 + ! ] { br }
+
+: dac ( n ) h# 155 and io r! ; { br }
+
+ ( canon load ) }block
 
 ( 002C3400 )               D# 781 shadow{ 
+ ( this load block compiles and configures the ) { cr }
+ ( ide for the host chip on the eval board. it's also an example of
+ configuring and customizing the ide without hacking it and breaking
+ other uses of the ide. ) { br }
+
+ ( this block starts by loading the serial ide in its standard form. )
+ [ -canon ] ( forgets the mapping of canonical words like ) @ ( and )
+ dup ( onto the f18 so that we may interact with x86 code and ram. )
+ { cr }
+ ( we then set ) [ orgn ] ( so that the ide ) compile ( will reload
+ this block, and we set ) [ sport ] ( to usb port a for normal ide
+ operations on host chip. ) [ !nam ] ( updates pathname for that com
+ port. ) { br }
+
+: dac ( is defined to illustrate extending the ide ) { cr }
+ [ canon load ] ( restores mapping of canonical words onto the f18.
+ comment this if you wish to use the 'r-words' for all f18 operations. )
  }block
 
 ( 002C3800 )               D# 782 code{ 
- }block
+ ( flakey { 40AF } tx osc monitor ) [ d# 517 node reclaim ] { , }
+ [ d# 0 org +cy ]
+: run ^ 00 ^ @p a! @p dup [ ' r-l- ] , [ d# 0 ] ,
+: spin ^ 03 ^ d# 0 !b @ drop .. { , .. .. }
+      ^ 06 ^ push d# 1 . + pop d# 0 . + h# 3FFF and { , .. }
+      ^ 0C ^ h# 800 !b @ .. drop @b 2* 2* -if { , .. .. }
+      ^ 10 ^ drop r--- spin ; then drop spin ; { , , }
+: -clk ( -00 ) ^ 14 ^ dup or dup ( ... )
+: ask ( lh-lh ) ^ 15 ^ a push right a! { , .. }
+      over ! dup ! pop a! ; { , , }
+: drive ^ 19 ^ ( 4n ) !b !b for unext drop ;
+: jump ( lh-lh ) ^ 1B ^ push push a push left a! { , .. }
+      d# 8 dup d# 0 h# 20000 d# 9 dup h# 800 h# 30000 { , .. .. }
+      dup dup drop drop d# 9 for drive drive next { , .. }
+      pop a! pop pop ask ; { , }
+ ^ 2E ^ ( ... ) }block
 
 ( 002C3C00 )               D# 783 shadow{ 
- }block
+ ( this node maintains a 36-bit free running ) { , }
+ ( count of cycles seen on an incoming signal. ) { , }
+ ( as used here this is a 10mhz clock. ) { , , }
+ ( receives requests through the ) [ right ] ( port with a protocol
+ that requires three words sent by ) { , }
+ ( consecutive slots of a single instruction ) { , }
+ ( word for detectable timing. the first two ) { , }
+ ( words are all nops and the third is a call to one of these functions,
+ always returning two ) { , }
+ ( 16-bit words... ) [ this is flakey because node ] { , }
+ [ d# 516 can write the right port when we are ] { , }
+ [ already in process of ending a read, resulting in hang and crash. ]
+ { , , }
+: ask ( queries the clock, returning low and high halves in that order. )
+: -clk ( zeroes the clock for time since boot. ) { , , }
+: jump ( jumpstarts the resonator. returns clock ) { , }
+ ( count as does ) ask }block
 
 ( 002C4000 )               D# 784 code{ 
- }block
+ ( flakey { 408F } tx osc agent ) [ d# 516 node d# 0 org +cy ] { ,
+ , }
+: @tfre ^ 00 ^ @p @p dup .. ask ; . .. { * , .. }
+     
+: ans ^ 03 ^ !b !b !b @b @b .. ( lh ) { , .. }
+      ^ 05 ^ over push d# 1 for { , .. .. }
+      ^ 08 ^ push dup . + pop dup . + next { , .. }
+      ^ 0B ^ ( h ) ! pop ( l ) ! ;
+: +osc ^ 0C ^ @p @p dup .. jump ; . .. { , .. }
+      ^ 0F ^ ans ;
+: -fre ^ 10 ^ @p @p dup .. -clk ; . .. { , .. }
+      ^ 13 ^ ans ; { , }
+ ^ 14 ^ [ reclaim ] }block
 
 ( 002C4400 )               D# 785 shadow{ 
- }block
+ ( this node translates ganglion transactions ) { , }
+ ( into the port timing protocol used to get the attention of node
+ 517. the ganglion messages, coming through ) [ left ] ( port in )
+ a, ( deliver focus ) { , }
+ ( and call to one of these routines, which talk to node { 40AF } through )
+ [ right ] ( port in ) b. { , }
+ ( each produces two 16-bit words in reply... ) { , }
+ [ uses flakey version of node d# 517 and can crash as a result. ]
+ { , , }
+: @tfre ( queries the clock, returning high and ) { , }
+ ( low halves in that order for storage as a dbl number in pf memory. )
+ { , , }
+: -fre ( zeroes the clock for coherent time since boot. ) { , , }
+: +osc ( jumpstarts the resonator. returns clock ) { , }
+ ( as does ) @tfre. }block
 
 ( 002C4800 )               D# 786 code{ 
  }block
@@ -12431,50 +13302,24 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( into it and starts it with a default value. ) }block
 
 ( 002D3800 )               D# 846 code{ 
- ( loader template ) [ target load ] { , , }
-: seed ( n ) h# 13 r! h# 12 call upd ; { , , }
- [ loader load d# 0 d# 708 hook d# 0 -hook ] { , , }
+ ( loader template ) [ host load loader load ] { , }
+ ( using default ide paths ) { , }
+ ( kill boots ) [ d# 0 d# 708 hook d# 0 -hook ] { , , }
  ( setup application ) { , ... }
-      [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 200 +node d# 200 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 100 +node d# 100 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 709 +node d# 709 /ram h# 19 /p ] { , ... }
-      [ d# 609 +node d# 609 /ram d# 0 /p ] { , ... }
-      [ d# 509 +node d# 509 /ram d# 0 /p ] { , ... }
-      [ d# 508 +node d# 508 /ram d# 0 /p ] { , ... }
-      [ d# 507 +node d# 507 /ram d# 0 /p ] { , ... }
-      [ d# 506 +node d# 506 /ram d# 0 /p ] { , ... }
-      [ d# 505 +node d# 505 /ram d# 0 /p ] { , ... }
-      [ d# 504 +node d# 504 /ram d# 0 /p ] { , ... }
-      [ d# 503 +node d# 503 /ram d# 0 /p ] { , ... }
-      [ d# 502 +node d# 502 /ram d# 0 /p ] { , ... }
-      [ d# 501 +node d# 501 /ram d# 0 /p ] { , , }
- [ d# 2 ship panel upd ?ram ] }block
+      [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { , , }
+ ( visit whole chip ) [ d# 2 ship panel upd ?ram ] }block
 
 ( 002D3C00 )               D# 847 shadow{ 
  }block
 
 ( 002D4000 )               D# 848 code{ 
- ( framer template ) [ empty ] { , }
+ ( framer template ) [ empty ] { , , }
  [ compile streamer load framer load ] { , }
  ( default ) [ entire course ] { , , }
  ( setup application ) { , ... }
-      [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 500 +node d# 500 /ram d# 0 d# 1 /stack h# 12 /p ] { , ... }
-      [ d# 501 +node d# 501 /ram d# 0 /p ] { , ... }
-      [ d# 502 +node d# 502 /ram d# 0 /p ] { , ... }
-      [ d# 503 +node d# 503 /ram d# 0 /p ] { , ... }
-      [ d# 504 +node d# 504 /ram d# 0 /p ] { , ... }
-      [ d# 505 +node d# 505 /ram d# 0 /p ] { , ... }
-      [ d# 506 +node d# 506 /ram d# 0 /p ] { , ... }
-      [ d# 507 +node d# 507 /ram d# 0 /p ] { , ... }
-      [ d# 508 +node d# 508 /ram d# 0 /p ] { , ... }
-      [ d# 509 +node d# 509 /ram d# 0 /p ] { , ... }
-      [ d# 609 +node d# 609 /ram d# 0 /p ] { , ... }
-      [ d# 709 +node d# 709 /ram d# 0 /p ] { , , }
+      [ d# 600 +node d# 600 /ram d# 0 d# 1 /stack h# 12 /p ] { , , }
  ( make boot ) [ frame ] { , , }
- ( fb ) [ d# 0 fh loaded ! nores strlen leng ! ] { , }
+ ( feedback ) [ .stream nores strlen leng ! ] { , }
  ( erase flash ) [ stream ers ] { , }
  ( flash ) [ stream d# 0 swap 18burn ] }block
 
@@ -12488,167 +13333,43 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002D5000 )               D# 852 code{ 
- ( pwm demo ) [ d# 500 node d# 0 org ] { br }
-
-: pol ^ 00 ^ @b h# 2000 ( dw ) and if { cr }
- ( ... ) ^ 03 ^ ( ... ) down b! @b push ex { cr }
-: rtn ^ 06 ^ ( ... ) io b! then ^ 08 ^ [ h# 16 ] end { br }
-
-: cyc ^ 09 ^ ( ie- ) h# 1FFFF and over . + -if { cr }
- ( ... ) ^ 0C ^ ( ... ) h# 20000 !b pol ; { cr }
- ( ... ) ^ 0F ^ then h# 10000 { 1F } !b pol ; { br }
-
-: upd ^ 12 ^ ( xex- ) drop push drop h# 1100 { cr }
- ( ... ) ^ 14 ^ pop pop ( iex- ) rtn ; ^ 16 ^ { br }
-
-: chk ^ 16 ^ ( xex- ) drop push @b h# 8000 ( rw ) { cr }
- ( ... ) ^ 18 ^ and if drop drop right . { cr }
- ( ... ) ^ 1B ^ ( ... ) b! @b dup io b! then { cr }
- ( ... ) ^ 1E ^ drop pop ( ie- ) cyc ; ^ 20 ^ }block
+ }block
 
 ( 002D5400 )               D# 853 shadow{ 
- ( pwm demo for host node { 3E8F } ) { br }
-
-: pol ( checks for ide inputs and calls ) up { cr }
- ( when noticed. )
-: rtn ( is the return point from a ) up ( call ) { cr }
- ( and is used by ) [ upd ] ( as an re-entry point. )
-: cyc ( begins the actual pwm code. )
-: upd ( is the ide entry point for initial ) { cr }
- ( start or output update. ) }block
+ }block
 
 ( 002D5800 )               D# 854 code{ 
- ( pwm demo ) [ d# 200 node d# 0 org ] { br }
-
-: pol ^ 00 ^ @b h# 8000 ( rw ) and if { cr }
- ( ... ) ^ 03 ^ ( ... ) right b! @b push ex { cr }
-: rtn ^ 06 ^ ( ... ) io b! then ^ 08 ^ drop { br }
-
- ( cyc ie- ) h# 1FFFF and over . + -if { cr }
- ( ... ) ^ 0C ^ ( ... ) h# 20000 !b pol ; { cr }
- ( ... ) ^ 0F ^ then h# 10000 { 1F } !b pol ; { br }
-
-: upd ^ 12 ^ ( xex- ) drop push drop h# 8100 { cr }
- ( ... ) ^ 14 ^ pop pop ( iex- ) rtn ; ^ 16 ^ }block
+ }block
 
 ( 002D5C00 )               D# 855 shadow{ 
- ( pwm demo for host node { 190F } ) { br }
-
-: pol ( checks for ide inputs and calls ) down { cr }
- ( when noticed. )
-: rtn ( is the return point from a ) down ( call ) { cr }
- ( and is used by ) [ upd ] ( as an re-entry point. )
-: cyc ( begins the actual pwm code. )
-: upd ( is the ide entry point for initial ) { cr }
- ( start or output update. ) }block
+ }block
 
 ( 002D6000 )               D# 856 code{ 
- ( pwm demo ) [ d# 100 node d# 0 org ] { br }
-
-: pol ^ 00 ^ @b h# 2000 ( dw ) and if { cr }
- ( ... ) ^ 03 ^ ( ... ) down b! @b push ex { cr }
-: rtn ^ 06 ^ ( ... ) io b! then ^ 08 ^ drop { br }
-
- ( cyc ie- ) h# 1FFFF and over . + -if { cr }
- ( ... ) ^ 0C ^ ( ... ) h# 20000 !b pol ; { cr }
- ( ... ) ^ 0F ^ then h# 10000 { 1F } !b pol ; { br }
-
-: upd ^ 12 ^ ( xex- ) drop push drop h# 10100 { cr }
- ( ... ) ^ 14 ^ pop pop ( iex- ) rtn ; ^ 16 ^ }block
+ }block
 
 ( 002D6400 )               D# 857 shadow{ 
- ( pwm demo for host node { C8F } ) { br }
-
-: pol ( checks for ide inputs and calls ) up { cr }
- ( when noticed. )
-: rtn ( is the return point from a ) up ( call ) { cr }
- ( and is used by ) [ upd ] ( as an re-entry point. )
-: cyc ( begins the actual pwm code. )
-: upd ( is the ide entry point for initial ) { cr }
- ( start or output update. ) }block
+ }block
 
 ( 002D6800 )               D# 858 code{ 
- ( potentiometer code ) [ d# 709 node d# 0 org ] { br }
-
-: pol @b h# 8000 ( rw ) and if { cr }
- ( ... ... ) right b! @b push ex io b! drop ; { cr }
- ( ... ) then d# 0 + d# 0 + d# 0 + @b + . drop ; { br }
-
-: check ( v-v ) io b! @b - h# 4000 ( dr ) and if { cr }
- ( ... ... ) down a! over ! drop ; { cr }
- ( ... ) then d# 0 + drop . @b drop ; { br }
-
-: adc ^ 19 ^ ( mode ) h# 0 !b { cr }
- ( ... initial ) data a! dup ! @ push { br }
-
-: read ( -v ) pol data a! dup ! @ dup a! { cr }
- ( ... ) - d# 1 . + pop . + h# 1FFFF and { cr }
- ( ... ) a push check read ; ^ 29 ^ }block
+ }block
 
 ( 002D6C00 )               D# 859 shadow{ 
  }block
 
 ( 002D7000 )               D# 860 code{ 
- ( wire code ) { , }
- [ d# 609 node d# 0 org reclaim ]
-: pass down b! up a! begin @b ! end ; { , }
- [ d# 509 node d# 0 org reclaim ]
-: pass up b! right a! begin @b ! end ; { , }
- [ d# 508 node d# 0 org reclaim ]
-: pass right b! left a! begin @b ! end ; { , }
- [ d# 507 node d# 0 org reclaim ]
-: pass left b! right a! begin @b ! end ; { , }
- [ d# 506 node d# 0 org reclaim ]
-: pass right b! left a! begin @b ! end ; { , }
- [ d# 505 node d# 0 org reclaim ]
-: pass left b! right a! begin @b ! end ; { , }
- [ d# 504 node d# 0 org reclaim ]
-: pass right b! left a! begin @b ! end ; { , }
- [ d# 503 node d# 0 org reclaim ]
-: pass left b! right a! begin @b ! end ; { , }
- [ d# 502 node d# 0 org reclaim ]
-: pass ( right b! left a! begin @b ! end ; ) { , }
- [ d# 501 node d# 0 org reclaim ]
-: pass ( left b! right a! begin @b ! end ; ) }block
+ }block
 
 ( 002D7400 )               D# 861 shadow{ 
  }block
 
 ( 002D7800 )               D# 862 code{ 
- ( scaling code ) [ d# 501 node d# 0 org ] { br }
-
- ( reduction ) d# 0 { br }
-
-: pol @b h# 8000 ( rw ) and if { cr }
- ( ... ) right b! @b push ex { cr }
- ( ... ) io b! then drop { br }
-
-: check ( -n ) @b h# 800 ( lw ) and if { cr }
- ( ... ... ) left a! push @ { br }
-
-: read ( rn-vr ) over over - push . + ( -rf ) -if { cr }
- ( adjust lo ) drop drop pop dup push d# 3 . + d# 2 { cr }
- ( ... ) then dup - d# 18 . + ( -rfo ) -if { cr }
- ( adjust hi ) drop drop drop pop dup push { cr }
- ( ... ... ) d# 16 . + d# 15 d# 0 { cr }
- ( ... ) then drop pop drop if { cr }
- ( ... ... ) h# 3FFFF . + push d# 1 begin 2* unext { cr }
- ( swap ) then a! push a pop ( -vr ) { br }
-
- ( ... ... ) right a! over ! pop { cr }
- ( ... ) then drop pol ; ^ 2E ^ }block
+ }block
 
 ( 002D7C00 )               D# 863 shadow{ 
  }block
 
 ( 002D8000 )               D# 864 code{ 
- ( averaging buffer code ) [ d# 502 node d# 0 org ]
-: pass h# 20 a! d# 31 for { , }
- ( ... ... ) right b! @b !+ { , }
- ( ... ... ) a push h# 20 a! @+ { , }
- ( ... ... ) d# 30 for @+ + 2/ unext { , }
- ( ... ... ) pop a! left b! !b { , }
- ( ... ) next pass ; ^ 11 ^ }block
+ }block
 
 ( 002D8400 )               D# 865 shadow{ 
  }block
@@ -12726,7 +13447,18 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002DE800 )               D# 890 code{ 
- }block
+ ( carry time ) [ d# 308 node reclaim d# 0 org ]
+: one ^ 00 ^ d# -1 d# -1 d# 0 .. drop + ;
+: two ^ 05 ^ d# -1 d# 1 d# 0 .. drop + ;
+: thr ^ 0A ^ d# 1 d# 0 .. - + ;
+: vier ^ 0E ^ d# 0 d# -1 .. dup + ;
+: fiv ^ 12 ^ h# 15555 dup .. 2* + ;
+: six ^ 15 ^ h# 15555 dup - .. dup + ;
+: sev ^ 18 ^ d# -1 h# 15555 .. dup + ;
+: ate ^ 1C ^ d# -1 d# 1 d# 0 .. + + ;
+: nine ^ 21 ^ d# -1 d# 1 d# 0 .. . . ( . { F } ) + ^ 26 ^ + ;
+: ta ^ 27 ^ d# 0 d# -1 d# 1 ^ 2B ^ + ;
+: tb ^ 2C ^ d# 0 d# -1 . d# 1 ^ 30 ^ + ; ^ 31 ^ }block
 
 ( 002DEC00 )               D# 891 shadow{ 
  }block
@@ -12744,43 +13476,171 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002E0000 )               D# 896 code{ 
- }block
+ ( 0xx-108 rx sram logging ) { , , }
+ [ d# 109 node d# 0 org reclaim ] { , }
+: wire ^ 00 ^ @ !b wire ; ^ 01 ^ { , , }
+ [ d# 108 node h# 39 org d# 278 load ] ^ 40 ^ [ d# 0 org ]
+: run ^ 00 ^ left b! right a! d# 1 h# 8000 h# 7FFF for { , }
+ ^ 08 ^ ( a-a' ) @ h# FFFF and over d# 0 ex! { , .. }
+      over . + dup d# 2 x! next { , }
+ @b run ; ^ 12 ^ [ d# 1801 bin reclaim ] { , , }
+ [ d# 110 node d# 0 org reclaim ]
+: run ^ 00 ^ @ if ( state ) !b @ !b run ; then dup !b { , }
+: bit ( n-n ) ^ 04 ^ @ -if ( drop ) !b @ !b !b run ; { , .. }
+      then ( drop ) !b d# 1 . + bit ;
+: run ^ 0A ^ @ -if drop !b dup or run ; { , x }
+ then dup d# -2 and if drop !b run ; { , .. }
+      then drop drop d# 1 . + run ; { , }
+ ^ 15 ^ [ reclaim ] }block
 
 ( 002E0400 )               D# 897 shadow{ 
- }block
+ { DAF } ( code is a simple wire from a to b. ) { , , { D8F } }
+ ( is a simple dma logger. ) { , }
+ ( receives words thru a and stores into second ) { , { 40F } }
+ ( kword page of sram. stops when full, ) { , }
+ ( restarts when pf sends it a stimulus. ) { , }
+ ( addr past last word stored is left in loc { 4F } ) { , , { DCF } }
+ ( passes rx time node events but only counts data bits, passing that
+ count when end packet is seen. ) }block
 
 ( 002E0800 )               D# 898 code{ 
- }block
+ ( gpio rx pin ) [ d# 217 node d# 0 org ] { , , }
+ ( note- this code designed to work in nodes with regular gpio pins.
+ production uses shared pin in an analog node. ) { , , }
+: edge ( rise fall ) ^ 00 ^ push @b -if { , ... .. }
+      pop !b @ . drop drop drop ; { , }
+ then drop !b @ . pop drop drop ; { , , }
+: run ^ 05 ^ edge a! @b ! d# 4 ^ 08 ^ push a! ^ 09 ^ { , ... }
+      begin unext run ; { , , }
+ ( ----------------- ) { , , }
+: init ^ 0A ^ left ( right ) up h# 5555 h# 5D55 { , }
+ left ( right ) up h# 5555 h# 5D55 { , }
+ dup dup drop drop io b! left a! run ; ^ 19 ^ [ reclaim ] }block
 
 ( 002E0C00 )               D# 899 shadow{ 
- }block
+ ( the ethernet rx pin node acts as a continuous manchester decoder,
+ recovering and passing ) { , }
+ ( each data bit to an adjacent buffering node ) { , }
+ ( to eliminate jitter in its timing sequence. ) { , }
+ ( this code automatically acquires bit sync ) { , }
+ ( during frame preambles. when a link pulse is ) { , }
+ ( positive only it decodes as a single '1' in ) { , }
+ ( which case another node must drive the pin low momentarily to reset
+ the schmitts; this may ) { , }
+ ( produce a spurious '0'. ) { , , }
+: edge ( samples pin and waits for opposite state. )
+: run ( waits for the edge at the center of a bit cell, writes the
+ value of io with the data bit in position { 22F } to the buffering
+ node, then ) { , }
+ ( delays long enough that the next ) edge ( call ) { , }
+ ( will be well centered in the first half of the next bit cell, maximizing
+ margins for sampling and waiting. it is paramount that the delay never
+ be too long since that means loss of bit ) { , }
+ ( sync. duty cycle is always lt { C8F } pct. ) }block
 
 ( 002E1000 )               D# 900 code{ 
- }block
+ ( sha-256 scheduler ) [ d# 101 node d# 0 org +cy ]
+: rdsc ( hln-hl ) ^ 00 ^ push a! push h# 4000
+: dsr ^ 02 ^ pop begin +* unext { cr }
+ push drop pop a ; ^ 05 ^
+: rdsl ( hln-hl ) ^ 05 ^ push a! push dup dup or dsr ;
+: dxor ( dd-d ) ^ 07 ^ push a! pop or push a or pop ;
+: sig0 ( dd-d ) ^ 0A ^ dup push over push d# 6 rdsc { cr }
+ over over d# 10 rdsc dxor pop pop d# 2 rdsl dxor
+: sum ( dd-d ) ^ 16 ^ push a! pop . + push a . + pop ;
+: sig1 ( dd-d ) ^ 19 ^ dup push over push d# 16 rdsc over over d# 1
+ rdsc dxor pop pop d# 9 rdsl dxor sum ( ; )
+: !dst ^ 26 ^ left a! ;
+: slam ( n ) ^ 28 ^ push !dst begin @b ! unext
+: g2x ( -hl ) ^ 2A ^ !dst @b dup ! @b dup ! ;
+: init ^ 2D ^ right b! dup or . +
+: run ^ 30 ^ @b @b g2x sig0 { cr }
+ ^ 33 ^ d# 13 slam sum { cr }
+ ^ 36 ^ d# 7 slam sig1 { cr }
+ ^ 39 ^ @b ! @b ! over ! dup ! { cr }
+ ( hasher ) down a! ^ 3D ^ over ! ! drop run ( -d-- ) ; { cr }
+ ^ 3F ^ [ reclaim ] }block
 
 ( 002E1400 )               D# 901 shadow{ 
- }block
+ ( first word moved is high order { 1CF } bits of w0. ) { br }
+
+ ( all that can be said for this is that it fits. ) [ the pipelining
+ will ] suck. ( the problem is that each each guy stops to calculate
+ out of phase with his neighbors. so they are blocked in ) { cr }
+ ( simply transferring and ) [ the blockage will just ripple along
+ the ] ( pipeline with ) [ most nodes idle while a few work. ] ( the
+ only good thing about it is that the duty cycle will be low so a whole
+ lot more chips can be employed for the same power. ) { br }
+
+ ( even if we had ram enough to keep the args and do the arithmetic
+ after moving all but one of the words of message, ) [ we would still
+ have the same problem because ] the next node could not start doing
+ its calculating ( till we completted ours. ) }block
 
 ( 002E1800 )               D# 902 code{ 
- }block
+ ( sha-256 scheduler ) [ d# 102 node d# 0 org +cy ]
+: rdsc ( hln-hl ) ^ 00 ^ push a! push h# 4000
+: dsr ^ 02 ^ pop begin +* unext { cr }
+ push drop pop a ; ^ 05 ^
+: rdsl ( hln-hl ) ^ 05 ^ push a! push dup dup or dsr ;
+: dxor ( dd-d ) ^ 07 ^ push a! pop or push a or pop ;
+: sig0 ( dd-d ) ^ 0A ^ dup push over push d# 6 rdsc { cr }
+ over over d# 10 rdsc dxor pop pop d# 2 rdsl dxor
+: sum ( dd-d ) ^ 16 ^ push a! pop . + push a . + pop ;
+: sig1 ( dd-d ) ^ 19 ^ dup push over push d# 16 rdsc over over d# 1
+ rdsc dxor pop pop d# 9 rdsl dxor sum ( ; )
+: !dst ^ 26 ^ ( left ) right a! ;
+: slam ( n ) ^ 28 ^ push !dst begin @b ! unext
+: g2x ( -hl ) ^ 2A ^ !dst @b dup ! @b dup ! ;
+: init ^ 2D ^ ( right ) left b! dup or . +
+: run ^ 30 ^ @b @b g2x sig0 { cr }
+ ^ 33 ^ d# 13 slam sum { cr }
+ ^ 36 ^ d# 7 slam sig1 { cr }
+ ^ 39 ^ @b ! @b ! over ! dup ! { cr }
+ ( hasher ) down a! ^ 3D ^ over ! ! drop run ( -d-- ) ; { cr }
+ ^ 3F ^ [ reclaim ] }block
 
 ( 002E1C00 )               D# 903 shadow{ 
- }block
+ ( first word moved is high order { 1CF } bits of w0. ) { br }
+
+ ( all that can be said for this is that it fits. ) [ the pipelining
+ will ] suck. ( the problem is that each each guy stops to calculate
+ out of phase with his neighbors. so they are blocked in ) { cr }
+ ( simply transferring and ) [ the blockage will just ripple along
+ the ] ( pipeline with ) [ most nodes idle while a few work. ] ( the
+ only good thing about it is that the duty cycle will be low so a whole
+ lot more chips can be employed for the same power. ) { br }
+
+ ( even if we had ram enough to keep the args and do the arithmetic
+ after moving all but one of the words of message, ) [ we would still
+ have the same problem because ] the next node could not start doing
+ its calculating ( till we completted ours. ) }block
 
 ( 002E2000 )               D# 904 code{ 
- }block
+ ( data source ) [ d# 100 node d# 0 org ]
+: init ^ 00 ^ right b! d# -1 push d# 0 dup { cr }
+ dup dup dup dup dup dup dup dup { cr }
+ ( abc test ) h# 26380 h# 1858
+: hose ^ 0A ^ begin !b ( !b !b ) unext hose ; { cr }
+ ^ 0B ^ [ reclaim ] }block
 
 ( 002E2400 )               D# 905 shadow{ 
  }block
 
 ( 002E2800 )               D# 906 code{ 
- }block
+ ( data sink ) [ d# 201 node d# 0 org ]
+: init ^ 00 ^ ( left r-l- ) h# 1F5 b! d# -1 push
+: hose ^ 04 ^ begin @b ( @b @b ) unext hose ; { cr }
+ ^ 05 ^ [ reclaim ] }block
 
 ( 002E2C00 )               D# 907 shadow{ 
  }block
 
 ( 002E3000 )               D# 908 code{ 
- }block
+ ( data sink ) [ d# 1 node d# 0 org ]
+: init ^ 00 ^ down b! d# -1 push
+: hose ^ 04 ^ begin @b ( @b @b ) unext hose ; { cr }
+ ^ 05 ^ [ reclaim ] }block
 
 ( 002E3400 )               D# 909 shadow{ 
  }block
@@ -12798,7 +13658,38 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002E4800 )               D# 914 code{ 
- }block
+ ( softsim setup ) { br }
+
+ ( sha ) [ d# 0 d# 100 enter d# 0 d# 1 enter ] { cr }
+ [ d# 1 d# 2 code d# 0 d# 2 enter d# 1 d# 3 code d# 0 d# 3 enter ]
+ { cr }
+ [ d# 1 d# 4 code d# 0 d# 4 enter d# 1 d# 5 code d# 0 d# 5 enter ]
+ { cr }
+ [ d# 1 d# 6 code d# 0 d# 6 enter d# 1 d# 7 code d# 0 d# 7 enter ]
+ { cr }
+ [ d# 1 d# 8 code d# 0 d# 8 enter d# 1 d# 9 code d# 0 d# 9 enter ]
+ { cr }
+ [ d# 1 d# 10 code d# 0 d# 10 enter d# 1 d# 11 code d# 0 d# 11 enter ]
+ { cr }
+ [ d# 1 d# 12 code d# 0 d# 12 enter d# 1 d# 13 code d# 0 d# 13 enter ]
+ { br }
+
+ [ d# 201 { CCF } d# 114 code d# 0 { CCF } d# 114 enter ] { br }
+
+ [ h# 22D d# 101 enter ] { cr }
+ [ d# 102 d# 102 code h# 22D d# 102 enter ] { cr }
+ [ d# 101 d# 103 code h# 22D d# 103 enter ] { cr }
+ [ d# 102 d# 104 code h# 22D d# 104 enter ] { cr }
+ [ d# 101 d# 105 code h# 22D d# 105 enter ] { cr }
+ [ d# 102 d# 106 code h# 22D d# 106 enter ] { cr }
+ [ d# 101 d# 107 code h# 22D d# 107 enter ] { cr }
+ [ d# 102 d# 108 code h# 22D d# 108 enter ] { cr }
+ [ d# 101 d# 109 code h# 22D d# 109 enter ] { cr }
+ [ d# 102 d# 110 code h# 22D d# 110 enter ] { cr }
+ [ d# 101 d# 111 code h# 22D d# 111 enter ] { cr }
+ [ d# 102 d# 112 code h# 22D d# 112 enter ] { cr }
+ [ d# 101 d# 113 code h# 22D d# 113 enter ] { cr }
+ [ d# 0 { 7FF } h# 3E d# 101 { D2F } break ] }block
 
 ( 002E4C00 )               D# 915 shadow{ 
  }block
@@ -12828,10 +13719,43 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002E7000 )               D# 924 code{ 
- }block
+ ( sha-256 scheduler ) [ d# 101 node d# 0 org +cy ]
+: rdsc ( hln-hl ) ^ 00 ^ push a! push h# 4000
+: dsr ^ 02 ^ pop begin +* unext { cr }
+ push drop pop a ; ^ 05 ^
+: rdsl ( hln-hl ) ^ 05 ^ push a! push dup dup or dsr ;
+: dxor ( dd-d ) ^ 07 ^ push a! pop or push a or pop ;
+: sig0 ( dd-d ) ^ 0A ^ dup push over push d# 6 rdsc { cr }
+ over over d# 10 rdsc dxor pop pop d# 2 rdsl dxor
+: sum ( dd-d ) ^ 16 ^ push a! pop . + push a . + pop ;
+: sig1 ( dd-d ) ^ 19 ^ dup push over push d# 16 rdsc over over d# 1
+ rdsc dxor pop pop d# 9 rdsl dxor sum ;
+: g2x ( -hl ) ^ 26 ^ @b dup !b @b dup !b ;
+: init ^ 28 ^ ( 'r-l- ) h# 1F5 b! dup or . +
+: run ^ 2B ^ @b @b g2x sig0 { cr }
+ ^ 2E ^ d# 13 for @b !b unext g2x sum { cr }
+ ^ 33 ^ d# 7 for @b !b unext g2x sig1 { cr }
+ ^ 38 ^ @b !b @b !b over !b dup !b { cr }
+ ( hasher ) down a! ^ 3C ^ over ! ! drop ( run ; )
+: hang hang ; { cr }
+ ^ 3F ^ [ reclaim ] }block
 
 ( 002E7400 )               D# 925 shadow{ 
- }block
+ ( all that can be said for this is that it fits. ) [ the pipelining
+ will ] suck. ( the problem is that each each guy stops to calculate
+ out of phase with his neighbors. so they are blocked in ) { cr }
+ ( simply transferring and ) [ the blockage will just ripple along
+ the ] ( pipeline with ) [ most nodes idle while a few work. ] ( the
+ only good thing about it is that the duty cycle will be low so a whole
+ lot more chips can be employed for the same power. ) { br }
+
+ ( even if we had ram enough to keep the args and do the arithmetic
+ after moving all but one of the words of message, ) [ we would still
+ have the same problem because ] the next node could not start doing
+ its calculating ( till we completted ours. ) { br }
+
+ ( so let's see how long this puppy takes to run. looks like { 528F }
+ or so ) [ but also 2-port r/w addr is ] screwing up. }block
 
 ( 002E7800 )               D# 926 code{ 
  }block
@@ -12846,46 +13770,212 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002E8800 )               D# 930 code{ 
- }block
+ ( ethernet calibration code ) { , }
+ ( uses { EAF } for rx, { 1B2F } for wire, ) { , { 27AF } }
+ ( for feedback and { 342F } to send link pulses. ) { , , }
+ ( xmtr test ) [ d# 6 fh load ] { , }
+ ( rx pin { 1B2F } { 10F } fh load ) { , }
+ ( rx pin { EAF } ) [ d# 10 fh load ] { , }
+ ( rx timing { EAF } { 18F } fh load ) { , }
+ ( rx timing { 28F } { 30F } fh load ) { , }
+ ( rx tst 300,400,500 { 2CF } fh load ) }block
 
 ( 002E8C00 )               D# 931 shadow{ 
- }block
+ ( compile initial ether tests. ) }block
 
 ( 002E9000 )               D# 932 code{ 
- }block
+ ( ether calib ide boot ) [ host load loader load ] { , , }
+ ( custom routes ) [ d# 2 fh load ] { , }
+ ( select ) [ b4eth 'pths d# 2 + ! ] { , , }
+ ( xmtr ) [ d# 417 +node d# 417 /ram h# 34 /p ] { , }
+ ( rcv0 test { 1B2F } +node { 1B2F } /ram { 15F } /p ) { , ... { 27AF } }
+      ( +node { 27AF } /ram { F } /p ) { , }
+ ( rcv1 test ) [ d# 117 +node d# 117 /ram io /b left /a ] { , ... }
+      [ h# 5555 h# 5D55 left up h# 5555 h# 5D55 left up ] { , ... }
+      [ h# 5555 h# 5D55 d# 10 /stack { 15F } d# 5 /p ] { , }
+ [ d# 217 +node d# 217 /ram d# 0 /p ] { , }
+ [ d# 317 +node d# 317 /ram d# 0 /p ] { , }
+ ( boot ) [ d# 2 ship ] { . }
+      [ panel upd ?ram ] }block
 
 ( 002E9400 )               D# 933 shadow{ 
- }block
+ ( customize ide for polyforth development. ) { br }
+
+: pf ( loads polyforth f18 code, nucleus in sram, and starts it up. )
+ { br }
+
+ < ***no canonical opcodes*** > { cr }
+ [ use the ] 'remote' [ ones ] }block
 
 ( 002E9800 )               D# 934 code{ 
- }block
+ ( - residual paths ) { , , }
+: b4eth align create [ d# 708 d# 717 to d# 617 d# 17 to ] { , }
+ [ d# 16 d# 616 to d# 615 d# 15 to d# 14 d# 614 to d# 613 d# 13 to ]
+ { , }
+ [ d# 12 d# 612 to d# 611 d# 11 to d# 10 d# 610 to d# 609 d# 209 to ]
+ { , }
+ [ d# 208 d# 608 to d# 607 d# 707 to d# 706 d# 606 to d# 605 d# 604
+ to ] { , }
+ [ d# 704 d# 700 to d# 600 d# 300 to d# 301 d# 601 to d# 602 d# 603
+ to ] { , }
+ [ d# 503 d# 507 to d# 407 d# 307 to d# 306 d# 406 to d# 405 d# 305
+ to ] { , }
+ [ d# 304 d# 404 to d# 403 d# 303 to d# 302 d# 502 to d# -1 , ] { ,
+ , }
+ [ exit ]
+: afeth align create [ d# 708 d# 701 to d# 700 d# 0 to ] { , }
+ [ d# 1 d# 6 to d# 106 d# 101 to d# 201 d# 208 to d# 108 d# 109 to ]
+ { , }
+ [ d# 209 d# 210 to d# 110 d# 10 to d# 11 d# 17 to d# 117 d# 111 to ]
+ { , }
+ [ d# 211 d# 217 to d# 317 d# 301 to d# 401 d# 417 to d# 517 d# 501
+ to ] { , }
+ [ d# 601 d# 617 to d# 717 d# 709 to d# -1 , ] }block
 
 ( 002E9C00 )               D# 935 shadow{ 
- }block
+ ( redefine path { 4F } to reach whole chip except pf nodes { 582F }
+ and corner and { 19EF } and { D8F } and { DAF } ) { , , }
+: b4eth ( does this. ) }block
 
 ( 002EA000 )               D# 936 code{ 
- }block
+ { 342F } ( send link pulses ) [ d# 417 node d# 0 org ]
+: bt/2 { 24F } d# 8 for unext ;
+: five ^ 03 ^ io b! h# 30000 { , ... }
+      begin dup !b h# 10000 or ( bt/2 bt/2 ) { , }
+ . .. . .. . .. . .. { , }
+ . .. . .. . .. . .. { , }
+ . .. . .. . .. ( . .. ) end ;
+: ten ^ 15 ^ io b! h# 30000 { , ... }
+      begin dup !b h# 10000 or ( bt/2 ) { , }
+ . .. . .. . .. . .. end ;
+: ms ^ 20 ^ ( n.n ) d# -1 . + for d# 41664 for unext next ;
+: pulse ^ 27 ^ io b! dup or dup !b h# 20000 h# 30000 { , }
+ h# 2 for !b . .. . .. . .. . .. next ;
+: idle ^ 34 ^ pulse d# 160 ms idle ; { , }
+ ^ 38 ^ [ reclaim ] }block
 
 ( 002EA400 )               D# 937 shadow{ 
  }block
 
 ( 002EA800 )               D# 938 code{ 
- }block
+ ( 217/317 rx pin ) [ d# 217 node d# 0 org ]
+: edge ( rise fall ) ^ 00 ^ push @b -if { , ... .. }
+      pop !b @ . drop drop drop ; { , }
+ then drop !b @ . pop drop drop ; { , , }
+: run ^ 05 ^ edge a! @b ! d# 4 ^ 08 ^ push a! ^ 09 ^ { , ... }
+      begin unext run ; { , }
+ ( ----------------- ) { , }
+: init ^ 0A ^ left down h# 5555 h# 5D55 { , }
+ left down h# 5555 h# 5D55 { , }
+ dup dup drop drop io b! left a! run ; ^ 19 ^ { , , }
+ [ d# 317 node d# 0 org ]
+: run io b! down a!
+: show h# 25555 h# 35555 @ -if ^ 08 ^ { , }
+ drop !b .. { , ... }
+      . .. . .. ( . .. ) !b show ; ^ 0C ^ { , }
+ then drop !b .. { , ... }
+      ( . ) . . !b show ; ^ 0F ^ [ reclaim ] }block
 
 ( 002EAC00 )               D# 939 shadow{ 
- }block
+ ( the ethernet rx pin node acts as a continuous manchester decoder,
+ recovering and passing ) { , }
+ ( each data bit to an adjacent buffering node ) { , }
+ ( to eliminate jitter in its timing sequence. ) { , }
+ ( this code automatically acquires bit sync ) { , }
+ ( during frame preambles. when a link pulse is ) { , }
+ ( positive only it decodes as a single '1' in ) { , }
+ ( which case another node must drive the pin low momentarily to reset
+ the schmitts; this may ) { , }
+ ( produce a spurious '0'. ) { , , }
+: edge ( samples pin and waits for opposite state. )
+: run ( waits for the edge at the center of a bit cell, writes the
+ value of io with the data bit in position { 22F } to the buffering
+ node, then ) { , }
+ ( delays long enough that the next ) edge ( call ) { , }
+ ( will be well centered in the first half of the next bit cell, maximizing
+ margins for sampling and waiting. it is paramount that the delay never
+ be too long since that means loss of bit ) { , }
+ ( sync. duty cycle is always lt { C8F } pct. ) }block
 
 ( 002EB000 )               D# 940 code{ 
- }block
+ ( 117/217/317 rx pin ) [ d# 117 node d# 0 org ]
+: edge ( rise fall ) ^ 00 ^ push @b -if { , ... .. }
+      pop !b ! . drop . . ; { , }
+ then over !b ! . pop drop drop ; { , , }
+: run ^ 05 ^ edge a! @b ! d# 4 push a! { , ... }
+      begin unext run ; { 15F } ( org ) { , }
+ ( ----------------- ) { , }
+: init ^ 0A ^ left ( down ) up h# 5555 h# 5D55 { , }
+ left ( down ) up h# 5555 h# 5D55 { , }
+ dup dup drop drop io b! left a! run ; ^ 19 ^ { , , }
+ [ d# 217 node d# 0 org ] { , }
+: wire io b! h# 5555 !b up a! down b! { , }
+: pass @ !b pass ; ^ 09 ^ { , , }
+ [ d# 317 node d# 0 org ]
+: run io b! down a!
+: show h# 25555 h# 35555 @ -if ^ 08 ^ { , }
+ drop !b .. . .. . .. ( . .. ) !b show ; ^ 0C ^ { , }
+ then drop !b .. ( . . . ) !b show ; ^ 0E ^ [ reclaim ] }block
 
 ( 002EB400 )               D# 941 shadow{ 
- }block
+ ( the ethernet rx pin node acts as a continuous manchester decoder,
+ recovering and passing ) { , }
+ ( each data bit to an adjacent buffering node ) { , }
+ ( to eliminate jitter in its timing sequence. ) { , }
+ ( this code automatically acquires bit sync ) { , }
+ ( during frame preambles. when a link pulse is ) { , }
+ ( positive only it decodes as a single '1' in ) { , }
+ ( which case another node must drive the pin low momentarily to reset
+ the schmitts; this may ) { , }
+ ( produce a spurious '0'. ) { , , }
+: edge ( samples pin and waits for opposite state. )
+: run ( waits for the edge at the center of a bit cell, writes the
+ value of io with the data bit in position { 22F } to the buffering
+ node, then ) { , }
+ ( delays long enough that the next ) edge ( call ) { , }
+ ( will be well centered in the first half of the next bit cell, maximizing
+ margins for sampling and waiting. it is paramount that the delay never
+ be too long since that means loss of bit ) { , }
+ ( sync. duty cycle is always lt { C8F } pct. ) }block
 
 ( 002EB800 )               D# 942 code{ 
- }block
+ ( 117/217/317 rx timing ) [ d# 117 node d# 0 org ]
+: edge ( hi lo ) ^ 00 ^ ( push ) . ( @b ) ! -if { , ... .. }
+      dup !b ( @ ) ! . ( drop ) . ( drop ) . ( drop ) . ; { , }
+ then dup !b ( @ ) ! . ( pop drop drop ) . . . ; { , , }
+: run ^ 05 ^ edge a! @b ! d# 4 ^ 08 ^ push a! ^ 09 ^ { , ... }
+      begin unext run ; { 15F } ( org ) { , }
+ ( ----------------- ) { , }
+: init ^ 0A ^ ( left ) up ( down ) io h# 35555 h# 25555 { , }
+ ( left ) up ( down ) io h# 35555 h# 25555 { , }
+ dup dup drop drop io b! ( left ) up a! run ; ^ 19 ^ { , , }
+ [ d# 217 node d# 0 org ] { , }
+: wire io b! h# 35555 !b up a! down b! { , }
+: pass @ !b pass ; ^ 09 ^ { , , }
+ [ d# 317 node d# 0 org ]
+: run io b! down a!
+: show @ b! show ; ^ 05 ^ [ reclaim ] }block
 
 ( 002EBC00 )               D# 943 shadow{ 
- }block
+ ( the ethernet rx pin node acts as a continuous manchester decoder,
+ recovering and passing ) { , }
+ ( each data bit to an adjacent buffering node ) { , }
+ ( to eliminate jitter in its timing sequence. ) { , }
+ ( this code automatically acquires bit sync ) { , }
+ ( during frame preambles. when a link pulse is ) { , }
+ ( positive only it decodes as a single '1' in ) { , }
+ ( which case another node must drive the pin low momentarily to reset
+ the schmitts; this may ) { , }
+ ( produce a spurious '0'. ) { , , }
+: edge ( samples pin and waits for opposite state. )
+: run ( waits for the edge at the center of a bit cell, writes the
+ value of io with the data bit in position { 22F } to the buffering
+ node, then ) { , }
+ ( delays long enough that the next ) edge ( call ) { , }
+ ( will be well centered in the first half of the next bit cell, maximizing
+ margins for sampling and waiting. it is paramount that the delay never
+ be too long since that means loss of bit ) { , }
+ ( sync. duty cycle is always lt { C8F } pct. ) }block
 
 ( 002EC000 )               D# 944 code{ 
  }block
@@ -12894,40 +13984,163 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 002EC800 )               D# 946 code{ 
- }block
+ ( - testloop load descriptor ) { , , }
+ ( wires ) { , ... }
+      [ d# 16 +node d# 516 /ram right /a left /b d# 0 /p ] { , ... }
+      [ d# 15 +node d# 516 /ram left /a right /b d# 0 /p ] { , ... }
+      [ d# 14 +node d# 516 /ram right /a down /b d# 0 /p ] { , ... }
+      [ d# 114 +node d# 516 /ram down /a up /b d# 0 /p ] { , ... }
+      [ d# 214 +node d# 516 /ram up /a down /b d# 0 /p ] { , ... }
+      [ d# 314 +node d# 516 /ram down /a up /b d# 0 /p ] { , ... }
+      [ d# 414 +node d# 516 /ram up /a down /b d# 0 /p ] { , ... }
+      [ d# 514 +node d# 516 /ram down /a right /b d# 0 /p ] { , ... }
+      [ d# 515 +node d# 516 /ram right /a left /b d# 0 /p ] { , ... }
+      [ d# 516 +node d# 516 /ram left /a right /b d# 0 /p ] { , , }
+ ( pin ) [ d# 517 +node d# 517 /ram d# 0 ] ( up ) [ /p ] }block
 
 ( 002ECC00 )               D# 947 shadow{ 
- }block
+ ( adds 0/1 pulse generator node { 40AF } and jumper ) { , }
+ ( wire from rx to { 408F } for rx verification. ) }block
 
 ( 002ED000 )               D# 948 code{ 
- }block
+ ( 015..517 rx display ) { , , }
+ [ d# 516 node d# 0 org ] { , }
+: wire ^ 00 ^ @ !b wire ; ^ 01 ^ { , , }
+ [ d# 517 node d# 0 org ]
+: run ^ 00 ^ io b! right a!
+: show ^ 04 ^ h# 25555 h# 35555 @ ( -if ) if ^ 08 ^ { , }
+ drop !b .. . .. . .. ( . .. ) !b show ; ^ 0C ^ { , }
+ then ^ 0C ^ drop .. ( . ) { , }
+ !b ( .. ) . ( . . ) ^ 0E ^ !b show ; ^ 0F ^ [ reclaim ] }block
 
 ( 002ED400 )               D# 949 shadow{ 
- }block
+ ( the ethernet rx pin node acts as a continuous manchester decoder,
+ recovering and passing ) { , }
+ ( each data bit to an adjacent buffering node ) { , }
+ ( to eliminate jitter in its timing sequence. ) { , }
+ ( this code automatically acquires bit sync ) { , }
+ ( during frame preambles. when a link pulse is ) { , }
+ ( positive only it decodes as a single '1' in ) { , }
+ ( which case another node must drive the pin low momentarily to reset
+ the schmitts; this may ) { , }
+ ( produce a spurious '0'. ) { , , }
+: edge ( samples pin and waits for opposite state. )
+: run ( waits for the edge at the center of a bit cell, writes the
+ value of io with the data bit in position { 22F } to the buffering
+ node, then ) { , }
+ ( delays long enough that the next ) edge ( call ) { , }
+ ( will be well centered in the first half of the next bit cell, maximizing
+ margins for sampling and waiting. it is paramount that the delay never
+ be too long since that means loss of bit ) { , }
+ ( sync. duty cycle is always lt { C8F } pct. ) }block
 
 ( 002ED800 )               D# 950 code{ 
- }block
+ ( rx timing ) [ d# 217 node d# 0 org ]
+: edge ( fall rise ) ^ 00 ^ push @b -if { , ... .. }
+      pop !b @ . drop drop drop ; { , }
+ then drop !b @ . pop drop drop ; { , }
+: init ^ 05 ^ left right h# 5555 h# 5D55 left right h# 5555 h# 5D55
+ dup dup drop drop io b! left a!
+: run ^ 14 ^ edge { , }
+ h# 5556 @b . -if h# 1 or then !b { , }
+ drop drop run ; ^ 1C ^ { , }
+ [ h# 2F org ]
+: tedge ^ 2F ^ io b! { , }
+ h# 25555 h# 35555 d# 0 { -11 } over .. ^ 35 ^ { , }
+ . !b -if { , ... .. }
+      drop !b !b ; { , }
+ then drop !b !b ;
+: temp ^ 38 ^ h# 25555 h# 35555 d# 999 io b! push !b begin unext !b
+ ; ^ 3F ^ [ reclaim ] }block
 
 ( 002EDC00 )               D# 951 shadow{ 
- }block
+ ( code used to measure the critical time ) { , }
+ ( interval in ) edge ( between sampling of signal ) { , }
+ ( level and starting to wait for the next edge. ) { , , }
+ ( this is important because we must always wait for some amount of
+ time, otherwise we will ) { , }
+ ( never wait and will creep, thus losing bit ) { , }
+ ( sync before long. with { 5DC0F } bit packets that can't be permitted. )
+ { , , }
+ ( thus the positioning of this time interval ) { , }
+ ( wants to be in the center of the half bit-time under nominal conditions
+ so that we avoid ) { , }
+ ( sampling too soon or waiting too late. ) }block
 
 ( 002EE000 )               D# 952 code{ 
- }block
+ ( test rx in { 258F } ) [ d# 400 node d# 0 org ] { , }
+: wire down b! up a! { , }
+: pass @ !b pass ; ^ 05 ^ { , , }
+ [ d# 500 node d# 0 org ]
+: run io b! down a!
+: show h# 25555 h# 35555 @ -if ^ 08 ^ { , }
+ drop !b .. { , ... }
+      . .. . .. ( . .. ) !b show ; ^ 0C ^ { , }
+ then drop !b .. { , ... }
+      ( . ) . . !b show ; ^ 0F ^ }block
 
 ( 002EE400 )               D# 953 shadow{ 
  }block
 
 ( 002EE800 )               D# 954 code{ 
- }block
+ ( rx timing { 4F } ) [ d# 217 node d# 0 org ]
+: edge ( hi lo ) ^ 00 ^ ( push ) dup ( @b ) !b -if { , ... .. }
+      . !b ( @ ) ! . ( drop drop drop ) . . . ; { , }
+ then . !b ( @ ) ! . ( pop drop drop ) . . . ; { , }
+: run ^ 05 ^ edge { , }
+ a! @b ! d# 4 ^ 08 ^ push a! ^ 09 ^ begin unext { , }
+ run ; { , , }
+: init ^ 0A ^ ( left ) io ( right ) up h# 35555 h# 25555 { , }
+ ( left ) io ( right ) up h# 35555 h# 25555 { , }
+ dup dup drop drop io b! io a! run ; ^ 19 ^ { , , }
+: temp ^ 19 ^ h# 25555 h# 35555 d# 999 io b! push !b begin unext !b
+ ; ^ 20 ^ [ reclaim ] }block
 
 ( 002EEC00 )               D# 955 shadow{ 
- }block
+ ( this code reproduces the internal timing of ) { , }
+ ( the manchester decode but depicts it by ) { , }
+ ( driving an output pin high when edge would be detected and driving
+ it low when state would ) { , }
+ ( be sampled. ) { , , }
+ ( node { 258F } on evb s/n 0001 runs near nominal ) { , }
+ ( speed and on it loop count of { 8F } had sample at { 84F } ns and
+ wait at 80. margins are 0.90,1.18 or 0.90,1.10 excluding worst outliers
+ from corner wafers. thus sample could be as early as 59.4 and wait
+ as late as 94.4 corner, 88.0 slow typ wafer. deem this as good enough
+ with { EF } ns ) { , }
+ ( jitter possible in channel. ) { , , }
+ ( should be solid at 1.8v and room temp across ) { , }
+ ( process variation. very large temp excursions may cause data errors
+ in atypical chips. ) }block
 
 ( 002EF000 )               D# 956 code{ 
- }block
+ { 342F } ( orig tx osc ) [ d# 417 node d# 0 org ]
+: drive ^ 00 ^ ( 4n ) drop !b !b for unext ;
+: sig ^ 03 ^ a up a! @p ^ 05 ^ ; .. ^ 06 ^ ! a! ;
+: pump ^ 07 ^ ( 4n ) !b ( drop ) @ drop !b !b drop ( ; ) sig ;
+: ring ^ 0A ^ ( 4n ) !b ( drop ) @ drop drop drop ( !b ) drop ( ; )
+ sig ; { , }
+: go ^ 0D ^ d# 9 for drive drive next ^ 12 ^ ; { , ... }
+      begin pump pump ring ring end { , , }
+: init ^ 18 ^ up a! @
+: xx ^ 1A ^ drop { . }
+      io b! left a! { , }
+ d# 5 d# 0 h# 20000 h# 800 { . }
+      d# 6 h# 800 h# 30000 h# 0 { , }
+ dup dup drop drop go ; { , }
+ ^ 2A ^ [ reclaim ] }block
 
 ( 002EF400 )               D# 957 shadow{ 
- }block
+ { 14F } ( mhz ceramic resonator drive. ) { , , }
+ ( each { 64F } ns edge sends a return instruction ) { , }
+ ( thru up port to tx pin node { 27AF } which waits ) { , }
+ ( for the edge by simply calling the port. ) { , , }
+ ( node { 27AF } must wait faithfully for every edge ) { , }
+ ( to keep this oscillator running reliably. ) { , , }
+ ( note that after starting the resonator decays in about { 14F } us
+ so it is important that node ) { , { 27AF } }
+ ( be ready to do this. therefore we let node { 27AF } start us when
+ it is ready to go by writing to port. ) }block
 
 ( 002EF800 )               D# 958 code{ 
  }block
@@ -12950,7 +14163,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  blocks such as 200. ) }block
 
 ( 002F0800 )               D# 962 code{ 
- }block
+ ( timing test for softsim so ) [ d# 50 load ]
+: test ( n ) tmclr counter steps timer [ secs ] @ ; }block
 
 ( 002F0C00 )               D# 963 shadow{ 
  }block
@@ -14289,19 +15503,17 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 00329800 )               D# 1190 code{ 
- ( burn 16-bit eforth.bin file into flash ) { cr }
- [ empty compile streamer load ] { cr }
- [ d# 1190 loaded ! nores ] { cr }
- ( read eforth.bin ) [ d# 1144 load ] { cr }
- [ fbuf source ! n-1 len ! ] { , }
- ( display image length ) [ len @ d# 8 d# 18 */ leng ! ] { br }
-
- [ h# 8000 stream nip ers ] { cr }
- [ stream h# 8000 swap burn d# 1194 load ] { br }
-
- [ exit ] ( source cf-byte-addr ) [ fbuf ] { cr }
- ( dest flash-byte-addr ) [ h# 8000 ] { cr }
- ( count 16-bit-words ) [ n-1 burn ] }block
+ ( burn 18-bit eforth bootstream into flash ) { , }
+ ( 1st pass ) [ empty compile streamer load ] { , }
+ ( framer ) [ framer load ] ( the stream ) [ d# 1180 load ] { , , }
+ ( 2nd pass ) [ empty compile streamer load ] { , }
+ ( framer ) [ framer load ] ( the stream ) [ d# 1180 load ] { , , }
+ [ .stream ] ( display stream length ) [ strlen leng ! ] { , }
+ ( write stream into flash ) { , ... }
+      ( source cf-word-addr ) [ stream ] { , ... }
+      ( dest flash-byte-addr ) [ d# 0 ] { , ... }
+      ( count 18-bit-words ) [ swap ] ( flasher ) [ 18burn ] { , , }
+ ( burn nucleus ) [ d# 1194 load ] }block
 
 ( 00329C00 )               D# 1191 shadow{ 
  }block
@@ -14313,19 +15525,13 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 0032A800 )               D# 1194 code{ 
- ( burn 18-bit eforth bootstream into flash ) { cr }
- ( 1st pass ) [ empty compile streamer load ] { cr }
- ( framer ) [ framer load ] ( the stream ) [ d# 1180 load ] { br }
-
- ( 2nd pass ) [ empty compile streamer load ] { cr }
- ( framer ) [ framer load ] ( the stream ) [ d# 1180 load ] { br }
-
- [ d# 1194 loaded ! ] { , }
- ( display stream length ) [ strlen leng ! ] { , }
- ( write stream into flash ) { indent }
-      ( source cf-word-addr ) [ stream ] { indent }
-      ( dest flash-byte-addr ) [ d# 0 ] { indent }
-      ( count 18-bit-words ) [ swap ] ( flasher ) [ 18burn ] }block
+ ( burn 16-bit eforth.bin file into flash ) { , }
+ [ empty compile streamer load ] { , { 94CF } }
+ ( loaded ! ) [ .nucleus nores ] { , }
+ ( read eforth.bin ) [ d# 1144 load ] { , }
+ [ fbuf source ! n-1 len ! ] { , }
+ ( display image length ) [ len @ d# 8 d# 18 */ leng ! ] { , , }
+ [ stream h# 8000 swap burn ] }block
 
 ( 0032AC00 )               D# 1195 shadow{ 
  }block
@@ -14760,7 +15966,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : rrq h# 80000 ; { * }
 : wrq h# 40000 ; { * }
 : brq h# C0000 ; { , , }
- :# 'trk 271562920 { * }
+ :# 'trk 271562988 { * }
 : -track [ 'trk ] assign nop ;
 : track [ 'trk ] assign ip @ 2/ 2/ h# B8 and mem ! ; { , }
  [ macro ] { * }
@@ -14881,8 +16087,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 : @mine ( accumulate r/w requests into ) rqs }block
 
 ( 0033B800 )               D# 1262 code{ 
- ( softsim tik/tok and power ) :# op 271568576 { , }
- :# 'boot 271568938 :# bail 0 [ d# 0 bail ! ] ( breakpoint )
+ ( softsim tik/tok and power ) :# op 271568644 { , }
+ :# 'boot 271569006 :# bail 0 [ d# 0 bail ! ] ( breakpoint )
 : update !pins 'bed xqt !ios ;
 : ipower !inode 'tok assign { , ... }
       [ d# 0 ] p17v [ p17v negate softbed + ] fill { , ... }
@@ -15132,7 +16338,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  }block
 
 ( 0033F000 )               D# 1276 code{ 
- ( softsim display ops ) :# ?op 271571604
+ ( softsim display ops ) :# ?op 271571672
 : tab/2 ( xy ) push [ d# 11 ] * [ d# 3 ] + pop [ d# 15 ] * [ d# 3 ]
  + { indent }
       over lm at ;
@@ -15359,7 +16565,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 ( 00342800 )               D# 1290 code{ 
  ( softsim display map and screen ) { cr }
- :# gap 1 :# wind? -1 :# time 13919
+ :# gap 2 :# wind? -1 :# time 0
 : xm ( -n ) nnx [ xs ] @ negate + ;
 : ym ( -n ) nny [ ys ] @ negate + ;
 : .vis ( hv ) 2/ [ yo ] @ - ym + [ d# 2 ] + + [ d# 30 ] * push { indent }
@@ -16696,8 +17902,8 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
  ( it at edit or compile time. ) }block
 
 ( 0035E000 )               D# 1400 code{ 
- ( f18 compiler ) :# h 17 :# ip 16 :# slot 4 :# call? 24576 :# cal 271554087
- :# com 92 [ macro ]
+ ( f18 compiler ) :# h 22 :# ip 21 :# slot 4 :# call? 24576 :# cal 271554153
+ :# com 108 [ macro ]
 : !7 h# BD0489 3, h# -4 , < drop > ;
 : 2*s ?lit h# E0C1 2, 1, ;
 : call ( nn ) < ?dup > h# B8 1, , h# E9 1, [ cal ] @ here d# 3 + -
@@ -17221,7 +18427,7 @@ C 0000000000000000 D 0000000000000000 E 0000000000000000 F 0000000000000000
 
 : warm ( is assumed by crawlers, and is also the destination of the
  call instruction that rom is initialized with. ) [ avoid clobbering
- this word since steven's test code will not work in its absence. tia ]
+ this word since steven's test code will not work in its absence. ]
  }block
 
 
