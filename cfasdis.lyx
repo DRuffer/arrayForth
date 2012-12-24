@@ -208,7 +208,6 @@ dsm
 \end_layout
 
 \begin_layout Scrap
-
 <<OkadWork>>=
 \begin_inset Newline newline
 \end_inset
@@ -229,7 +228,6 @@ The cfasdis source is an extension of Albert's ciasdis as can be seen here:
 \end_layout
 
 \begin_layout Scrap
-
 <<cfasdis.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -643,7 +641,6 @@ Disassembler support for OkadWork.cf the arrayForth for GA144-1.10.
 \end_layout
 
 \begin_layout Scrap
-
 <<cfdis.f>>=
 \begin_inset Newline newline
 \end_inset
@@ -799,7 +796,6 @@ The following are used to fetch data that is in known Endian format.
 \end_layout
 
 \begin_layout Scrap
-
 <<endians>>=
 \begin_inset Newline newline
 \end_inset
@@ -844,7 +840,6 @@ Icon decompiler
 \end_layout
 
 \begin_layout Scrap
-
 <<icons>>=
 \begin_inset Newline newline
 \end_inset
@@ -1098,7 +1093,6 @@ range
 \end_layout
 
 \begin_layout Scrap
-
 <<unpack-words>>=
 \begin_inset Newline newline
 \end_inset
@@ -1260,7 +1254,6 @@ Word adjustments
 \end_layout
 
 \begin_layout Scrap
-
 <<word-adjustments>>=
 \begin_inset Newline newline
 \end_inset
@@ -1317,15 +1310,15 @@ Files  FILE Words.dbf  FILE= Words.dbf
 \begin_inset Newline newline
 \end_inset
 
-    LONG ADDR     ( Address, used as the key)
+    LONG WORD-ADDR ( Address, used as the key)
 \begin_inset Newline newline
 \end_inset
 
- NUMERIC ADJUST   ( Difference from old)
+ NUMERIC ADJUST    ( Difference from old)
 \begin_inset Newline newline
 \end_inset
 
- 8 BYTES NAME     ( Name, word name)
+ 8 BYTES NAME-STR  ( Name, word name)
 \begin_inset Newline newline
 \end_inset
 
@@ -1337,7 +1330,7 @@ CONSTANT |Words|
 \begin_inset Newline newline
 \end_inset
 
-: .ADDR ( -- )   BASE @ HEX  ADDR L@ 8 H.R SPACE  BASE ! ;
+: .WORD-ADDR ( -- )   BASE @ HEX  WORD-ADDR L@ 8 H.R SPACE  BASE ! ;
 \begin_inset Newline newline
 \end_inset
 
@@ -1345,11 +1338,11 @@ CONSTANT |Words|
 \begin_inset Newline newline
 \end_inset
 
-: .Word ( n -- )   WORD-NAMES READ  .ADDR  ADJUST N?
+: .Word ( n -- )   WORD-NAMES READ  .WORD-ADDR  ADJUST N?
 \begin_inset Newline newline
 \end_inset
 
-    NAME OVER >R B@  FILE-PAD R> xTYPE  SPACE ;
+    NAME-STR OVER >R B@  FILE-PAD R> xTYPE  SPACE ;
 \begin_inset Newline newline
 \end_inset
 
@@ -1373,7 +1366,7 @@ CONSTANT |Words|
 \begin_inset Newline newline
 \end_inset
 
-        CR  I READ  .ADDR  ADJUST N?
+        CR  I READ  .WORD-ADDR  ADJUST N?
 \begin_inset Newline newline
 \end_inset
 
@@ -1389,7 +1382,7 @@ CONSTANT |Words|
 \begin_inset Newline newline
 \end_inset
 
-    ADDR 4 nC!  4 ADDR -BINARY ;
+    WORD-ADDR 4 nC!  4 WORD-ADDR -BINARY ;
 \begin_inset Newline newline
 \end_inset
 
@@ -1397,7 +1390,7 @@ CONSTANT |Words|
 \begin_inset Newline newline
 \end_inset
 
-        SAVE  WORD-NAMES SLOT DUP READ  ADDR 4 nC@ ADDR L!
+        SAVE  WORD-NAMES SLOT DUP READ  WORD-ADDR 4 nC@ WORD-ADDR L!
 \begin_inset Newline newline
 \end_inset
 
@@ -1405,7 +1398,7 @@ CONSTANT |Words|
 \begin_inset Newline newline
 \end_inset
 
-        FILE-PAD DUP #TB BLANK  SWAP MOVE  NAME B!  0 ADJUST N!
+        FILE-PAD DUP #TB BLANK  SWAP MOVE  NAME-STR B!  0 ADJUST N!
 \begin_inset Newline newline
 \end_inset
 
@@ -1518,7 +1511,7 @@ Assem
 \begin_inset Newline newline
 \end_inset
 
-        ADDR L@  NAME OVER >R B@  FILE-PAD R> -TRAILING  Assem
+        WORD-ADDR L@  NAME-STR OVER >R B@  FILE-PAD R> -TRAILING  Assem
 \begin_inset Newline newline
 \end_inset
 
@@ -1626,7 +1619,7 @@ Assem
 \begin_inset Newline newline
 \end_inset
 
-            ADDR L@  NAME OVER >R B@  FILE-PAD R> -TRAILING
+            WORD-ADDR L@  NAME-STR OVER >R B@  FILE-PAD R> -TRAILING
 \begin_inset Newline newline
 \end_inset
 
@@ -1654,7 +1647,6 @@ Transitions
 \end_layout
 
 \begin_layout Scrap
-
 <<transitions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1815,7 +1807,6 @@ Token output
 \end_layout
 
 \begin_layout Scrap
-
 <<token-output>>=
 \begin_inset Newline newline
 \end_inset
@@ -2149,7 +2140,6 @@ Dump blocks
 \end_layout
 
 \begin_layout Scrap
-
 <<dump-blocks>>=
 \begin_inset Newline newline
 \end_inset
@@ -2326,7 +2316,6 @@ Pulled out of OkadWork.cf blocks
 \end_layout
 
 \begin_layout Scrap
-
 <<Restore.f>>=
 \begin_inset Newline newline
 \end_inset
@@ -2797,7 +2786,6 @@ Assembler support for OkadWork.cf the arrayForth for GA144-1.10
 \end_layout
 
 \begin_layout Scrap
-
 <<cfas.f>>=
 \begin_inset Newline newline
 \end_inset
@@ -2908,7 +2896,6 @@ Creates a stack called word with n cells.
 \end_layout
 
 \begin_layout Scrap
-
 <<stacks>>=
 \begin_inset Newline newline
 \end_inset
@@ -3107,7 +3094,6 @@ Icon assembler support
 \end_layout
 
 \begin_layout Scrap
-
 <<icon-assem>>=
 \begin_inset Newline newline
 \end_inset
@@ -3342,7 +3328,6 @@ ASCII to colorForth support
 \end_layout
 
 \begin_layout Scrap
-
 <<af2cf-support>>=
 \begin_inset Newline newline
 \end_inset
@@ -3475,7 +3460,6 @@ Input words and numbers
 \end_layout
 
 \begin_layout Scrap
-
 <<get-words+numbers>>=
 \begin_inset Newline newline
 \end_inset
@@ -3650,7 +3634,6 @@ ColorForth character encoding
 \end_layout
 
 \begin_layout Scrap
-
 <<cfcharacters>>=
 \begin_inset Newline newline
 \end_inset
@@ -3803,7 +3786,6 @@ The capitalization support is no longer used.
 \end_layout
 
 \begin_layout Scrap
-
 <<cfwords>>=
 \begin_inset Newline newline
 \end_inset
@@ -3972,7 +3954,6 @@ Translate ASCII to colorForth
 \end_layout
 
 \begin_layout Scrap
-
 <<a2cf>>=
 \begin_inset Newline newline
 \end_inset
@@ -4207,7 +4188,6 @@ ColorForth blocks
 \end_layout
 
 \begin_layout Scrap
-
 <<cfblocks>>=
 \begin_inset Newline newline
 \end_inset
@@ -4429,7 +4409,6 @@ cygwin
 \end_layout
 
 \begin_layout Scrap
-
 <<ciasdis.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -4450,7 +4429,6 @@ Load the ciasdis support files:
 \end_layout
 
 \begin_layout Scrap
-
 <<load-ciasdis>>=
 \begin_inset Newline newline
 \end_inset
@@ -4549,7 +4527,11 @@ CR
 \begin_inset Newline newline
 \end_inset
 
-include File.fth  Files FALSE REVERSE !  BIG-ENDIAN  ONLY FORTH DEFINITIONS
+include File/pFDatabase/pFDatabase.fth
+\begin_inset Newline newline
+\end_inset
+
+Files FALSE REVERSE !  BIG-ENDIAN  ONLY FORTH DEFINITIONS
 \begin_inset Newline newline
 \end_inset
 
@@ -4599,7 +4581,6 @@ This second part defines the run time behavior of ciasdis:
 \end_layout
 
 \begin_layout Scrap
-
 <<run-ciasdis>>=
 \begin_inset Newline newline
 \end_inset
@@ -4849,7 +4830,6 @@ Write current section to FILEHANDLE.
 \end_layout
 
 \begin_layout Scrap
-
 <<WRITE-ONE-SECTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -4875,7 +4855,6 @@ Write all sections to FILEHANDLE.
 \end_layout
 
 \begin_layout Scrap
-
 <<WRITE-SECTIONS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4900,7 +4879,6 @@ Open NAME, return FILEHANDLE.
 \end_layout
 
 \begin_layout Scrap
-
 <<OPEN-IT>>=
 \begin_inset Newline newline
 \end_inset
@@ -4917,7 +4895,6 @@ Close FILEHANDLE.
 \end_layout
 
 \begin_layout Scrap
-
 <<CLOSE-IT>>=
 \begin_inset Newline newline
 \end_inset
@@ -4934,7 +4911,6 @@ Write all sections to file NAME.
 \end_layout
 
 \begin_layout Scrap
-
 <<WRITE-IT>>=
 \begin_inset Newline newline
 \end_inset
@@ -4951,7 +4927,6 @@ Handle all the filename extensions.
 \end_layout
 
 \begin_layout Scrap
-
 <<filenames>>=
 \begin_inset Newline newline
 \end_inset
@@ -5020,7 +4995,6 @@ Assembler parser.
 \end_layout
 
 \begin_layout Scrap
-
 <<PARSE-ASM>>=
 \begin_inset Newline newline
 \end_inset
@@ -5099,7 +5073,6 @@ ASM]
 \end_layout
 
 \begin_layout Scrap
-
 <<[ASM>>=
 \begin_inset Newline newline
 \end_inset
@@ -5142,7 +5115,6 @@ cias
 \end_layout
 
 \begin_layout Scrap
-
 <<cias>>=
 \begin_inset Newline newline
 \end_inset
@@ -5159,7 +5131,6 @@ Fetch file NAME to the code buffer.
 \end_layout
 
 \begin_layout Scrap
-
 <<FETCHED>>=
 \begin_inset Newline newline
 \end_inset
@@ -5180,7 +5151,6 @@ Fetch file "name" to the code buffer.
 \end_layout
 
 \begin_layout Scrap
-
 <<FETCH>>=
 \begin_inset Newline newline
 \end_inset
@@ -5204,7 +5174,6 @@ CODE-BUFFER
 \end_layout
 
 \begin_layout Scrap
-
 <<CONSULTED>>=
 \begin_inset Newline newline
 \end_inset
@@ -5231,7 +5200,6 @@ CONSULT
 \end_layout
 
 \begin_layout Scrap
-
 <<CONSULT>>=
 \begin_inset Newline newline
 \end_inset
@@ -5248,7 +5216,6 @@ Restore all revectoring done while compiling to stand alone.
 \end_layout
 
 \begin_layout Scrap
-
 <<RESTORE-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -5277,7 +5244,6 @@ Return the NAME of the source file.
 \end_layout
 
 \begin_layout Scrap
-
 <<cf-SOURCE-AS>>=
 \begin_inset Newline newline
 \end_inset
@@ -5294,7 +5260,6 @@ Return the NAME of the target file.
 \end_layout
 
 \begin_layout Scrap
-
 <<cf-TARGET-AS>>=
 \begin_inset Newline newline
 \end_inset
@@ -5311,7 +5276,6 @@ Return the NAME of the target file.
 \end_layout
 
 \begin_layout Scrap
-
 <<cf-TARGET-DIS>>=
 \begin_inset Newline newline
 \end_inset
@@ -5334,7 +5298,6 @@ cidis
 \end_layout
 
 \begin_layout Scrap
-
 <<cfdis>>=
 \begin_inset Newline newline
 \end_inset
@@ -5375,7 +5338,6 @@ Return the NAME of the source file.
 \end_layout
 
 \begin_layout Scrap
-
 <<ci-SOURCE-AS>>=
 \begin_inset Newline newline
 \end_inset
@@ -5392,7 +5354,6 @@ Return the NAME of the target file.
 \end_layout
 
 \begin_layout Scrap
-
 <<ci-TARGET-AS>>=
 \begin_inset Newline newline
 \end_inset
@@ -5409,7 +5370,6 @@ Return the NAME of the target file.
 \end_layout
 
 \begin_layout Scrap
-
 <<ci-TARGET-DIS>>=
 \begin_inset Newline newline
 \end_inset
@@ -5432,7 +5392,6 @@ cidis
 \end_layout
 
 \begin_layout Scrap
-
 <<cidis>>=
 \begin_inset Newline newline
 \end_inset
@@ -5464,7 +5423,6 @@ QUIT
 \end_layout
 
 \begin_layout Scrap
-
 <<INTERACTIVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -5486,7 +5444,6 @@ Handle arguments, start interactive system if no arguments.
 \end_layout
 
 \begin_layout Scrap
-
 <<HANDLE-ARG>>=
 \begin_inset Newline newline
 \end_inset
@@ -5513,7 +5470,6 @@ STRING:
 \end_layout
 
 \begin_layout Scrap
-
 <<CONTAINS-D?>>=
 \begin_inset Newline newline
 \end_inset
@@ -5549,7 +5505,6 @@ ciasdis
 \end_layout
 
 \begin_layout Scrap
-
 <<BLOCK-FILE>>=
 \begin_inset Newline newline
 \end_inset
@@ -5566,7 +5521,6 @@ Make a cold start silent.
 \end_layout
 
 \begin_layout Scrap
-
 <<SIGNON>>=
 \begin_inset Newline newline
 \end_inset
@@ -5583,7 +5537,6 @@ The name determines what to do.
 \end_layout
 
 \begin_layout Scrap
-
 <<MAIN>>=
 \begin_inset Newline newline
 \end_inset
@@ -5612,7 +5565,6 @@ This name might later be changed.
 \end_layout
 
 \begin_layout Scrap
-
 <<noname>>=
 \begin_inset Newline newline
 \end_inset
@@ -5629,7 +5581,6 @@ ANS Forth specific
 \end_layout
 
 \begin_layout Scrap
-
 <<GET-FILE>>=
 \begin_inset Newline newline
 \end_inset
@@ -5670,7 +5621,6 @@ ANS Forth specific
 \end_layout
 
 \begin_layout Scrap
-
 <<PUT-FILE>>=
 \begin_inset Newline newline
 \end_inset
@@ -5710,7 +5660,6 @@ PRESENT
 \end_layout
 
 \begin_layout Scrap
-
 <<NEW-PRESENT>>=
 \begin_inset Newline newline
 \end_inset
@@ -5751,7 +5700,6 @@ L@
 \end_layout
 
 \begin_layout Scrap
-
 <<FAR-at>>=
 \begin_inset Newline newline
 \end_inset
@@ -5828,7 +5776,6 @@ http://www.jwdt.com/~paysan/bigforth.html
 \end_layout
 
 \begin_layout Scrap
-
 <<ForBigForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -5866,7 +5813,6 @@ http://home.hccnet.nl/a.w.m.van.der.horst/ciforth.html
 \end_layout
 
 \begin_layout Scrap
-
 <<ForCiForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -5904,7 +5850,6 @@ http://ficl.sourceforge.net
 \end_layout
 
 \begin_layout Scrap
-
 <<ForFicl>>=
 \begin_inset Newline newline
 \end_inset
@@ -5949,7 +5894,6 @@ http://www.jwdt.com/~paysan/gforth.html
 \end_layout
 
 \begin_layout Scrap
-
 <<ForGForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -5987,7 +5931,6 @@ http://home.iae.nl/users/mhx/i4faq.html
 \end_layout
 
 \begin_layout Scrap
-
 <<ForIForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -6025,7 +5968,6 @@ http://ccreweb.org/software/kforth/kforth.html
 \end_layout
 
 \begin_layout Scrap
-
 <<ForKForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -6063,7 +6005,6 @@ http://pfe.sourceforge.net
 \end_layout
 
 \begin_layout Scrap
-
 <<ForPfe>>=
 \begin_inset Newline newline
 \end_inset
@@ -6101,7 +6042,6 @@ http://www.softsynth.com/pforth
 \end_layout
 
 \begin_layout Scrap
-
 <<ForPForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -6139,7 +6079,6 @@ http://spf.sourceforge.net
 \end_layout
 
 \begin_layout Scrap
-
 <<ForSpf4>>=
 \begin_inset Newline newline
 \end_inset
@@ -6187,7 +6126,6 @@ http://www.mpeforth.com
 \end_layout
 
 \begin_layout Scrap
-
 <<ForVfx>>=
 \begin_inset Newline newline
 \end_inset
@@ -6225,7 +6163,6 @@ http://win32forth.sourceforge.net
 \end_layout
 
 \begin_layout Scrap
-
 <<ForWin32Forth>>=
 \begin_inset Newline newline
 \end_inset
@@ -6263,7 +6200,6 @@ http://forth.com/swiftforth
 \end_layout
 
 \begin_layout Scrap
-
 <<ForSwiftForth>>=
 \begin_inset Newline newline
 \end_inset
@@ -6459,7 +6395,6 @@ flag
 \end_layout
 
 \begin_layout Scrap
-
 <<uses>>=
 \begin_inset Newline newline
 \end_inset
@@ -6496,7 +6431,6 @@ BL WORD FIND
 \end_layout
 
 \begin_layout Scrap
-
 <<??>>=
 \begin_inset Newline newline
 \end_inset
@@ -6519,7 +6453,6 @@ COMPARE
 \end_layout
 
 \begin_layout Scrap
-
 <<STR=>>=
 \begin_inset Newline newline
 \end_inset
@@ -6550,7 +6483,6 @@ ENVIRONMENT?
 \end_layout
 
 \begin_layout Scrap
-
 <<ENVIRONMENT?>>=
 \begin_inset Newline newline
 \end_inset
@@ -6574,7 +6506,6 @@ ENVIRONMENT?
 \end_layout
 
 \begin_layout Scrap
-
 <<env-words>>=
 \begin_inset Newline newline
 \end_inset
@@ -6708,7 +6639,6 @@ INCLUDED
 \end_layout
 
 \begin_layout Scrap
-
 <<compat.f>>=
 \begin_inset Newline newline
 \end_inset
@@ -6797,7 +6727,6 @@ Those auxiliary thingies that are not appropriate elsewhere.
 \end_layout
 
 \begin_layout Scrap
-
 <<tools.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -6995,7 +6924,6 @@ Note that
 \end_layout
 
 \begin_layout Scrap
-
 <<warnings>>=
 \begin_inset Newline newline
 \end_inset
@@ -7064,7 +6992,6 @@ To enable output to be turned off, or sent to a file.
 \end_layout
 
 \begin_layout Scrap
-
 <<display>>=
 \begin_inset Newline newline
 \end_inset
@@ -7208,7 +7135,6 @@ Make the output disappear till the end of the calling word.
 \end_layout
 
 \begin_layout Scrap
-
 <<SHUTUP>>=
 \begin_inset Newline newline
 \end_inset
@@ -7235,7 +7161,6 @@ ANS Forth specific
 \end_layout
 
 \begin_layout Scrap
-
 <<num-out>>=
 \begin_inset Newline newline
 \end_inset
@@ -7278,7 +7203,6 @@ ANS Forth specific
 \end_layout
 
 \begin_layout Scrap
-
 <<string-primitives>>=
 \begin_inset Newline newline
 \end_inset
@@ -7355,7 +7279,6 @@ Print SINGLE in hex.
 \end_layout
 
 \begin_layout Scrap
-
 <<H.>>=
 \begin_inset Newline newline
 \end_inset
@@ -7433,7 +7356,6 @@ In lina, Albert adds a , after 4 digits.
 \end_layout
 
 \begin_layout Scrap
-
 <<4?>>=
 \begin_inset Newline newline
 \end_inset
@@ -7450,7 +7372,6 @@ Bags of stacks
 \end_layout
 
 \begin_layout Scrap
-
 <<BAGS>>=
 \begin_inset Newline newline
 \end_inset
@@ -7528,7 +7449,6 @@ Build a bag (i.e.
 \end_layout
 
 \begin_layout Scrap
-
 <<BUILD-BAG>>=
 \begin_inset Newline newline
 \end_inset
@@ -7545,7 +7465,6 @@ Create a bag "x" with X items.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG>>=
 \begin_inset Newline newline
 \end_inset
@@ -7562,7 +7481,6 @@ Make the BAG empty.
 \end_layout
 
 \begin_layout Scrap
-
 <<!BAG>>=
 \begin_inset Newline newline
 \end_inset
@@ -7579,7 +7497,6 @@ For the BAG : it IS non-empty.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG?>>=
 \begin_inset Newline newline
 \end_inset
@@ -7596,7 +7513,6 @@ Push ITEM to the BAG
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG+!>>=
 \begin_inset Newline newline
 \end_inset
@@ -7613,7 +7529,6 @@ From BAG: pop ITEM
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG@->>=
 \begin_inset Newline newline
 \end_inset
@@ -7630,7 +7545,6 @@ Remove entry at ADDRESS from BAG.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG-REMOVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -7651,7 +7565,6 @@ Make hole at ADDRESS in BAG.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG-HOLE>>=
 \begin_inset Newline newline
 \end_inset
@@ -7672,7 +7585,6 @@ Insert VALUE at ADDRESS in BAG.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG-INSERT>>=
 \begin_inset Newline newline
 \end_inset
@@ -7689,7 +7601,6 @@ For BAG : NUMBER of items.
 \end_layout
 
 \begin_layout Scrap
-
 <<|BAG|>>=
 \begin_inset Newline newline
 \end_inset
@@ -7712,7 +7623,6 @@ Loop over a bag, see '
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG-LOOP>>=
 \begin_inset Newline newline
 \end_inset
@@ -7733,7 +7643,6 @@ Print BAG.
 \end_layout
 
 \begin_layout Scrap
-
 <<.BAG>>=
 \begin_inset Newline newline
 \end_inset
@@ -7750,7 +7659,6 @@ For VALUE and BAG : ADDRESS of value in bag/nill.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG-WHERE>>=
 \begin_inset Newline newline
 \end_inset
@@ -7775,7 +7683,6 @@ For VALUE and BAG : value IS present in bag.
 \end_layout
 
 \begin_layout Scrap
-
 <<IN-BAG?>>=
 \begin_inset Newline newline
 \end_inset
@@ -7792,7 +7699,6 @@ Remove VALUE from BAG.
 \end_layout
 
 \begin_layout Scrap
-
 <<BAG->>=
 \begin_inset Newline newline
 \end_inset
@@ -7810,7 +7716,6 @@ Add/remove VALUE to bag, used as a SET, i.e.
 \end_layout
 
 \begin_layout Scrap
-
 <<SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -7853,7 +7758,6 @@ BIN-SEARCH
 \end_layout
 
 \begin_layout Scrap
-
 <<BIN-SEARCH>>=
 \begin_inset Newline newline
 \end_inset
@@ -7921,7 +7825,6 @@ Make QSORT safe by allowing an empty range.
 \end_layout
 
 \begin_layout Scrap
-
 <<QSORT-SAFE>>=
 \begin_inset Newline newline
 \end_inset
@@ -7977,7 +7880,6 @@ Sort the range FIRST to LAST (inclusive) of item compared by the xt COMPARING
 \end_layout
 
 \begin_layout Scrap
-
 <<QSORT>>=
 \begin_inset Newline newline
 \end_inset
@@ -8037,7 +7939,6 @@ Partition inclusive range LO HI leaving LO_1 HI_1 LO_2 HI_2.
 \end_layout
 
 \begin_layout Scrap
-
 <<PARTITION>>=
 \begin_inset Newline newline
 \end_inset
@@ -8121,7 +8022,6 @@ Sort the range LOW to HIGH inclusive observing 'LOW' and 'HIGH' must be
 \end_layout
 
 \begin_layout Scrap
-
 <<(QSORT)>>=
 \begin_inset Newline newline
 \end_inset
@@ -8154,7 +8054,6 @@ Make ADDRESS return some label NAME, static memory so use immediately.
 \end_layout
 
 \begin_layout Scrap
-
 <<INVENT-NAME>>=
 \begin_inset Newline newline
 \end_inset
@@ -8171,7 +8070,6 @@ For ADDRESS and NAME: "that name WAS invented".
 \end_layout
 
 \begin_layout Scrap
-
 <<INVENTED-NAME?>>=
 \begin_inset Newline newline
 \end_inset
@@ -8188,7 +8086,6 @@ For ADDRESS and NAME: "that name WAS invented".
 \end_layout
 
 \begin_layout Scrap
-
 <<INVENTED-NAMES>>=
 \begin_inset Newline newline
 \end_inset
@@ -8261,7 +8158,6 @@ Debug comments.
 \end_layout
 
 \begin_layout Scrap
-
 <<debug>>=
 \begin_inset Newline newline
 \end_inset
@@ -8290,7 +8186,6 @@ Missing conditionals.
 \end_layout
 
 \begin_layout Scrap
-
 <<=<>=>>=
 \begin_inset Newline newline
 \end_inset
@@ -8312,7 +8207,6 @@ If FLAG is not zero, output STRING on the error channel and exit with an
 \end_layout
 
 \begin_layout Scrap
-
 <<?ABORT>>=
 \begin_inset Newline newline
 \end_inset
@@ -8333,7 +8227,6 @@ Exchange the content at ADDR1 and ADDR2 over a fixed LENGTH.
 \end_layout
 
 \begin_layout Scrap
-
 <<EXCHANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -8358,7 +8251,6 @@ Print name of following definition.
 \end_layout
 
 \begin_layout Scrap
-
 <<.NFA>>=
 \begin_inset Newline newline
 \end_inset
@@ -9119,7 +9011,6 @@ TALLY-BA
 \end_layout
 
 \begin_layout Scrap
-
 <<asgen.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -9229,7 +9120,6 @@ Wrapper for asgen, when we want to test without label mechanisms.
 \end_layout
 
 \begin_layout Scrap
-
 <<prelude>>=
 \begin_inset Newline newline
 \end_inset
@@ -9370,7 +9260,6 @@ Maybe not present utilities
 \end_layout
 
 \begin_layout Scrap
-
 <<assembler-utilities>>=
 \begin_inset Newline newline
 \end_inset
@@ -9420,7 +9309,6 @@ Store DATA to ADDRES.
 \end_layout
 
 \begin_layout Scrap
-
 <<!+>>=
 \begin_inset Newline newline
 \end_inset
@@ -9438,7 +9326,6 @@ Fetch from decremented ADDRES.
 \end_layout
 
 \begin_layout Scrap
-
 <<@->>=
 \begin_inset Newline newline
 \end_inset
@@ -9451,7 +9338,6 @@ Fetch from decremented ADDRES.
 \end_layout
 
 \begin_layout Scrap
-
 <<CTRL>>=
 \begin_inset Newline newline
 \end_inset
@@ -9486,7 +9372,6 @@ x TABLE1 + @
 \end_layout
 
 \begin_layout Scrap
-
 <<TABLE1>>=
 \begin_inset Newline newline
 \end_inset
@@ -9511,7 +9396,6 @@ Rotate X by I bytes left leaving X' Left i.e.
 \end_layout
 
 \begin_layout Scrap
-
 <<ROTLEFT>>=
 \begin_inset Newline newline
 \end_inset
@@ -9536,7 +9420,6 @@ Common fields in the defining words for posits fixups and commaers.
 \end_layout
 
 \begin_layout Scrap
-
 <<dependant-utilities>>=
 \begin_inset Newline newline
 \end_inset
@@ -9740,7 +9623,6 @@ Print a definition's name from its DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<ID.>>=
 \begin_inset Newline newline
 \end_inset
@@ -9770,7 +9652,6 @@ DOES>
 \end_layout
 
 \begin_layout Scrap
-
 <<DOES>>=
 \begin_inset Newline newline
 \end_inset
@@ -9788,7 +9669,6 @@ Leave for DEA : it is to be ignored in disassemblies.
 \end_layout
 
 \begin_layout Scrap
-
 <<IGNORE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -9812,7 +9692,6 @@ Given a DEA, return the next DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<VOCEND?>>=
 \begin_inset Newline newline
 \end_inset
@@ -9842,7 +9721,6 @@ As
 \end_layout
 
 \begin_layout Scrap
-
 <<NEXT>>=
 \begin_inset Newline newline
 \end_inset
@@ -9867,7 +9745,6 @@ Leave the first DEA of the assembler vocabulary.
 \end_layout
 
 \begin_layout Scrap
-
 <<STARTVOC>>=
 \begin_inset Newline newline
 \end_inset
@@ -9909,7 +9786,6 @@ DOES>
 \end_layout
 
 \begin_layout Scrap
-
 <<IS-A>>=
 \begin_inset Newline newline
 \end_inset
@@ -9958,7 +9834,6 @@ DOES>
 \end_layout
 
 \begin_layout Scrap
-
 <<MEMBER>>=
 \begin_inset Newline newline
 \end_inset
@@ -9983,7 +9858,6 @@ Also needed : ?ERROR that defeats all checks.
 \end_layout
 
 \begin_layout Scrap
-
 <<?ERROR->>=
 \begin_inset Newline newline
 \end_inset
@@ -10004,7 +9878,6 @@ Behaves as 'CREATE' except, if the word to be created has name "--" it is
 \end_layout
 
 \begin_layout Scrap
-
 <<CREATE-->>=
 \begin_inset Newline newline
 \end_inset
@@ -10049,7 +9922,6 @@ Make an alias for "
 \end_layout
 
 \begin_layout Scrap
-
 <<'alias>>=
 \begin_inset Newline newline
 \end_inset
@@ -10082,7 +9954,6 @@ Note that the assembler works with multi-character bigendian numbers.
 \end_layout
 
 \begin_layout Scrap
-
 <<independant-utilities>>=
 \begin_inset Newline newline
 \end_inset
@@ -10123,7 +9994,6 @@ The FIRST bitset is contained in the SECOND one, leaving it IS.
 \end_layout
 
 \begin_layout Scrap
-
 <<CONTAINED-IN>>=
 \begin_inset Newline newline
 \end_inset
@@ -10140,7 +10010,6 @@ Compile the ls 8 bits of X at here, leaving the REMAINING bits.
 \end_layout
 
 \begin_layout Scrap
-
 <<lsbyte,>>=
 \begin_inset Newline newline
 \end_inset
@@ -10159,7 +10028,6 @@ For X and ADDRESS , add the byte below address to x at l.s.
 \end_layout
 
 \begin_layout Scrap
-
 <<lsbyte-at>>=
 \begin_inset Newline newline
 \end_inset
@@ -10177,7 +10045,6 @@ For X ADDRESS LENGTH , return the NUMBER that at address (bigendian).
 \end_layout
 
 \begin_layout Scrap
-
 <<lsbytes>>=
 \begin_inset Newline newline
 \end_inset
@@ -10195,7 +10062,6 @@ For ADDRESS LENGTH , return the NUMBER that is there (bigendian).
 \end_layout
 
 \begin_layout Scrap
-
 <<MCat>>=
 \begin_inset Newline newline
 \end_inset
@@ -10212,7 +10078,6 @@ For ADDRESS LENGTH , return the "number there IS negative".
 \end_layout
 
 \begin_layout Scrap
-
 <<MC<0>>=
 \begin_inset Newline newline
 \end_inset
@@ -10231,7 +10096,6 @@ For ADDRESS LENGTH , return the NUMBER that is there.
 \end_layout
 
 \begin_layout Scrap
-
 <<MC@-S>>=
 \begin_inset Newline newline
 \end_inset
@@ -10252,7 +10116,6 @@ The bookkeeping is needed for error detection and disassembly.
 \end_layout
 
 \begin_layout Scrap
-
 <<assembler-bookkeeping>>=
 \begin_inset Newline newline
 \end_inset
@@ -10369,7 +10232,6 @@ Bits that need to be fixed up.
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY-BI>>=
 \begin_inset Newline newline
 \end_inset
@@ -10386,7 +10248,6 @@ Bits represent a commaer that is to be supplied.
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY-BY>>=
 \begin_inset Newline newline
 \end_inset
@@ -10403,7 +10264,6 @@ State bits, bad if two consequitive bits are up.
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY-BA>>=
 \begin_inset Newline newline
 \end_inset
@@ -10422,7 +10282,6 @@ Bits set in the default can be used to exclude certain classes of instructions,
 \end_layout
 
 \begin_layout Scrap
-
 <<BA-DEFAULT>>=
 \begin_inset Newline newline
 \end_inset
@@ -10439,7 +10298,6 @@ Previous comma, or zero.
 \end_layout
 
 \begin_layout Scrap
-
 <<OLDCOMMA>>=
 \begin_inset Newline newline
 \end_inset
@@ -10456,7 +10314,6 @@ Start of current instruction.
 \end_layout
 
 \begin_layout Scrap
-
 <<ISS>>=
 \begin_inset Newline newline
 \end_inset
@@ -10473,7 +10330,6 @@ Length of current instruction
 \end_layout
 
 \begin_layout Scrap
-
 <<ISL>>=
 \begin_inset Newline newline
 \end_inset
@@ -10490,7 +10346,6 @@ To be executed instead of reset BA between prefix and instruction.
 \end_layout
 
 \begin_layout Scrap
-
 <<BA-XT>>=
 \begin_inset Newline newline
 \end_inset
@@ -10513,7 +10368,6 @@ BA
 \end_layout
 
 \begin_layout Scrap
-
 <<RESET-BAD>>=
 \begin_inset Newline newline
 \end_inset
@@ -10540,7 +10394,6 @@ TALLY
 \end_layout
 
 \begin_layout Scrap
-
 <<!TALLY>>=
 \begin_inset Newline newline
 \end_inset
@@ -10562,7 +10415,6 @@ Return: instruction IS complete, or not started.
 \end_layout
 
 \begin_layout Scrap
-
 <<AT-REST?>>=
 \begin_inset Newline newline
 \end_inset
@@ -10579,7 +10431,6 @@ For N : it CONTAINS bad pairs.
 \end_layout
 
 \begin_layout Scrap
-
 <<BADPAIRS?>>=
 \begin_inset Newline newline
 \end_inset
@@ -10607,7 +10458,6 @@ TALLY-BA
 \end_layout
 
 \begin_layout Scrap
-
 <<CONSISTENT?>>=
 \begin_inset Newline newline
 \end_inset
@@ -10626,7 +10476,6 @@ Generate errors.
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK26>>=
 \begin_inset Newline newline
 \end_inset
@@ -10643,7 +10492,6 @@ Always an error.
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK32>>=
 \begin_inset Newline newline
 \end_inset
@@ -10663,7 +10511,6 @@ Generate error for fixup, if for the BI, some of the BITS would stick out
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK31>>=
 \begin_inset Newline newline
 \end_inset
@@ -10686,7 +10533,6 @@ Generate error for ``FIXUP-DATA'' , if the BI and the LEN are not compatible.
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK31A>>=
 \begin_inset Newline newline
 \end_inset
@@ -10708,7 +10554,6 @@ The part of BITS outside of BITFIELD must be either all ones or zeros.
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK32B>>=
 \begin_inset Newline newline
 \end_inset
@@ -10736,7 +10581,6 @@ Generate error for postit, if for the inverted BI , some of the the BITS
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK33>>=
 \begin_inset Newline newline
 \end_inset
@@ -10761,7 +10605,6 @@ BITS would stick out it.
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK28>>=
 \begin_inset Newline newline
 \end_inset
@@ -10780,7 +10623,6 @@ Generate error on data for commaer, if the BITS to reset are not present
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK29>>=
 \begin_inset Newline newline
 \end_inset
@@ -10798,7 +10640,6 @@ Generate error if COMMAMASK is not in ascending order.
 \end_layout
 
 \begin_layout Scrap
-
 <<CHECK30>>=
 \begin_inset Newline newline
 \end_inset
@@ -10820,7 +10661,6 @@ Or DATA into ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<OR!>>=
 \begin_inset Newline newline
 \end_inset
@@ -10844,7 +10684,6 @@ Or DATA into ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<AND!>>=
 \begin_inset Newline newline
 \end_inset
@@ -10861,7 +10700,6 @@ Assembler defining words
 \end_layout
 
 \begin_layout Scrap
-
 <<assembler-defining-words>>=
 \begin_inset Newline newline
 \end_inset
@@ -10935,7 +10773,6 @@ Assemble INSTRUCTION for ``ISL'' bytes.
 \end_layout
 
 \begin_layout Scrap
-
 <<assemble,>>=
 \begin_inset Newline newline
 \end_inset
@@ -10952,7 +10789,6 @@ Initialise in behalf of postit.
 \end_layout
 
 \begin_layout Scrap
-
 <<!POSTIT>>=
 \begin_inset Newline newline
 \end_inset
@@ -10970,7 +10806,6 @@ Bookkeeping for a postit using a pointer to the BIBYBA information, can
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY:,>>=
 \begin_inset Newline newline
 \end_inset
@@ -10991,7 +10826,6 @@ Post the instruction using DATA.
 \end_layout
 
 \begin_layout Scrap
-
 <<POSTIT>>=
 \begin_inset Newline newline
 \end_inset
@@ -11012,7 +10846,6 @@ Build an instruction given by BA BY BI the OPCODE and COUNT.
 \end_layout
 
 \begin_layout Scrap
-
 <<BUILD-IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -11038,7 +10871,6 @@ Define an instruction by BA BY BI and the OPCODE.
 \end_layout
 
 \begin_layout Scrap
-
 <<PIS>>=
 \begin_inset Newline newline
 \end_inset
@@ -11067,7 +10899,6 @@ For DEA : it REPRESENTS some kind of opcode.
 \end_layout
 
 \begin_layout Scrap
-
 <<IS-PI>>=
 \begin_inset Newline newline
 \end_inset
@@ -11089,7 +10920,6 @@ Bookkeeping for a fixup using a pointer to the BIBYBA information, can fake
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY:|>>=
 \begin_inset Newline newline
 \end_inset
@@ -11110,7 +10940,6 @@ Fix up the instruction using a pointer to DATA.
 \end_layout
 
 \begin_layout Scrap
-
 <<FIXUP>>=
 \begin_inset Newline newline
 \end_inset
@@ -11128,7 +10957,6 @@ Define a fixup by BA BY BI and the FIXUP bits.
 \end_layout
 
 \begin_layout Scrap
-
 <<xFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -11151,7 +10979,6 @@ For a signed DATA item a LENGTH and a BITFIELD.
 \end_layout
 
 \begin_layout Scrap
-
 <<TRIM-SIGNED>>=
 \begin_inset Newline newline
 \end_inset
@@ -11168,7 +10995,6 @@ Fix up the instruction using DATA and a pointer to the bit POSITION.
 \end_layout
 
 \begin_layout Scrap
-
 <<FIXUP-DATA>>=
 \begin_inset Newline newline
 \end_inset
@@ -11189,7 +11015,6 @@ Fix up the instruction using DATA and a pointer to the bit POSITION.
 \end_layout
 
 \begin_layout Scrap
-
 <<FIXUP-SIGNED>>=
 \begin_inset Newline newline
 \end_inset
@@ -11216,7 +11041,6 @@ Define a data fixup by BA BY BI, and LEN the bit position.
 \end_layout
 
 \begin_layout Scrap
-
 <<DFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -11237,7 +11061,6 @@ Same, but for signed data.
 \end_layout
 
 \begin_layout Scrap
-
 <<DFIs>>=
 \begin_inset Newline newline
 \end_inset
@@ -11259,7 +11082,6 @@ Obsolescent
 \end_layout
 
 \begin_layout Scrap
-
 <<obsolescent>>=
 \begin_inset Newline newline
 \end_inset
@@ -11297,7 +11119,6 @@ Reverses bytes in a WORD.
 \end_layout
 
 \begin_layout Scrap
-
 <<REVERSE-BYTES>>=
 \begin_inset Newline newline
 \end_inset
@@ -11324,7 +11145,6 @@ Rotate the MASK etc from a fixup-from-reverse into a NEW mask fit for using
 \end_layout
 
 \begin_layout Scrap
-
 <<CORRECT-R>>=
 \begin_inset Newline newline
 \end_inset
@@ -11342,7 +11162,6 @@ Bookkeeping for a fixup-from-reverse using a pointer to the BIBYBA information,
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY:|R>>=
 \begin_inset Newline newline
 \end_inset
@@ -11363,7 +11182,6 @@ Fix up the instruction from reverse with DATA.
 \end_layout
 
 \begin_layout Scrap
-
 <<FIXUP<>>=
 \begin_inset Newline newline
 \end_inset
@@ -11382,7 +11200,6 @@ Define a fixup-from-reverse by BA BY BI and the FIXUP bits.
 \end_layout
 
 \begin_layout Scrap
-
 <<FIR>>=
 \begin_inset Newline newline
 \end_inset
@@ -11410,7 +11227,6 @@ Define a fixup-from-reverse by BA BY BI and LEN to shift.
 \end_layout
 
 \begin_layout Scrap
-
 <<DFIR>>=
 \begin_inset Newline newline
 \end_inset
@@ -11439,12 +11255,10 @@ Preferred
 \end_layout
 
 \begin_layout Scrap
-
 Not yet used???
 \end_layout
 
 \begin_layout Scrap
-
 <<preferred>>=
 \begin_inset Newline newline
 \end_inset
@@ -11482,7 +11296,6 @@ If bits were already down it is wrong, for next two words.
 \end_layout
 
 \begin_layout Scrap
-
 <<(AND!BYTE)>>=
 \begin_inset Newline newline
 \end_inset
@@ -11499,7 +11312,6 @@ Reset bits of DATA byte by byte into ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<AND!BYTE>>=
 \begin_inset Newline newline
 \end_inset
@@ -11518,7 +11330,6 @@ If bits were already up its wrong, for next two words.
 \end_layout
 
 \begin_layout Scrap
-
 <<(OR!BYTE)>>=
 \begin_inset Newline newline
 \end_inset
@@ -11535,7 +11346,6 @@ Or DATA byte by byte from behind into ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<OR!BYTE>>=
 \begin_inset Newline newline
 \end_inset
@@ -11554,7 +11364,6 @@ Bookkeeping for a fixup-from-reverse using a pointer to the BIBYBA information,
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY:|R'>>=
 \begin_inset Newline newline
 \end_inset
@@ -11575,7 +11384,6 @@ Fix up the instruction from reverse using a pointer to DATA.
 \end_layout
 
 \begin_layout Scrap
-
 <<FIXUP<'>>=
 \begin_inset Newline newline
 \end_inset
@@ -11592,7 +11400,6 @@ End preferred
 \end_layout
 
 \begin_layout Scrap
-
 <<end-preferred>>=
 \begin_inset Newline newline
 \end_inset
@@ -11618,7 +11425,6 @@ Bookkeeping for a commaer using a pointer to the BIBYBA information.
 \end_layout
 
 \begin_layout Scrap
-
 <<TALLY:,,>>=
 \begin_inset Newline newline
 \end_inset
@@ -11632,7 +11438,6 @@ Bookkeeping for a commaer using a pointer to the BIBYBA information.
 \end_layout
 
 \begin_layout Scrap
-
 <<COMMA>>=
 \begin_inset Newline newline
 \end_inset
@@ -11651,7 +11456,6 @@ on and the ADDRESS that is executing the commaer.
 \end_layout
 
 \begin_layout Scrap
-
 <<COMMAER>>=
 \begin_inset Newline newline
 \end_inset
@@ -11677,7 +11481,6 @@ Assembler super defining words
 \end_layout
 
 \begin_layout Scrap
-
 <<super-defining-words>>=
 \begin_inset Newline newline
 \end_inset
@@ -11710,7 +11513,6 @@ Prototype for TALLY-BI BY BA.
 \end_layout
 
 \begin_layout Scrap
-
 <<PRO-TALLY>>=
 \begin_inset Newline newline
 \end_inset
@@ -11727,7 +11529,6 @@ Fill in the tally prototype with BA BY BI.
 \end_layout
 
 \begin_layout Scrap
-
 <<T!>>=
 \begin_inset Newline newline
 \end_inset
@@ -11744,7 +11545,6 @@ Reversed BI information.
 \end_layout
 
 \begin_layout Scrap
-
 <<T!R>>=
 \begin_inset Newline newline
 \end_inset
@@ -11761,7 +11561,6 @@ Get the data from the tally prototype back BA BY BI.
 \end_layout
 
 \begin_layout Scrap
-
 <<Tat>>=
 \begin_inset Newline newline
 \end_inset
@@ -11787,7 +11586,6 @@ PRO-TALLY
 \end_layout
 
 \begin_layout Scrap
-
 <<FAMILIES>>=
 \begin_inset Newline newline
 \end_inset
@@ -11829,7 +11627,6 @@ Disassembler data structures
 \end_layout
 
 \begin_layout Scrap
-
 <<structures>>=
 \begin_inset Newline newline
 \end_inset
@@ -11888,7 +11685,6 @@ A row of dea's representing a disassembly.
 \end_layout
 
 \begin_layout Scrap
-
 <<DISS>>=
 \begin_inset Newline newline
 \end_inset
@@ -11911,7 +11707,6 @@ DISS-VECTOR
 \end_layout
 
 \begin_layout Scrap
-
 <<DISS-VECTOR>>=
 \begin_inset Newline newline
 \end_inset
@@ -11934,7 +11729,6 @@ DISS
 \end_layout
 
 \begin_layout Scrap
-
 <<DISS->>=
 \begin_inset Newline newline
 \end_inset
@@ -11956,7 +11750,6 @@ Tryers try to construct an instruction from current bookkeeping.
 \end_layout
 
 \begin_layout Scrap
-
 <<tryers>>=
 \begin_inset Newline newline
 \end_inset
@@ -12032,7 +11825,6 @@ These tryers are quite similar: if the DEA on the stack is of the right
 \end_layout
 
 \begin_layout Scrap
-
 <<TRY-PI>>=
 \begin_inset Newline newline
 \end_inset
@@ -12069,7 +11861,6 @@ These tryers are quite similar: if the DEA on the stack is of the right
 \end_layout
 
 \begin_layout Scrap
-
 <<TRY-xFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -12106,7 +11897,6 @@ These tryers are quite similar: if the DEA on the stack is of the right
 \end_layout
 
 \begin_layout Scrap
-
 <<TRY-DFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -12143,7 +11933,6 @@ These tryers are quite similar: if the DEA on the stack is of the right
 \end_layout
 
 \begin_layout Scrap
-
 <<TRY-FIR>>=
 \begin_inset Newline newline
 \end_inset
@@ -12180,7 +11969,6 @@ These tryers are quite similar: if the DEA on the stack is of the right
 \end_layout
 
 \begin_layout Scrap
-
 <<TRY-COMMA>>=
 \begin_inset Newline newline
 \end_inset
@@ -12227,7 +12015,6 @@ DISS
 \end_layout
 
 \begin_layout Scrap
-
 <<REBUILD>>=
 \begin_inset Newline newline
 \end_inset
@@ -12270,7 +12057,6 @@ Discard the last item of the disassembly -- it is either used up or incorrect
 \end_layout
 
 \begin_layout Scrap
-
 <<BACKTRACK>>=
 \begin_inset Newline newline
 \end_inset
@@ -12326,7 +12112,6 @@ AT-REST?
 \end_layout
 
 \begin_layout Scrap
-
 <<RESULT?>>=
 \begin_inset Newline newline
 \end_inset
@@ -12343,7 +12128,6 @@ If present, print a result and continue searching for a new last item.
 \end_layout
 
 \begin_layout Scrap
-
 <<.RESULT>>=
 \begin_inset Newline newline
 \end_inset
@@ -12387,7 +12171,6 @@ DISS
 \end_layout
 
 \begin_layout Scrap
-
 <<SHOW-STEP>>=
 \begin_inset Newline newline
 \end_inset
@@ -12429,7 +12212,6 @@ Show all the instructions present in the assembler vocabulary.
 \end_layout
 
 \begin_layout Scrap
-
 <<SHOW-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -12462,7 +12244,6 @@ Show all the opcodes present in the assembler vocabulary.
 \end_layout
 
 \begin_layout Scrap
-
 <<SHOW-OPCODES>>=
 \begin_inset Newline newline
 \end_inset
@@ -12496,7 +12277,6 @@ Show at least all instructions valid for the "OPCODE" given.
 \end_layout
 
 \begin_layout Scrap
-
 <<SHOW:>>=
 \begin_inset Newline newline
 \end_inset
@@ -12536,7 +12316,6 @@ Disassemblers try to reconstruct an instruction from current bookkeeping.
 \end_layout
 
 \begin_layout Scrap
-
 <<disassemblers>>=
 \begin_inset Newline newline
 \end_inset
@@ -12633,7 +12412,6 @@ Contains the position that is being disassembled.
 \end_layout
 
 \begin_layout Scrap
-
 <<AS-POINTER>>=
 \begin_inset Newline newline
 \end_inset
@@ -12650,7 +12428,6 @@ Get the valid part of the INSTRUCTION under examination.
 \end_layout
 
 \begin_layout Scrap
-
 <<INSTRUCTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -12668,7 +12445,6 @@ This is kept up to date during disassembly.
 \end_layout
 
 \begin_layout Scrap
-
 <<LATEST-INSTRUCTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -12689,7 +12465,6 @@ These disassemblers are quite similar: if the DEA on the stack is of the
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-PI>>=
 \begin_inset Newline newline
 \end_inset
@@ -12754,7 +12529,6 @@ These disassemblers are quite similar: if the DEA on the stack is of the
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-xFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -12807,7 +12581,6 @@ These disassemblers are quite similar: if the DEA on the stack is of the
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-DFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -12852,7 +12625,6 @@ These disassemblers are quite similar: if the DEA on the stack is of the
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-DFIR>>=
 \begin_inset Newline newline
 \end_inset
@@ -12897,7 +12669,6 @@ These disassemblers are quite similar: if the DEA on the stack is of the
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-FIR>>=
 \begin_inset Newline newline
 \end_inset
@@ -12950,7 +12721,6 @@ These disassemblers are quite similar: if the DEA on the stack is of the
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-COMMA>>=
 \begin_inset Newline newline
 \end_inset
@@ -12999,7 +12769,6 @@ Print a disassembly for the data-fixup DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<.DFI>>=
 \begin_inset Newline newline
 \end_inset
@@ -13025,7 +12794,6 @@ Print a disassembly for the data-fixup from reverse DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<.DFIR>>=
 \begin_inset Newline newline
 \end_inset
@@ -13055,7 +12823,6 @@ Print a standard disassembly for the commaer DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<.COMMA-STANDARD>>=
 \begin_inset Newline newline
 \end_inset
@@ -13085,7 +12852,6 @@ Print a signed disassembly for the commaer DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<.COMMA-SIGNED>>=
 \begin_inset Newline newline
 \end_inset
@@ -13121,7 +12887,6 @@ AS-POINTER
 \end_layout
 
 \begin_layout Scrap
-
 <<.COMMA>>=
 \begin_inset Newline newline
 \end_inset
@@ -13143,7 +12908,6 @@ Print the DEA but with suppression, i.e.
 \end_layout
 
 \begin_layout Scrap
-
 <<~ID.>>=
 \begin_inset Newline newline
 \end_inset
@@ -13168,7 +12932,6 @@ DISS
 \end_layout
 
 \begin_layout Scrap
-
 <<.DISS>>=
 \begin_inset Newline newline
 \end_inset
@@ -13252,7 +13015,6 @@ AS-POINTER
 \end_layout
 
 \begin_layout Scrap
-
 <<SHOW-MEMORY>>=
 \begin_inset Newline newline
 \end_inset
@@ -13301,7 +13063,6 @@ AS-POINTER
 \end_layout
 
 \begin_layout Scrap
-
 <<((DISASSEMBLE))>>=
 \begin_inset Newline newline
 \end_inset
@@ -13383,7 +13144,6 @@ Dissassemble one instruction from ADDRESS using the whole instruction set
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS>>=
 \begin_inset Newline newline
 \end_inset
@@ -13413,7 +13173,6 @@ AS-POINTER
 \end_layout
 
 \begin_layout Scrap
-
 <<FORCED-DISASSEMBLY>>=
 \begin_inset Newline newline
 \end_inset
@@ -13434,7 +13193,6 @@ Dissassemble one instruction from address ONE to address TWO.
 \end_layout
 
 \begin_layout Scrap
-
 <<DISASSEMBLE-RANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -13460,7 +13218,6 @@ Close an assembly definition: restore and check.
 \end_layout
 
 \begin_layout Scrap
-
 <<defining-words>>=
 \begin_inset Newline newline
 \end_inset
@@ -13536,7 +13293,6 @@ SMUDGE
 \end_layout
 
 \begin_layout Scrap
-
 <<CODE>>=
 \begin_inset Newline newline
 \end_inset
@@ -13569,7 +13325,6 @@ END-CODE
 \end_layout
 
 \begin_layout Scrap
-
 <<;CODE>>=
 \begin_inset Newline newline
 \end_inset
@@ -13595,7 +13350,6 @@ Abbreviations for interactive use.
 \end_layout
 
 \begin_layout Scrap
-
 <<conveniences>>=
 \begin_inset Newline newline
 \end_inset
@@ -13633,7 +13387,6 @@ This file hot patches some words in the prelude of asgen.frt.
 \end_layout
 
 \begin_layout Scrap
-
 <<aswrap.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -13783,7 +13536,6 @@ Copy the behaviour of the latest definition into "name" affecting all words
 \end_layout
 
 \begin_layout Scrap
-
 <<HOT-PATCH>>=
 \begin_inset Newline newline
 \end_inset
@@ -13800,7 +13552,6 @@ Length of the code buffer.
 \end_layout
 
 \begin_layout Scrap
-
 <<CODE-LENGTH>>=
 \begin_inset Newline newline
 \end_inset
@@ -13817,7 +13568,6 @@ A bag with the DEA's of all segments.
 \end_layout
 
 \begin_layout Scrap
-
 <<SECTION-REGISTRY>>=
 \begin_inset Newline newline
 \end_inset
@@ -13850,7 +13600,6 @@ CODE-SPACE
 \end_layout
 
 \begin_layout Scrap
-
 <<CURRENT-SECTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -13953,7 +13702,6 @@ TARGET-START
 \end_layout
 
 \begin_layout Scrap
-
 <<SECTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -14000,7 +13748,6 @@ Define at least one segment lest the user forgets.
 \end_layout
 
 \begin_layout Scrap
-
 <<DEFAULT-SECTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -14043,7 +13790,6 @@ HERE
 \end_layout
 
 \begin_layout Scrap
-
 <<'AS-HERE>>=
 \begin_inset Newline newline
 \end_inset
@@ -14061,7 +13807,6 @@ Use only while disassembling.
 \end_layout
 
 \begin_layout Scrap
-
 <<TARGET-END>>=
 \begin_inset Newline newline
 \end_inset
@@ -14078,7 +13823,6 @@ For ADDR return "it is a pointing into the target space"
 \end_layout
 
 \begin_layout Scrap
-
 <<PLAUSIBLE-LABEL?>>=
 \begin_inset Newline newline
 \end_inset
@@ -14096,7 +13840,6 @@ Use only while disassembling.
 \end_layout
 
 \begin_layout Scrap
-
 <<HOST-END>>=
 \begin_inset Newline newline
 \end_inset
@@ -14136,7 +13879,6 @@ CODE-SPACE
 \end_layout
 
 \begin_layout Scrap
-
 <<ORG>>=
 \begin_inset Newline newline
 \end_inset
@@ -14154,7 +13896,6 @@ Convert host memory ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<HOST>TARGET>>=
 \begin_inset Newline newline
 \end_inset
@@ -14172,7 +13913,6 @@ Convert target memory ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<TARGET>HOST>>=
 \begin_inset Newline newline
 \end_inset
@@ -14190,7 +13930,6 @@ Convert file memory ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<FILE>TARGET>>=
 \begin_inset Newline newline
 \end_inset
@@ -14208,7 +13947,6 @@ Convert target memory ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<TARGET>FILE>>=
 \begin_inset Newline newline
 \end_inset
@@ -14221,7 +13959,6 @@ Convert target memory ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<SUB-SECTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -14243,7 +13980,6 @@ Instruction pointer in assembly.
 \end_layout
 
 \begin_layout Scrap
-
 <<'AP>>=
 \begin_inset Newline newline
 \end_inset
@@ -14260,7 +13996,6 @@ Swap dictionary pointer back and forth to assembler area.
 \end_layout
 
 \begin_layout Scrap
-
 <<SWAP-AS>>=
 \begin_inset Newline newline
 \end_inset
@@ -14307,7 +14042,6 @@ ALLOT
 \end_layout
 
 \begin_layout Scrap
-
 <<'AS-ALLOT>>=
 \begin_inset Newline newline
 \end_inset
@@ -14338,7 +14072,6 @@ C,
 \end_layout
 
 \begin_layout Scrap
-
 <<'AS-C,>>=
 \begin_inset Newline newline
 \end_inset
@@ -14355,7 +14088,6 @@ Reserve X bytes, without specifying a content.
 \end_layout
 
 \begin_layout Scrap
-
 <<RESB>>=
 \begin_inset Newline newline
 \end_inset
@@ -14379,7 +14111,6 @@ ORG
 \end_layout
 
 \begin_layout Scrap
-
 <<RES-TIL>>=
 \begin_inset Newline newline
 \end_inset
@@ -14396,7 +14127,6 @@ Align to a target address, that is multiple of N.
 \end_layout
 
 \begin_layout Scrap
-
 <<AS-ALIGN>>=
 \begin_inset Newline newline
 \end_inset
@@ -14414,7 +14144,6 @@ Align to a target address, that is multiple of N.
 \end_layout
 
 \begin_layout Scrap
-
 <<asi386.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -14884,7 +14613,6 @@ These definitions are such that they work regardless of the endianness of
 \end_layout
 
 \begin_layout Scrap
-
 <<additions>>=
 \begin_inset Newline newline
 \end_inset
@@ -14918,7 +14646,6 @@ OS:,
 \end_layout
 
 \begin_layout Scrap
-
 <<AS:,OS:,>>=
 \begin_inset Newline newline
 \end_inset
@@ -14942,7 +14669,6 @@ You may want to use these always instead of
 \end_layout
 
 \begin_layout Scrap
-
 <<Rx,alt>>=
 \begin_inset Newline newline
 \end_inset
@@ -14968,7 +14694,6 @@ Require instructions as per a 32 resp.
 \end_layout
 
 \begin_layout Scrap
-
 <<BITS>>=
 \begin_inset Newline newline
 \end_inset
@@ -14989,7 +14714,6 @@ Two fixup operands
 \end_layout
 
 \begin_layout Scrap
-
 <<two-fixup-operands>>=
 \begin_inset Newline newline
 \end_inset
@@ -15088,7 +14812,6 @@ It is dubious but fairly intractible whether the logical operation with
 \end_layout
 
 \begin_layout Scrap
-
 <<one-fixup-operands>>=
 \begin_inset Newline newline
 \end_inset
@@ -15193,7 +14916,6 @@ No fixup operands
 \end_layout
 
 \begin_layout Scrap
-
 <<no-fixup-operands>>=
 \begin_inset Newline newline
 \end_inset
@@ -15247,7 +14969,6 @@ Special fixups
 \end_layout
 
 \begin_layout Scrap
-
 <<special-fixups>>=
 \begin_inset Newline newline
 \end_inset
@@ -15328,7 +15049,6 @@ No fixups
 \end_layout
 
 \begin_layout Scrap
-
 <<no-fixups>>=
 \begin_inset Newline newline
 \end_inset
@@ -15457,7 +15177,6 @@ These must be found last
 \end_layout
 
 \begin_layout Scrap
-
 <<~SIB,>>=
 \begin_inset Newline newline
 \end_inset
@@ -15484,7 +15203,6 @@ Handle a 'sib' bytes as an instruction-within-an-instruction.
 \end_layout
 
 \begin_layout Scrap
-
 <<SIB-bytes>>=
 \begin_inset Newline newline
 \end_inset
@@ -15523,7 +15241,6 @@ TALLY-BA
 \end_layout
 
 \begin_layout Scrap
-
 <<(SIB),,>>=
 \begin_inset Newline newline
 \end_inset
@@ -15560,7 +15277,6 @@ FORCED-DISASSEMBLY
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS-SIB>>=
 \begin_inset Newline newline
 \end_inset
@@ -15627,7 +15343,6 @@ SIB,,
 \end_layout
 
 \begin_layout Scrap
-
 <<SIBfixups>>=
 \begin_inset Newline newline
 \end_inset
@@ -15689,7 +15404,6 @@ Contains access words and other little utilities that complement ciasdis.
 \end_layout
 
 \begin_layout Scrap
-
 <<access.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -15740,7 +15454,6 @@ Handle labels
 \end_layout
 
 \begin_layout Scrap
-
 <<labelas.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -15899,7 +15612,6 @@ _
 \end_layout
 
 \begin_layout Scrap
-
 <<FIX-DEA>>=
 \begin_inset Newline newline
 \end_inset
@@ -15917,7 +15629,6 @@ Backspace a character, but not if we are at the end of input.
 \end_layout
 
 \begin_layout Scrap
-
 <<BACKSPACE-IN>>=
 \begin_inset Newline newline
 \end_inset
@@ -15976,7 +15687,6 @@ Make sure undefined labels that looks like numbers, don't fool up the first
 \end_layout
 
 \begin_layout Scrap
-
 <<FIX-NMB>>=
 \begin_inset Newline newline
 \end_inset
@@ -16017,7 +15727,6 @@ If FLAG we have a misspelled number, skip its remainder.
 \end_layout
 
 \begin_layout Scrap
-
 <<ERROR10>>=
 \begin_inset Newline newline
 \end_inset
@@ -16034,7 +15743,6 @@ If FLAG we have an unknown word, treat it as a label.
 \end_layout
 
 \begin_layout Scrap
-
 <<ERROR12>>=
 \begin_inset Newline newline
 \end_inset
@@ -16070,7 +15778,6 @@ FIX-DEA
 \end_layout
 
 \begin_layout Scrap
-
 <<?ERROR-FIXING>>=
 \begin_inset Newline newline
 \end_inset
@@ -16123,7 +15830,6 @@ SECTION
 \end_layout
 
 \begin_layout Scrap
-
 <<RESET-SECTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -16143,7 +15849,6 @@ Ignore undefined labels during first pass ...
 \end_layout
 
 \begin_layout Scrap
-
 <<PASSES>>=
 \begin_inset Newline newline
 \end_inset
@@ -16184,7 +15889,6 @@ All labels link back to here.
 \end_layout
 
 \begin_layout Scrap
-
 <<'LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -16201,7 +15905,6 @@ For NAME: "name REPRESENTS a label."
 \end_layout
 
 \begin_layout Scrap
-
 <<IS-A-LABEL?>>=
 \begin_inset Newline newline
 \end_inset
@@ -16232,7 +15935,6 @@ For NAME: NAME and "it is a KNOWN label." We don't need to define it if there
 \end_layout
 
 \begin_layout Scrap
-
 <<KNOWN-LABEL?>>=
 \begin_inset Newline newline
 \end_inset
@@ -16308,7 +16010,6 @@ ONLY
 \end_layout
 
 \begin_layout Scrap
-
 <<:PREFIX>>=
 \begin_inset Newline newline
 \end_inset
@@ -16343,7 +16044,6 @@ Handle constant data in assembler.
 \end_layout
 
 \begin_layout Scrap
-
 <<constant-data>>=
 \begin_inset Newline newline
 \end_inset
@@ -16408,7 +16108,6 @@ Contains the data on the remainder of the line in reverse order.
 \end_layout
 
 \begin_layout Scrap
-
 <<DX-SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -16431,7 +16130,6 @@ DX-SET
 \end_layout
 
 \begin_layout Scrap
-
 <<GET-DX-SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -16470,7 +16168,6 @@ DX-SET
 \end_layout
 
 \begin_layout Scrap
-
 <<C,-DX-SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -16487,7 +16184,6 @@ Add remainder of line to codespace, as bytes.
 \end_layout
 
 \begin_layout Scrap
-
 <<db>>=
 \begin_inset Newline newline
 \end_inset
@@ -16528,7 +16224,6 @@ DX-SET
 \end_layout
 
 \begin_layout Scrap
-
 <<W,-DX-SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -16545,7 +16240,6 @@ Add remainder of line to codespace, as words.
 \end_layout
 
 \begin_layout Scrap
-
 <<dw>>=
 \begin_inset Newline newline
 \end_inset
@@ -16568,7 +16262,6 @@ DX-SET
 \end_layout
 
 \begin_layout Scrap
-
 <<L,-DX-SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -16585,7 +16278,6 @@ Add remainder of line to codespace, as longs (or, mostly, cells).
 \end_layout
 
 \begin_layout Scrap
-
 <<dl>>=
 \begin_inset Newline newline
 \end_inset
@@ -16602,7 +16294,6 @@ Lay down a STRING in assembler memory.
 \end_layout
 
 \begin_layout Scrap
-
 <<(,)>>=
 \begin_inset Newline newline
 \end_inset
@@ -16625,7 +16316,6 @@ DX-SET
 \end_layout
 
 \begin_layout Scrap
-
 <<,-DX-SET>>=
 \begin_inset Newline newline
 \end_inset
@@ -16654,7 +16344,6 @@ Add remainder of line to codespace, as strings.
 \end_layout
 
 \begin_layout Scrap
-
 <<d>>=
 \begin_inset Newline newline
 \end_inset
@@ -16680,7 +16369,6 @@ Handle labels as far as disassembly is concerned.
 \end_layout
 
 \begin_layout Scrap
-
 <<labeldis.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -16925,7 +16613,6 @@ Ignore addresses in this range.
 \end_layout
 
 \begin_layout Scrap
-
 <<IGNORE>>=
 \begin_inset Newline newline
 \end_inset
@@ -16954,7 +16641,6 @@ Print a remark about whether START and END fit.
 \end_layout
 
 \begin_layout Scrap
-
 <<.HOW-FIT>>=
 \begin_inset Newline newline
 \end_inset
@@ -16989,7 +16675,6 @@ Print a remark about whether start of the current range fits to the END
 \end_layout
 
 \begin_layout Scrap
-
 <<HOW-FIT>>=
 \begin_inset Newline newline
 \end_inset
@@ -17007,7 +16692,6 @@ Print a remark about whether the END of the previous range is really the
 \end_layout
 
 \begin_layout Scrap
-
 <<HOW-FIT-END>>=
 \begin_inset Newline newline
 \end_inset
@@ -17027,7 +16711,6 @@ Disassemble all those ranges with their own disassemblers.
 \end_layout
 
 \begin_layout Scrap
-
 <<DISASSEMBLE-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -17066,7 +16749,6 @@ asgen.frt
 \end_layout
 
 \begin_layout Scrap
-
 <<(ADORN-ADDRESS)>>=
 \begin_inset Newline newline
 \end_inset
@@ -17087,7 +16769,6 @@ Initialise all registered label classes.
 \end_layout
 
 \begin_layout Scrap
-
 <<INIT-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -17108,7 +16789,6 @@ Sort all registered label classes.
 \end_layout
 
 \begin_layout Scrap
-
 <<SORT-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -17129,7 +16809,6 @@ Decompile all labels of current label class.
 \end_layout
 
 \begin_layout Scrap
-
 <<DECOMP-ONE>>=
 \begin_inset Newline newline
 \end_inset
@@ -17146,7 +16825,6 @@ Generate the source of all label classs.
 \end_layout
 
 \begin_layout Scrap
-
 <<DECOMP-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -17167,7 +16845,6 @@ Make a full blown cul file from the internal data.
 \end_layout
 
 \begin_layout Scrap
-
 <<MAKE-CUL>>=
 \begin_inset Newline newline
 \end_inset
@@ -17188,7 +16865,6 @@ Show what type of labels there are.
 \end_layout
 
 \begin_layout Scrap
-
 <<SHOW-REGISTER>>=
 \begin_inset Newline newline
 \end_inset
@@ -17213,7 +16889,6 @@ CODE-BUFFER
 \end_layout
 
 \begin_layout Scrap
-
 <<DISASSEMBLE-TARGET>>=
 \begin_inset Newline newline
 \end_inset
@@ -17235,7 +16910,6 @@ i386 dependant, should somehow be separated out.
 \end_layout
 
 \begin_layout Scrap
-
 <<DISASSEMBLE-TARGET-i386>>=
 \begin_inset Newline newline
 \end_inset
@@ -17261,7 +16935,6 @@ This is used to plug holes, where the user doesn't specify how to disassemble.
 \end_layout
 
 \begin_layout Scrap
-
 <<DEFAULT-DISASSEMBLY>>=
 \begin_inset Newline newline
 \end_inset
@@ -17292,7 +16965,6 @@ Labels are bags of two cell structs, a target address and a pointer to the
 \end_layout
 
 \begin_layout Scrap
-
 <<generic-labels>>=
 \begin_inset Newline newline
 \end_inset
@@ -17447,7 +17119,6 @@ A bag with the dea's of all labelclasses.
 \end_layout
 
 \begin_layout Scrap
-
 <<THE-REGISTER>>=
 \begin_inset Newline newline
 \end_inset
@@ -17465,7 +17136,6 @@ Realloc ADDRESS to new LENGTH, return new ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<REALLOC>>=
 \begin_inset Newline newline
 \end_inset
@@ -17483,7 +17153,6 @@ Realloc POINTER to old buffer to new LENGTH.
 \end_layout
 
 \begin_layout Scrap
-
 <<REALLOC-POINTER>>=
 \begin_inset Newline newline
 \end_inset
@@ -17501,7 +17170,6 @@ Define a class for label-like things of length N.
 \end_layout
 
 \begin_layout Scrap
-
 <<LABEL-FIELD>>=
 \begin_inset Newline newline
 \end_inset
@@ -17638,7 +17306,6 @@ Remember that from now on two times as much labels are allowed.
 \end_layout
 
 \begin_layout Scrap
-
 <<DOUBLE-SIZE>>=
 \begin_inset Newline newline
 \end_inset
@@ -17655,7 +17322,6 @@ Return a VARIABLE containing the max labels allowed.
 \end_layout
 
 \begin_layout Scrap
-
 <<MAX-LAB>>=
 \begin_inset Newline newline
 \end_inset
@@ -17672,7 +17338,6 @@ Return largest INDEX of labels present.
 \end_layout
 
 \begin_layout Scrap
-
 <<LAB-UPB>>=
 \begin_inset Newline newline
 \end_inset
@@ -17699,7 +17364,6 @@ LABELS
 \end_layout
 
 \begin_layout Scrap
-
 <<RELOCATABLE>>=
 \begin_inset Newline newline
 \end_inset
@@ -17746,7 +17410,6 @@ For I return the ith LABEL .
 \end_layout
 
 \begin_layout Scrap
-
 <<LABELS[]>>=
 \begin_inset Newline newline
 \end_inset
@@ -17763,7 +17426,6 @@ Remove label I.
 \end_layout
 
 \begin_layout Scrap
-
 <<REMOVE-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -17793,7 +17455,6 @@ DO-BAG ..
 \end_layout
 
 \begin_layout Scrap
-
 <<DO-LAB>>=
 \begin_inset Newline newline
 \end_inset
@@ -17814,7 +17475,6 @@ A simple printout of the payload.
 \end_layout
 
 \begin_layout Scrap
-
 <<.PAY.>>=
 \begin_inset Newline newline
 \end_inset
@@ -17832,7 +17492,6 @@ Print the payload of the label at ADDRESS , provided it is a string.
 \end_layout
 
 \begin_layout Scrap
-
 <<.PAY>>=
 \begin_inset Newline newline
 \end_inset
@@ -17850,7 +17509,6 @@ Print the name of the label at ADDRESS , provided it is a dea.
 \end_layout
 
 \begin_layout Scrap
-
 <<.PAY-DEA>>=
 \begin_inset Newline newline
 \end_inset
@@ -17868,7 +17526,6 @@ For label INDEX return the label NAME, provided it is a dea.
 \end_layout
 
 \begin_layout Scrap
-
 <<LABEL-NAME>>=
 \begin_inset Newline newline
 \end_inset
@@ -17885,7 +17542,6 @@ Print the addresses and payloads of the labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<.LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -17904,7 +17560,6 @@ Return LOWER and UPPER indices of the labels, inclusive.
 \end_layout
 
 \begin_layout Scrap
-
 <<LAB-BOUNDS>>=
 \begin_inset Newline newline
 \end_inset
@@ -17923,7 +17578,6 @@ In behalf of qsort.
 \end_layout
 
 \begin_layout Scrap
-
 <<LAB<>>=
 \begin_inset Newline newline
 \end_inset
@@ -17941,7 +17595,6 @@ In behalf of qsort.
 \end_layout
 
 \begin_layout Scrap
-
 <<LAB<->>=
 \begin_inset Newline newline
 \end_inset
@@ -17964,7 +17617,6 @@ LABELS
 \end_layout
 
 \begin_layout Scrap
-
 <<SORT-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -17982,7 +17634,6 @@ In behalf of bin-search.
 \end_layout
 
 \begin_layout Scrap
-
 <<CONT>>=
 \begin_inset Newline newline
 \end_inset
@@ -18006,7 +17657,6 @@ CONT
 \end_layout
 
 \begin_layout Scrap
-
 <<L<>>=
 \begin_inset Newline newline
 \end_inset
@@ -18026,7 +17676,6 @@ Find where ADDRESS belongs in a sorted array.
 \end_layout
 
 \begin_layout Scrap
-
 <<WHERE-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18052,7 +17701,6 @@ BIN-SEARCH
 \end_layout
 
 \begin_layout Scrap
-
 <<FIND-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18071,7 +17719,6 @@ Find ADDRESS in the label table.
 \end_layout
 
 \begin_layout Scrap
-
 <<>LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18097,7 +17744,6 @@ Find ADDRESS in the label table.
 \end_layout
 
 \begin_layout Scrap
-
 <<(~LABEL)>>=
 \begin_inset Newline newline
 \end_inset
@@ -18126,7 +17772,6 @@ For ADDRESS and INDEX return ADDRESS and INDEX where the deviation is minimal.
 \end_layout
 
 \begin_layout Scrap
-
 <<IMPROVE-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18153,7 +17798,6 @@ Find target ADDRESS in the label table.
 \end_layout
 
 \begin_layout Scrap
-
 <<~LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18175,7 +17819,6 @@ Roll the last label to place INDEX.
 \end_layout
 
 \begin_layout Scrap
-
 <<ROLL-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18204,7 +17847,6 @@ LABEL-CACHE
 \end_layout
 
 \begin_layout Scrap
-
 <<NEXT-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18229,7 +17871,6 @@ Names of labels
 \end_layout
 
 \begin_layout Scrap
-
 <<names-of-labels>>=
 \begin_inset Newline newline
 \end_inset
@@ -18440,7 +18081,6 @@ Decompile label INDEX.
 \end_layout
 
 \begin_layout Scrap
-
 <<.EQU>>=
 \begin_inset Newline newline
 \end_inset
@@ -18465,7 +18105,6 @@ LABEL
 \end_layout
 
 \begin_layout Scrap
-
 <<EQU-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -18484,7 +18123,6 @@ Generate a equ label at (target) ADDRESS with NAME, this can be any symbolic
 \end_layout
 
 \begin_layout Scrap
-
 <<LABELED>>=
 \begin_inset Newline newline
 \end_inset
@@ -18524,7 +18162,6 @@ LABEL
 \end_layout
 
 \begin_layout Scrap
-
 <<LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18547,7 +18184,6 @@ For host ADDRESS return an associated equ LABEL or 0.
 \end_layout
 
 \begin_layout Scrap
-
 <<=EQU-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18565,7 +18201,6 @@ For host ADDRESS print all labels at that addres, return the NUMBER of labels
 \end_layout
 
 \begin_layout Scrap
-
 <<.EQU-ALL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18602,7 +18237,6 @@ Adorn the ADDRESS we are currently disassembling with a named label if any.
 \end_layout
 
 \begin_layout Scrap
-
 <<ADORN-WITH-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18619,7 +18253,6 @@ Prevent leading hex letter for NUMBER by printing a zero.
 \end_layout
 
 \begin_layout Scrap
-
 <<.0?>>=
 \begin_inset Newline newline
 \end_inset
@@ -18636,7 +18269,6 @@ Print a NUMBER in hex in a smart way.
 \end_layout
 
 \begin_layout Scrap
-
 <<SMART.>>=
 \begin_inset Newline newline
 \end_inset
@@ -18659,7 +18291,6 @@ For label INDEX and OFFSET print the label with offset.
 \end_layout
 
 \begin_layout Scrap
-
 <<.~LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18682,7 +18313,6 @@ Print X as a symbolic label if possible, else as a number.
 \end_layout
 
 \begin_layout Scrap
-
 <<.LABEL/.>>=
 \begin_inset Newline newline
 \end_inset
@@ -18716,7 +18346,6 @@ For label INDEX , return its XT.
 \end_layout
 
 \begin_layout Scrap
-
 <<@LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18762,7 +18391,6 @@ For labels INDEX1 and INDEX2 return "they are equal".
 \end_layout
 
 \begin_layout Scrap
-
 <<LABEL=>>=
 \begin_inset Newline newline
 \end_inset
@@ -18791,7 +18419,6 @@ Get rid of a label with INDEX if trivial .
 \end_layout
 
 \begin_layout Scrap
-
 <<REMOVE-TRIVIAL>>=
 \begin_inset Newline newline
 \end_inset
@@ -18830,7 +18457,6 @@ Get rid of superfluous equ labels
 \end_layout
 
 \begin_layout Scrap
-
 <<CLEAN-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -18888,7 +18514,6 @@ Comment till remainder of line.
 \end_layout
 
 \begin_layout Scrap
-
 <<comment-remainder>>=
 \begin_inset Newline newline
 \end_inset
@@ -18987,7 +18612,6 @@ Decompile comment: label INDEX.
 \end_layout
 
 \begin_layout Scrap
-
 <<.COMMENT:>>=
 \begin_inset Newline newline
 \end_inset
@@ -19012,7 +18636,6 @@ COMMENT:
 \end_layout
 
 \begin_layout Scrap
-
 <<COMMENT:-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -19030,7 +18653,6 @@ Generate a comment label at ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<COMMENT:>>=
 \begin_inset Newline newline
 \end_inset
@@ -19076,7 +18698,6 @@ Remember the comment at the end of this instruction.
 \end_layout
 
 \begin_layout Scrap
-
 <<COMMENT:-TO-BE>>=
 \begin_inset Newline newline
 \end_inset
@@ -19093,7 +18714,6 @@ Initialise to no comment.
 \end_layout
 
 \begin_layout Scrap
-
 <<INIT-COMMENT:>>=
 \begin_inset Newline newline
 \end_inset
@@ -19114,7 +18734,6 @@ Print comment at the end of previous instruction.
 \end_layout
 
 \begin_layout Scrap
-
 <<PRINT-OLD-COMMENT:>>=
 \begin_inset Newline newline
 \end_inset
@@ -19141,7 +18760,6 @@ Remember what comment to put after the disassembly of ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<REMEMBER-COMMENT:>>=
 \begin_inset Newline newline
 \end_inset
@@ -19184,7 +18802,6 @@ Multiple line comment/command in front.
 \end_layout
 
 \begin_layout Scrap
-
 <<multi-line-comment>>=
 \begin_inset Newline newline
 \end_inset
@@ -19284,7 +18901,6 @@ Decompile mcomment label INDEX.
 \end_layout
 
 \begin_layout Scrap
-
 <<.MDIRECTIVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -19324,7 +18940,6 @@ COMMENT
 \end_layout
 
 \begin_layout Scrap
-
 <<MCOMMENT-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -19349,7 +18964,6 @@ DIRECTIVE
 \end_layout
 
 \begin_layout Scrap
-
 <<NEW-DIRECTIVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -19374,7 +18988,6 @@ DIRECTIVE
 \end_layout
 
 \begin_layout Scrap
-
 <<OLD-DIRECTIVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -19398,7 +19011,6 @@ Make STRING the command in front of label at ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<DIRECTIVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -19424,7 +19036,6 @@ Make STRING the comment in front of label at ADDRESS.
 \end_layout
 
 \begin_layout Scrap
-
 <<COMMENT>>=
 \begin_inset Newline newline
 \end_inset
@@ -19493,7 +19104,6 @@ Print comment for instruction at ADDRESS , if any.
 \end_layout
 
 \begin_layout Scrap
-
 <<PRINT-DIRECTIVE>>=
 \begin_inset Newline newline
 \end_inset
@@ -19536,7 +19146,6 @@ The special printing of strings.
 \end_layout
 
 \begin_layout Scrap
-
 <<printing-strings>>=
 \begin_inset Newline newline
 \end_inset
@@ -19825,7 +19434,6 @@ normal printable
 \end_layout
 
 \begin_layout Scrap
-
 <<TABLE2>>=
 \begin_inset Newline newline
 \end_inset
@@ -19870,7 +19478,6 @@ For CHAR: "it is control"
 \end_layout
 
 \begin_layout Scrap
-
 <<IS-CTRL>>=
 \begin_inset Newline newline
 \end_inset
@@ -19899,7 +19506,6 @@ For CHAR: "it is printable".
 \end_layout
 
 \begin_layout Scrap
-
 <<IS-PRINT>>=
 \begin_inset Newline newline
 \end_inset
@@ -19934,7 +19540,6 @@ Accumulates characters that may form a string.
 \end_layout
 
 \begin_layout Scrap
-
 <<ACCU>>=
 \begin_inset Newline newline
 \end_inset
@@ -19964,7 +19569,6 @@ Print the accumulated chars, if any.
 \end_layout
 
 \begin_layout Scrap
-
 <<.ACCU>>=
 \begin_inset Newline newline
 \end_inset
@@ -20020,7 +19624,6 @@ Display a BYTE in clean hex.
 \end_layout
 
 \begin_layout Scrap
-
 <<.C>>=
 \begin_inset Newline newline
 \end_inset
@@ -20078,7 +19681,6 @@ For ADDR of a (printable) char, add it to the accumulated range.
 \end_layout
 
 \begin_layout Scrap
-
 <<ACCU-C+>>=
 \begin_inset Newline newline
 \end_inset
@@ -20100,7 +19702,6 @@ Things to print at the start of a line.
 \end_layout
 
 \begin_layout Scrap
-
 <<start-of-line>>=
 \begin_inset Newline newline
 \end_inset
@@ -20133,7 +19734,6 @@ Print the ADDRES as target address in hex.
 \end_layout
 
 \begin_layout Scrap
-
 <<.TARGET-ADDRESS>>=
 \begin_inset Newline newline
 \end_inset
@@ -20150,7 +19750,6 @@ Start a new line, with printing the decompiled ADDRESS as seen.
 \end_layout
 
 \begin_layout Scrap
-
 <<CR-ADORNED>>=
 \begin_inset Newline newline
 \end_inset
@@ -20183,7 +19782,6 @@ For ADDRESS: "it is at next cut." If so, advance.
 \end_layout
 
 \begin_layout Scrap
-
 <<NEXT-CUT?>>=
 \begin_inset Newline newline
 \end_inset
@@ -20207,7 +19805,6 @@ db
 \end_layout
 
 \begin_layout Scrap
-
 <<CR+GENERIC>>=
 \begin_inset Newline newline
 \end_inset
@@ -20240,7 +19837,6 @@ For ADDRESS : interupt byte display.
 \end_layout
 
 \begin_layout Scrap
-
 <<CR+dx>>=
 \begin_inset Newline newline
 \end_inset
@@ -20284,7 +19880,6 @@ A 'range' is defined here as a range of addresses that is kept together,
 \end_layout
 
 \begin_layout Scrap
-
 <<disassembly-ranges>>=
 \begin_inset Newline newline
 \end_inset
@@ -20476,7 +20071,6 @@ Define a range.
 \end_layout
 
 \begin_layout Scrap
-
 <<RANGE-FIELD>>=
 \begin_inset Newline newline
 \end_inset
@@ -20497,7 +20091,6 @@ Print the range LAB as a matter of testing.
 \end_layout
 
 \begin_layout Scrap
-
 <<.PAY-RANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -20531,7 +20124,6 @@ RANGE-TYPES
 \end_layout
 
 \begin_layout Scrap
-
 <<ARE-COUPLED>>=
 \begin_inset Newline newline
 \end_inset
@@ -20548,7 +20140,6 @@ For current range, return the XT of a proper defining word.
 \end_layout
 
 \begin_layout Scrap
-
 <<CREATOR-XT>>=
 \begin_inset Newline newline
 \end_inset
@@ -20565,7 +20156,6 @@ Make range I current, provided the payload is a dea.
 \end_layout
 
 \begin_layout Scrap
-
 <<MAKE-CURRENT>>=
 \begin_inset Newline newline
 \end_inset
@@ -20617,7 +20207,6 @@ NONAME
 \end_layout
 
 \begin_layout Scrap
-
 <<DECOMP-RANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -20654,7 +20243,6 @@ Contains range specification, limits plus type.
 \end_layout
 
 \begin_layout Scrap
-
 <<RANGE-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -20673,7 +20261,6 @@ Create a disassembly range from AD1 to AD2 using dis-assembler DEA1 with
 \end_layout
 
 \begin_layout Scrap
-
 <<RANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -20682,32 +20269,26 @@ Create a disassembly range from AD1 to AD2 using dis-assembler DEA1 with
 \end_layout
 
 \begin_layout Scrap
-
     2SWAP PAD $+!  PAD $@ EVALUATE  HERE DUP >R  |RANGE| DUP ALLOT  ERASE
 \end_layout
 
 \begin_layout Scrap
-
     $, R@ >NFA !  CURRENT-RANGE R@ >LFA !  R> TO CURRENT-RANGE
 \end_layout
 
 \begin_layout Scrap
-
     'RANGE-XT !  1 'RANGE-STRIDE !  'RANGE-END !  'RANGE-START !
 \end_layout
 
 \begin_layout Scrap
-
     RANGE-LABELS  RANGE-START LAB+!  CURRENT-RANGE LAB+!
 \end_layout
 
 \begin_layout Scrap
-
     CURRENT-SECTION 'RANGE-SECTION !
 \end_layout
 
 \begin_layout Scrap
-
     DOES>  RANGE-SECTION ;
 \begin_inset Newline newline
 \end_inset
@@ -20725,7 +20306,6 @@ Create a disassembly range from AD1 to AD2 using dis-assembler DEA1 with
 \end_layout
 
 \begin_layout Scrap
-
 <<DIS:>>=
 \begin_inset Newline newline
 \end_inset
@@ -20754,7 +20334,6 @@ Create a disassembly range from AD1 to AD2 using dis-assembler DEA1 with
 \end_layout
 
 \begin_layout Scrap
-
 <<RANGE:>>=
 \begin_inset Newline newline
 \end_inset
@@ -20783,7 +20362,6 @@ Disassemble
 \end_layout
 
 \begin_layout Scrap
-
 <<disassemble>>=
 \begin_inset Newline newline
 \end_inset
@@ -20820,7 +20398,6 @@ Disassemble to ADDRESS2 from ADDRESS1.
 \end_layout
 
 \begin_layout Scrap
-
 <<(D-R-T)>>=
 \begin_inset Newline newline
 \end_inset
@@ -20837,7 +20414,6 @@ Disassemble from target ADDRESS1 to ADDRESS2.
 \end_layout
 
 \begin_layout Scrap
-
 <<D-R-T>>=
 \begin_inset Newline newline
 \end_inset
@@ -20855,7 +20431,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dc>>=
 \begin_inset Newline newline
 \end_inset
@@ -20873,7 +20448,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dc:>>=
 \begin_inset Newline newline
 \end_inset
@@ -20891,7 +20465,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dc->>=
 \begin_inset Newline newline
 \end_inset
@@ -20908,7 +20481,6 @@ Dump unspecified content
 \end_layout
 
 \begin_layout Scrap
-
 <<unspecified>>=
 \begin_inset Newline newline
 \end_inset
@@ -20945,7 +20517,6 @@ Dump storage with unspecified content to ADDRESS2 from ADDRESS1.
 \end_layout
 
 \begin_layout Scrap
-
 <<(DUMP-N)>>=
 \begin_inset Newline newline
 \end_inset
@@ -20964,7 +20535,6 @@ Dump such from target ADDRESS1 to ADDRESS2 where only address1 may be adorned
 \end_layout
 
 \begin_layout Scrap
-
 <<DUMP-N>>=
 \begin_inset Newline newline
 \end_inset
@@ -20982,7 +20552,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dn>>=
 \begin_inset Newline newline
 \end_inset
@@ -21000,7 +20569,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dn:>>=
 \begin_inset Newline newline
 \end_inset
@@ -21018,7 +20586,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dn->>=
 \begin_inset Newline newline
 \end_inset
@@ -21035,7 +20602,6 @@ Dump bytes
 \end_layout
 
 \begin_layout Scrap
-
 <<bytes>>=
 \begin_inset Newline newline
 \end_inset
@@ -21074,7 +20640,6 @@ Dump bytes from target ADDRESS1 to ADDRESS2 plain.
 \end_layout
 
 \begin_layout Scrap
-
 <<(DUMP-B)>>=
 \begin_inset Newline newline
 \end_inset
@@ -21092,7 +20657,6 @@ Dump bytes from target ADDRESS1 to ADDRESS2 adorned with labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<DUMP-B>>=
 \begin_inset Newline newline
 \end_inset
@@ -21110,7 +20674,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-db>>=
 \begin_inset Newline newline
 \end_inset
@@ -21128,7 +20691,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-db:>>=
 \begin_inset Newline newline
 \end_inset
@@ -21146,7 +20708,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-db->>=
 \begin_inset Newline newline
 \end_inset
@@ -21163,7 +20724,6 @@ Dump words
 \end_layout
 
 \begin_layout Scrap
-
 <<words>>=
 \begin_inset Newline newline
 \end_inset
@@ -21204,7 +20764,6 @@ Print X as a word (4 hex digits).
 \end_layout
 
 \begin_layout Scrap
-
 <<W.>>=
 \begin_inset Newline newline
 \end_inset
@@ -21222,7 +20781,6 @@ Dump words to ADDRESS1 from ADDRESS2, plain.
 \end_layout
 
 \begin_layout Scrap
-
 <<(DUMP-W)>>=
 \begin_inset Newline newline
 \end_inset
@@ -21244,7 +20802,6 @@ Dump words from target ADDRESS1 to ADDRESS2 adorned with labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<DUMP-W>>=
 \begin_inset Newline newline
 \end_inset
@@ -21262,7 +20819,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dw>>=
 \begin_inset Newline newline
 \end_inset
@@ -21280,7 +20836,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dw:>>=
 \begin_inset Newline newline
 \end_inset
@@ -21298,7 +20853,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dw->>=
 \begin_inset Newline newline
 \end_inset
@@ -21315,7 +20869,6 @@ Dump longs
 \end_layout
 
 \begin_layout Scrap
-
 <<longs>>=
 \begin_inset Newline newline
 \end_inset
@@ -21352,7 +20905,6 @@ Dump longs to ADDRESS1 from ADDRESS2, plain.
 \end_layout
 
 \begin_layout Scrap
-
 <<(DUMP-L)>>=
 \begin_inset Newline newline
 \end_inset
@@ -21374,7 +20926,6 @@ Dump words from target ADDRESS1 to ADDRESS2 adorned with labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<DUMP-L>>=
 \begin_inset Newline newline
 \end_inset
@@ -21392,7 +20943,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dl>>=
 \begin_inset Newline newline
 \end_inset
@@ -21410,7 +20960,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dl:>>=
 \begin_inset Newline newline
 \end_inset
@@ -21428,7 +20977,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dl->>=
 \begin_inset Newline newline
 \end_inset
@@ -21445,7 +20993,6 @@ Dump strings
 \end_layout
 
 \begin_layout Scrap
-
 <<strings>>=
 \begin_inset Newline newline
 \end_inset
@@ -21483,7 +21030,6 @@ Print all chars to ADDR1 from ADDR2 appropriately.
 \end_layout
 
 \begin_layout Scrap
-
 <<(DUMP-)>>=
 \begin_inset Newline newline
 \end_inset
@@ -21552,7 +21098,6 @@ Dump words from target ADDRESS1 to ADDRESS2 adorned with labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<DUMP->>=
 \begin_inset Newline newline
 \end_inset
@@ -21570,7 +21115,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-d>>=
 \begin_inset Newline newline
 \end_inset
@@ -21588,7 +21132,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-d:>>=
 \begin_inset Newline newline
 \end_inset
@@ -21606,7 +21149,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-d->>=
 \begin_inset Newline newline
 \end_inset
@@ -21637,7 +21179,6 @@ Not yet definitions, these thingies must be visible in the disassembler.
 \end_layout
 
 \begin_layout Scrap
-
 <<ranges>>=
 \begin_inset Newline newline
 \end_inset
@@ -21678,7 +21219,6 @@ Disassemble from target ADDRESS1 to ADDRESS2 as 16 bit.
 \end_layout
 
 \begin_layout Scrap
-
 <<(D-R-T-16)>>=
 \begin_inset Newline newline
 \end_inset
@@ -21699,7 +21239,6 @@ Disassemble from target ADDRESS1 to ADDRESS2.
 \end_layout
 
 \begin_layout Scrap
-
 <<D-R-T-16>>=
 \begin_inset Newline newline
 \end_inset
@@ -21717,7 +21256,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dc16>>=
 \begin_inset Newline newline
 \end_inset
@@ -21735,7 +21273,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dc16:>>=
 \begin_inset Newline newline
 \end_inset
@@ -21753,7 +21290,6 @@ Range ADDRESS1 ..
 \end_layout
 
 \begin_layout Scrap
-
 <<-dc16->>=
 \begin_inset Newline newline
 \end_inset
@@ -21770,7 +21306,6 @@ Instructions
 \end_layout
 
 \begin_layout Scrap
-
 <<instructions>>=
 \begin_inset Newline newline
 \end_inset
@@ -21838,7 +21373,6 @@ AS-POINTER
 \end_layout
 
 \begin_layout Scrap
-
 <<AS-@+>>=
 \begin_inset Newline newline
 \end_inset
@@ -21892,7 +21426,6 @@ AS-POINTER
 \end_layout
 
 \begin_layout Scrap
-
 <<AS-S-@+>>=
 \begin_inset Newline newline
 \end_inset
@@ -21941,7 +21474,6 @@ This is kept up to date during disassembly.
 \end_layout
 
 \begin_layout Scrap
-
 <<LATEST-OFFSET>>=
 \begin_inset Newline newline
 \end_inset
@@ -21966,7 +21498,6 @@ IX,
 \end_layout
 
 \begin_layout Scrap
-
 <<.COMMA-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -21985,7 +21516,6 @@ For DEA print the name without the surrounding brackets.
 \end_layout
 
 \begin_layout Scrap
-
 <<ID.-NO()>>=
 \begin_inset Newline newline
 \end_inset
@@ -22003,7 +21533,6 @@ Assuming the disassembly sits at the offset of a relative branch assembled
 \end_layout
 
 \begin_layout Scrap
-
 <<NEXT-INSTRUCTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -22021,7 +21550,6 @@ Assuming the disassembly sits at the offset of a relative branch assembled
 \end_layout
 
 \begin_layout Scrap
-
 <<GET-OFFSET>>=
 \begin_inset Newline newline
 \end_inset
@@ -22039,7 +21567,6 @@ For the commaer DEA return ADDRESS in host space that is the target of the
 \end_layout
 
 \begin_layout Scrap
-
 <<GOAL-RB>>=
 \begin_inset Newline newline
 \end_inset
@@ -22058,7 +21585,6 @@ For the relative branch commaer DEA print the target ADDRESS as a symbolic
 \end_layout
 
 \begin_layout Scrap
-
 <<.BRANCH/.>>=
 \begin_inset Newline newline
 \end_inset
@@ -22084,7 +21610,6 @@ Print a disassembly for a relative branch DEA.
 \end_layout
 
 \begin_layout Scrap
-
 <<.COMMA-REL>>=
 \begin_inset Newline newline
 \end_inset
@@ -22190,7 +21715,6 @@ Contains all instruction that represent an unconditional transfer of control.
 \end_layout
 
 \begin_layout Scrap
-
 <<UNCONDITIONAL-TRANSFERS>>=
 \begin_inset Newline newline
 \end_inset
@@ -22227,7 +21751,6 @@ Contains all instructions that represent intra-segment jumps.
 \end_layout
 
 \begin_layout Scrap
-
 <<JUMPS>>=
 \begin_inset Newline newline
 \end_inset
@@ -22262,7 +21785,6 @@ Crawling is the process of following jumps to determine code space.
 \end_layout
 
 \begin_layout Scrap
-
 <<crawl.frt>>=
 \begin_inset Newline newline
 \end_inset
@@ -22566,7 +22088,6 @@ Insert the equ-label ADDRESS1 with an NAME.
 \end_layout
 
 \begin_layout Scrap
-
 <<INSERT-EQU>>=
 \begin_inset Newline newline
 \end_inset
@@ -22588,7 +22109,6 @@ Insert the equ-label ADDRESS1 with an invented name.
 \end_layout
 
 \begin_layout Scrap
-
 <<INSERT-EQU-INVENT>>=
 \begin_inset Newline newline
 \end_inset
@@ -22606,7 +22126,6 @@ Add target ADDRESS to the equ labels if it is not there.
 \end_layout
 
 \begin_layout Scrap
-
 <<?INSERT-EQU?>>=
 \begin_inset Newline newline
 \end_inset
@@ -22680,7 +22199,6 @@ For range INDEX : "it is of the same type as the previous one".
 \end_layout
 
 \begin_layout Scrap
-
 <<COMPATIBLE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -22722,7 +22240,6 @@ Get the name of range INDEX.
 \end_layout
 
 \begin_layout Scrap
-
 <<RANGE-NAME>>=
 \begin_inset Newline newline
 \end_inset
@@ -22760,7 +22277,6 @@ For a collapsible pair of range with INDEX1 and INDEX2 return INDEX1 and
 \end_layout
 
 \begin_layout Scrap
-
 <<NEW-RANGE-START>>=
 \begin_inset Newline newline
 \end_inset
@@ -22814,7 +22330,6 @@ For a collapsible pair of range with INDEX1 and INDEX2 return INDEX1 and
 \end_layout
 
 \begin_layout Scrap
-
 <<NEW-RANGE-END>>=
 \begin_inset Newline newline
 \end_inset
@@ -22868,7 +22383,6 @@ Replace the two ranges INDEX1 and INDEX2 with the last range.
 \end_layout
 
 \begin_layout Scrap
-
 <<REPLACE>>=
 \begin_inset Newline newline
 \end_inset
@@ -22977,7 +22491,6 @@ For range INDEX: "It has the same type and alignment as the previous one."
 \end_layout
 
 \begin_layout Scrap
-
 <<SAME-ALIGN>>=
 \begin_inset Newline newline
 \end_inset
@@ -23068,7 +22581,6 @@ For range INDEX return END of previous, START of this one,
 \end_layout
 
 \begin_layout Scrap
-
 <<END+START>>=
 \begin_inset Newline newline
 \end_inset
@@ -23122,7 +22634,6 @@ Range INDEX overlaps with previous one.
 \end_layout
 
 \begin_layout Scrap
-
 <<OVERLAP?>>=
 \begin_inset Newline newline
 \end_inset
@@ -23163,7 +22674,6 @@ Range INDEX overlaps or borders with the previous one.
 \end_layout
 
 \begin_layout Scrap
-
 <<OVERLAP-OR-BORDER?>>=
 \begin_inset Newline newline
 \end_inset
@@ -23204,7 +22714,6 @@ Range INDEX has a gap with the previous one.
 \end_layout
 
 \begin_layout Scrap
-
 <<GAP?>>=
 \begin_inset Newline newline
 \end_inset
@@ -23245,7 +22754,6 @@ For range INDEX: "It has a name"
 \end_layout
 
 \begin_layout Scrap
-
 <<IS-NAMED>>=
 \begin_inset Newline newline
 \end_inset
@@ -23282,7 +22790,6 @@ Collapse range I into the previous range, that determines the properties.
 \end_layout
 
 \begin_layout Scrap
-
 <<COLLAPSE>>=
 \begin_inset Newline newline
 \end_inset
@@ -23347,7 +22854,6 @@ Trim the range previous to INDEX, such that it borders to range index.
 \end_layout
 
 \begin_layout Scrap
-
 <<TRIM-RANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -23412,7 +22918,6 @@ Combine range INDEX with the previous one.
 \end_layout
 
 \begin_layout Scrap
-
 <<COMBINE>>=
 \begin_inset Newline newline
 \end_inset
@@ -23517,7 +23022,6 @@ Combine range INDEX with a previous overlapping or bordering range.
 \end_layout
 
 \begin_layout Scrap
-
 <<KILL-OVERLAP>>=
 \begin_inset Newline newline
 \end_inset
@@ -23697,7 +23201,6 @@ Introduce char range to fill the gap at INDEX.
 \end_layout
 
 \begin_layout Scrap
-
 <<FILL-GAP>>=
 \begin_inset Newline newline
 \end_inset
@@ -23772,7 +23275,6 @@ Clean up the range labels, from behind.
 \end_layout
 
 \begin_layout Scrap
-
 <<CLEANUP-RANGES>>=
 \begin_inset Newline newline
 \end_inset
@@ -23793,7 +23295,6 @@ Plug a hole at the first range.
 \end_layout
 
 \begin_layout Scrap
-
 <<PLUG-FIRST>>=
 \begin_inset Newline newline
 \end_inset
@@ -23818,7 +23319,6 @@ Plug a hole at the last range.
 \end_layout
 
 \begin_layout Scrap
-
 <<PLUG-LAST>>=
 \begin_inset Newline newline
 \end_inset
@@ -23846,7 +23346,6 @@ If there are no ranges at all, make the buffer into a default range.
 \end_layout
 
 \begin_layout Scrap
-
 <<PLUG-SPECIAL>>=
 \begin_inset Newline newline
 \end_inset
@@ -23867,7 +23366,6 @@ Fill any holes with character ranges.
 \end_layout
 
 \begin_layout Scrap
-
 <<PLUG-HOLES>>=
 \begin_inset Newline newline
 \end_inset
@@ -23899,7 +23397,6 @@ Jump targets that are starting points for further crawling.
 \end_layout
 
 \begin_layout Scrap
-
 <<STARTERS>>=
 \begin_inset Newline newline
 \end_inset
@@ -23917,7 +23414,6 @@ Required xt.
 \end_layout
 
 \begin_layout Scrap
-
 <<REQUIRED-XT>>=
 \begin_inset Newline newline
 \end_inset
@@ -23938,7 +23434,6 @@ Specify normal disassembly.
 \end_layout
 
 \begin_layout Scrap
-
 <<NORMAL-DISASSEMBLY>>=
 \begin_inset Newline newline
 \end_inset
@@ -23977,7 +23472,6 @@ For ADDRESS : "it is in a current code range"
 \end_layout
 
 \begin_layout Scrap
-
 <<IN-CURRENT-CODE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -23998,7 +23492,6 @@ For ADDRESS and range number N: "address SITS in code range n"
 \end_layout
 
 \begin_layout Scrap
-
 <<IN-CODE-N?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24016,7 +23509,6 @@ For ADDRESS and range I : "It is code and address is part of it, or same
 \end_layout
 
 \begin_layout Scrap
-
 <<IN-CODE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24055,7 +23547,6 @@ RANGE-LABELS
 \end_layout
 
 \begin_layout Scrap
-
 <<KNOWN-CODE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24072,7 +23563,6 @@ For ADDRESS : "it falls within the binary image"
 \end_layout
 
 \begin_layout Scrap
-
 <<IN-CODE-SPACE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24089,7 +23579,6 @@ For ADDRESS: "It is usable as a new starter".
 \end_layout
 
 \begin_layout Scrap
-
 <<STARTER?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24107,7 +23596,6 @@ Return the target ADDRESS of the current instruction.
 \end_layout
 
 \begin_layout Scrap
-
 <<JUMP-TARGET>>=
 \begin_inset Newline newline
 \end_inset
@@ -24149,7 +23637,6 @@ ISL
 \end_layout
 
 \begin_layout Scrap
-
 <<ANALYSE-INSTRUCTION>>=
 \begin_inset Newline newline
 \end_inset
@@ -24174,7 +23661,6 @@ Collapse the label at INDEX with the next and or previous labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<COLLAPSE[I1]>>=
 \begin_inset Newline newline
 \end_inset
@@ -24252,7 +23738,6 @@ Add the information that ADDRESS1 to ADDRESS2 is a code range.
 \end_layout
 
 \begin_layout Scrap
-
 <<INSERT-RANGE>>=
 \begin_inset Newline newline
 \end_inset
@@ -24286,7 +23771,6 @@ LABELS
 \end_layout
 
 \begin_layout Scrap
-
 <<CRAWL-ONE>>=
 \begin_inset Newline newline
 \end_inset
@@ -24315,7 +23799,6 @@ Analyse code from ADDRESS , unless already known.
 \end_layout
 
 \begin_layout Scrap
-
 <<?CRAWL-ONE?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24338,7 +23821,6 @@ STARTERS
 \end_layout
 
 \begin_layout Scrap
-
 <<(CRAWL)>>=
 \begin_inset Newline newline
 \end_inset
@@ -24358,7 +23840,6 @@ ADDRESS points into code.
 \end_layout
 
 \begin_layout Scrap
-
 <<CRAWL>>=
 \begin_inset Newline newline
 \end_inset
@@ -24389,7 +23870,6 @@ TALLY-BA
 \end_layout
 
 \begin_layout Scrap
-
 <<CRAWL16>>=
 \begin_inset Newline newline
 \end_inset
@@ -24406,7 +23886,6 @@ DL range
 \end_layout
 
 \begin_layout Scrap
-
 <<dl-range>>=
 \begin_inset Newline newline
 \end_inset
@@ -24431,7 +23910,6 @@ For ADDR create a label if it points in the target space.
 \end_layout
 
 \begin_layout Scrap
-
 <<NEW-LABEL?>>=
 \begin_inset Newline newline
 \end_inset
@@ -24449,7 +23927,6 @@ For dl-range from ADDR1 to ADDR2 add all plausible labels found in data.
 \end_layout
 
 \begin_layout Scrap
-
 <<ADD-L-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -24466,7 +23943,6 @@ For all dl-ranges add all plausible labels.
 \end_layout
 
 \begin_layout Scrap
-
 <<ALL-L-LABELS>>=
 \begin_inset Newline newline
 \end_inset
@@ -24499,7 +23975,6 @@ A script for converting this document to PDF form follows:
 \end_layout
 
 \begin_layout Scrap
-
 <<final>>=
 \begin_inset Newline newline
 \end_inset
@@ -24512,7 +23987,6 @@ lyx -e pdf cfasdis.lyx
 \end_layout
 
 \begin_layout Scrap
-
 <<*>>=
 \begin_inset Newline newline
 \end_inset

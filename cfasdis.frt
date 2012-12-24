@@ -266,7 +266,8 @@ DECIMAL
 [DEFINED] ForCiForth [IF]
     REQUIRE $=    REQUIRE ."$"
 [THEN]
-include File.fth  Files FALSE REVERSE !  BIG-ENDIAN  ONLY FORTH DEFINITIONS
+include File/pFDatabase/pFDatabase.fth
+Files FALSE REVERSE !  BIG-ENDIAN  ONLY FORTH DEFINITIONS
 ( $Id: asgen.frt,v 4.31 2005/03/07 11:54:58 albert Exp $ )
 ( Copyright{2000}: Albert van der Horst, HCC FIG Holland by GNU Public License)
 ( Uses Richard Stallmans convention. Uppercased word are parameters.    )
@@ -2120,29 +2121,29 @@ Files  FILE Words.dbf  FILE= Words.dbf
 : /Adjust ( -- )   ADJUSTMENTS INITIALIZE ;
 
 4 ( LINK)
-    LONG ADDR     ( Address, used as the key)
- NUMERIC ADJUST   ( Difference from old)
- 8 BYTES NAME     ( Name, word name)
+    LONG WORD-ADDR ( Address, used as the key)
+ NUMERIC ADJUST    ( Difference from old)
+ 8 BYTES NAME-STR  ( Name, word name)
 CONSTANT |Words|
 
-: .ADDR ( -- )   BASE @ HEX  ADDR L@ 8 H.R SPACE  BASE ! ;
+: .WORD-ADDR ( -- )   BASE @ HEX  WORD-ADDR L@ 8 H.R SPACE  BASE ! ;
 
-: .Word ( n -- )   WORD-NAMES READ  .ADDR  ADJUST N?
-    NAME OVER >R B@  FILE-PAD R> xTYPE  SPACE ;
+: .Word ( n -- )   WORD-NAMES READ  .WORD-ADDR  ADJUST N?
+    NAME-STR OVER >R B@  FILE-PAD R> xTYPE  SPACE ;
 : .Words ( -- )   CR  (WORD-NAMES) RECORDS ?DO
         I (WORD-NAMES) READ  LINK L@ .Word
         I 4 MOD 0= IF  CR  THEN
     LOOP  CR ;
 : .Adjusts ( -- )   ADJUSTMENTS RECORDS ?DO
-        CR  I READ  .ADDR  ADJUST N?
+        CR  I READ  .WORD-ADDR  ADJUST N?
     LOOP ;
 
 : FIND-ADDRESS ( a1 -- flag )   FILE-PAD #TB BLANK
-    ADDR 4 nC!  4 ADDR -BINARY ;
+    WORD-ADDR 4 nC!  4 WORD-ADDR -BINARY ;
 : add-word ( a1 a2 n -- )   ROT (WORD-NAMES) FIND-ADDRESS IF
-        SAVE  WORD-NAMES SLOT DUP READ  ADDR 4 nC@ ADDR L!
+        SAVE  WORD-NAMES SLOT DUP READ  WORD-ADDR 4 nC@ WORD-ADDR L!
         RESTORE  DUP LINK 4 nC!  +ORDERED  WORD-NAMES READ
-        FILE-PAD DUP #TB BLANK  SWAP MOVE  NAME B!  0 ADJUST N!
+        FILE-PAD DUP #TB BLANK  SWAP MOVE  NAME-STR B!  0 ADJUST N!
     ELSE  ORDERED RELEASE  2DROP \ TYPE 1 ABORT" at duplicate address "
     THEN ;
 : add-adjust ( a n -- )   SWAP ADJUSTMENTS FIND-ADDRESS IF
@@ -2169,7 +2170,7 @@ Assem
 : FIND-ADJUSTMENTS ( -- n )   TARGET-START  Files
     /Adjust 0 add-adjust  0 (WORD-NAMES) RECORDS ?DO
         I (WORD-NAMES) READ  LINK L@ WORD-NAMES READ
-        ADDR L@  NAME OVER >R B@  FILE-PAD R> -TRAILING  Assem
+        WORD-ADDR L@  NAME-STR OVER >R B@  FILE-PAD R> -TRAILING  Assem
         S" X_" PAD PLACE  PAD APPEND  PAD FIND IF
             EXECUTE ADJUST-DELTA
         ELSE  2DROP  Files -1 ADJUST N! Assem  THEN
@@ -2196,7 +2197,7 @@ Assem
 
 : ADD-LABELS ( -- )   Files  WORD-NAMES RECORDS ?DO
         I READ  ADJUST N@ -1 = IF
-            ADDR L@  NAME OVER >R B@  FILE-PAD R> -TRAILING
+            WORD-ADDR L@  NAME-STR OVER >R B@  FILE-PAD R> -TRAILING
             Assem  S" LABEL X_" PAD PLACE  PAD APPEND
             PAD COUNT EVALUATE
         THEN

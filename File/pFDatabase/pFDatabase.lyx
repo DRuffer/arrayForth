@@ -92,6 +92,7 @@ customHeadersFooters
 \html_math_output 0
 \html_css_as_file 0
 \html_be_strict false
+\author 193454332 "DaR" 
 \author 1040033075 "DRuffer" 
 \end_header
 
@@ -419,6 +420,7 @@ A set of words for creating ordered indexes (for keeping sorted lists).
 \end_layout
 
 \begin_layout Scrap
+
 <<support>>=
 \begin_inset Newline newline
 \end_inset
@@ -1119,6 +1121,7 @@ R#
 \end_layout
 
 \begin_layout Scrap
+
 <<user>>=
 \begin_inset Newline newline
 \end_inset
@@ -1296,6 +1299,7 @@ R@
 \end_layout
 
 \begin_layout Scrap
+
 <<save>>=
 \begin_inset Newline newline
 \end_inset
@@ -1763,6 +1767,7 @@ Remember that any task, which performs an application that uses working
 \end_layout
 
 \begin_layout Scrap
+
 <<working>>=
 \begin_inset Newline newline
 \end_inset
@@ -2157,6 +2162,7 @@ The Data Base Support Package can be compiled into gforth by loading the
 \end_layout
 
 \begin_layout Scrap
+
 <<pFDatabase.fth>>=
 \begin_inset Newline newline
 \end_inset
@@ -2169,11 +2175,31 @@ The Data Base Support Package can be compiled into gforth by loading the
 \begin_inset Newline newline
 \end_inset
 
+
+\change_inserted 193454332 1356330246
+warnings @  0 warnings !
+\begin_inset Newline newline
+\end_inset
+
+
+\change_unchanged
 <<append>>
 \begin_inset Newline newline
 \end_inset
 
 <<place>>
+\change_inserted 193454332 1356330283
+
+\begin_inset Newline newline
+\end_inset
+
+warnings !
+\begin_inset Newline newline
+\end_inset
+
+
+\change_unchanged
+
 \begin_inset Newline newline
 \end_inset
 
@@ -2532,6 +2558,7 @@ FALSE
 \end_layout
 
 \begin_layout Scrap
+
 <<reverse>>=
 \begin_inset Newline newline
 \end_inset
@@ -2554,6 +2581,7 @@ KEEP-CLOSED
 \end_layout
 
 \begin_layout Scrap
+
 <<keep-closed>>=
 \begin_inset Newline newline
 \end_inset
@@ -2683,6 +2711,7 @@ Modified Julian Dates in the range 01 Jan 1900 through 05 Jun 2079 may be
 \end_layout
 
 \begin_layout Scrap
+
 <<date-format>>=
 \begin_inset Newline newline
 \end_inset
@@ -2759,6 +2788,7 @@ D/Y
 \end_layout
 
 \begin_layout Scrap
+
 <<dy>>=
 \begin_inset Newline newline
 \end_inset
@@ -2779,6 +2809,7 @@ DAYS
 \end_layout
 
 \begin_layout Scrap
+
 <<days>>=
 \begin_inset Newline newline
 \end_inset
@@ -2803,6 +2834,7 @@ CREATE DAYS   -1 ,  0 ,  31 ,  59 ,  90 ,  120 ,  151 ,
 \end_layout
 
 \begin_layout Scrap
+
 <<fetch-mth>>=
 \begin_inset Newline newline
 \end_inset
@@ -2823,6 +2855,7 @@ D/M/Y
 \end_layout
 
 \begin_layout Scrap
+
 <<dmy>>=
 \begin_inset Newline newline
 \end_inset
@@ -2858,6 +2891,7 @@ YEAR
 \end_layout
 
 \begin_layout Scrap
+
 <<a.d.>>=
 \begin_inset Newline newline
 \end_inset
@@ -2895,6 +2929,7 @@ YEAR
 \end_layout
 
 \begin_layout Scrap
+
 <<mth>>=
 \begin_inset Newline newline
 \end_inset
@@ -2931,6 +2966,7 @@ M/D/Y
 \end_layout
 
 \begin_layout Scrap
+
 <<mdy>>=
 \begin_inset Newline newline
 \end_inset
@@ -2955,6 +2991,7 @@ DM
 \end_layout
 
 \begin_layout Scrap
+
 <<y-dd-dm>>=
 \begin_inset Newline newline
 \end_inset
@@ -2991,6 +3028,7 @@ DD-MMM-YYYY
 \end_layout
 
 \begin_layout Scrap
+
 <<dd-mmm-yyyy>>=
 \begin_inset Newline newline
 \end_inset
@@ -3031,6 +3069,7 @@ MM/DD/YYYY
 \end_layout
 
 \begin_layout Scrap
+
 <<mmddyyyy>>=
 \begin_inset Newline newline
 \end_inset
@@ -3059,6 +3098,7 @@ MM/DD/YYYY
 \end_layout
 
 \begin_layout Scrap
+
 <<.date>>=
 \begin_inset Newline newline
 \end_inset
@@ -3079,6 +3119,7 @@ MM/DD/YYYY
 \end_layout
 
 \begin_layout Scrap
+
 <<fetch-date>>=
 \begin_inset Newline newline
 \end_inset
@@ -3099,6 +3140,7 @@ MM/DD/YYYY
 \end_layout
 
 \begin_layout Scrap
+
 <<time>>=
 \begin_inset Newline newline
 \end_inset
@@ -3154,6 +3196,7 @@ TITLE"
 \end_layout
 
 \begin_layout Scrap
+
 <<title">>=
 \begin_inset Newline newline
 \end_inset
@@ -3186,6 +3229,7 @@ COMPANY"
 \end_layout
 
 \begin_layout Scrap
+
 <<company">>=
 \begin_inset Newline newline
 \end_inset
@@ -3222,6 +3266,7 @@ APP"
 \end_layout
 
 \begin_layout Scrap
+
 <<app">>=
 \begin_inset Newline newline
 \end_inset
@@ -3363,6 +3408,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<get>>=
 \begin_inset Newline newline
 \end_inset
@@ -3403,6 +3449,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<grab>>=
 \begin_inset Newline newline
 \end_inset
@@ -3435,6 +3482,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<release>>=
 \begin_inset Newline newline
 \end_inset
@@ -3463,6 +3511,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<number-user>>=
 \begin_inset Newline newline
 \end_inset
@@ -3495,6 +3544,7 @@ o n
 \end_layout
 
 \begin_layout Scrap
+
 <<+user>>=
 \begin_inset Newline newline
 \end_inset
@@ -3543,6 +3593,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<c@-le>>=
 \begin_inset Newline newline
 \end_inset
@@ -3613,6 +3664,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<c!-le>>=
 \begin_inset Newline newline
 \end_inset
@@ -3675,6 +3727,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<c@-be>>=
 \begin_inset Newline newline
 \end_inset
@@ -3745,6 +3798,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<c!-be>>=
 \begin_inset Newline newline
 \end_inset
@@ -3786,6 +3840,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<endians>>=
 \begin_inset Newline newline
 \end_inset
@@ -3880,6 +3935,7 @@ BIG-ENDIAN
 \end_layout
 
 \begin_layout Scrap
+
 <<@!,link>>=
 \begin_inset Newline newline
 \end_inset
@@ -3933,6 +3989,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<links>>=
 \begin_inset Newline newline
 \end_inset
@@ -3993,6 +4050,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<>link>>=
 \begin_inset Newline newline
 \end_inset
@@ -4025,6 +4083,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<<link>>=
 \begin_inset Newline newline
 \end_inset
@@ -4058,6 +4117,7 @@ a a'
 \end_layout
 
 \begin_layout Scrap
+
 <<unlink>>=
 \begin_inset Newline newline
 \end_inset
@@ -4091,6 +4151,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<calls>>=
 \begin_inset Newline newline
 \end_inset
@@ -4139,6 +4200,7 @@ a1 n a2
 \end_layout
 
 \begin_layout Scrap
+
 <<append>>=
 \begin_inset Newline newline
 \end_inset
@@ -4175,6 +4237,7 @@ a1 n a2
 \end_layout
 
 \begin_layout Scrap
+
 <<place>>=
 \begin_inset Newline newline
 \end_inset
@@ -4207,6 +4270,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<,string>>=
 \begin_inset Newline newline
 \end_inset
@@ -4239,6 +4303,7 @@ a n
 \end_layout
 
 \begin_layout Scrap
+
 <<string-c,>>=
 \begin_inset Newline newline
 \end_inset
@@ -4267,6 +4332,7 @@ spin
 \end_layout
 
 \begin_layout Scrap
+
 <<spin>>=
 \begin_inset Newline newline
 \end_inset
@@ -4299,6 +4365,7 @@ spin
 \end_layout
 
 \begin_layout Scrap
+
 <<-spin>>=
 \begin_inset Newline newline
 \end_inset
@@ -4319,6 +4386,7 @@ spin
 \end_layout
 
 \begin_layout Scrap
+
 <<-text>>=
 \begin_inset Newline newline
 \end_inset
@@ -4570,6 +4638,7 @@ reference "sub:Ordered-Index-Files"
 \end_layout
 
 \begin_layout Scrap
+
 <<people>>=
 \begin_inset Newline newline
 \end_inset
@@ -4616,6 +4685,7 @@ Define the fields:
 \end_layout
 
 \begin_layout Scrap
+
 <<people-fields>>=
 \begin_inset Newline newline
 \end_inset
@@ -4751,6 +4821,7 @@ Define the file:
 \end_layout
 
 \begin_layout Scrap
+
 <<people-file>>=
 \begin_inset Newline newline
 \end_inset
@@ -4830,6 +4901,7 @@ Initialize the file.
 \end_layout
 
 \begin_layout Scrap
+
 <<people-initialize>>=
 \begin_inset Newline newline
 \end_inset
@@ -4870,6 +4942,7 @@ Here is the definition of a word that will allow data entry for a single
 \end_layout
 
 \begin_layout Scrap
+
 <<enter-person>>=
 \begin_inset Newline newline
 \end_inset
@@ -4994,6 +5067,7 @@ We define the following word to display the current record:
 \end_layout
 
 \begin_layout Scrap
+
 <<display-person>>=
 \begin_inset Newline newline
 \end_inset
@@ -5037,6 +5111,7 @@ To display the contents of all records that have been entered, we define:
 \end_layout
 
 \begin_layout Scrap
+
 <<display-everyone>>=
 \begin_inset Newline newline
 \end_inset
@@ -5398,6 +5473,7 @@ FILE=
 \end_layout
 
 \begin_layout Scrap
+
 <<file>>=
 \begin_inset Newline newline
 \end_inset
@@ -5840,6 +5916,7 @@ HERE>MEMORY
 \end_layout
 
 \begin_layout Scrap
+
 <<memory>>=
 \begin_inset Newline newline
 \end_inset
@@ -6107,6 +6184,7 @@ STRUCTURE
 \end_layout
 
 \begin_layout Scrap
+
 <<block>>=
 \begin_inset Newline newline
 \end_inset
@@ -6339,6 +6417,7 @@ TO #DATA
 \end_layout
 
 \begin_layout Scrap
+
 <<structure>>=
 \begin_inset Newline newline
 \end_inset
@@ -6584,6 +6663,7 @@ It's a good idea to leave extra space in records, in case you need to add
 \end_layout
 
 \begin_layout Scrap
+
 <<origin>>=
 \begin_inset Newline newline
 \end_inset
@@ -6792,6 +6872,7 @@ stopper
 \end_layout
 
 \begin_layout Scrap
+
 <<initialize>>=
 \begin_inset Newline newline
 \end_inset
@@ -7091,6 +7172,7 @@ R#
 \end_layout
 
 \begin_layout Scrap
+
 <<read>>=
 \begin_inset Newline newline
 \end_inset
@@ -7287,6 +7369,7 @@ wrapping around
 \end_layout
 
 \begin_layout Scrap
+
 <<available>>=
 \begin_inset Newline newline
 \end_inset
@@ -7357,6 +7440,7 @@ n
 \end_layout
 
 \begin_layout Scrap
+
 <<slot>>=
 \begin_inset Newline newline
 \end_inset
@@ -7614,6 +7698,7 @@ LIM
 \end_layout
 
 \begin_layout Scrap
+
 <<records>>=
 \begin_inset Newline newline
 \end_inset
@@ -7746,6 +7831,7 @@ TRUE
 \end_layout
 
 \begin_layout Scrap
+
 <<bind-fields>>=
 \begin_inset Newline newline
 \end_inset
@@ -8440,6 +8526,7 @@ BYTES
 \end_layout
 
 \begin_layout Scrap
+
 <<fields>>=
 \begin_inset Newline newline
 \end_inset
@@ -8666,6 +8753,7 @@ FILLER
 \end_layout
 
 \begin_layout Scrap
+
 <<filler>>=
 \begin_inset Newline newline
 \end_inset
@@ -8779,6 +8867,7 @@ COPIES
 \end_layout
 
 \begin_layout Scrap
+
 <<indexed>>=
 \begin_inset Newline newline
 \end_inset
@@ -8810,6 +8899,7 @@ INDEX
 \end_layout
 
 \begin_layout Scrap
+
 <<copies>>=
 \begin_inset Newline newline
 \end_inset
@@ -8997,6 +9087,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<byte>>=
 \begin_inset Newline newline
 \end_inset
@@ -9105,6 +9196,7 @@ NUMERIC
 \end_layout
 
 \begin_layout Scrap
+
 <<numeric>>=
 \begin_inset Newline newline
 \end_inset
@@ -9221,6 +9313,7 @@ LONG
 \end_layout
 
 \begin_layout Scrap
+
 <<long>>=
 \begin_inset Newline newline
 \end_inset
@@ -9293,6 +9386,7 @@ FL!
 \end_layout
 
 \begin_layout Scrap
+
 <<float>>=
 \begin_inset Newline newline
 \end_inset
@@ -9423,6 +9517,7 @@ DOUBLE
 \end_layout
 
 \begin_layout Scrap
+
 <<double>>=
 \begin_inset Newline newline
 \end_inset
@@ -9571,6 +9666,7 @@ PAD
 \end_layout
 
 \begin_layout Scrap
+
 <<bytes>>=
 \begin_inset Newline newline
 \end_inset
@@ -9668,6 +9764,7 @@ GROSS
 \end_layout
 
 \begin_layout Scrap
+
 <<access>>=
 \begin_inset Newline newline
 \end_inset
@@ -9757,6 +9854,7 @@ BYTES
 \end_layout
 
 \begin_layout Scrap
+
 <<put>>=
 \begin_inset Newline newline
 \end_inset
@@ -9825,6 +9923,7 @@ PUT
 \end_layout
 
 \begin_layout Scrap
+
 <<ask>>=
 \begin_inset Newline newline
 \end_inset
@@ -9887,6 +9986,7 @@ BYTES
 \end_layout
 
 \begin_layout Scrap
+
 <<entire>>=
 \begin_inset Newline newline
 \end_inset
@@ -10063,6 +10163,7 @@ This phrase places the actual memory address of the field on top of the
 \end_layout
 
 \begin_layout Scrap
+
 <<address>>=
 \begin_inset Newline newline
 \end_inset
@@ -10445,6 +10546,7 @@ S!
 \end_layout
 
 \begin_layout Scrap
+
 <<strings>>=
 \begin_inset Newline newline
 \end_inset
@@ -10772,6 +10874,7 @@ LINK
 \end_layout
 
 \begin_layout Scrap
+
 <<index>>=
 \begin_inset Newline newline
 \end_inset
@@ -11201,6 +11304,7 @@ NICK
 \end_layout
 
 \begin_layout Scrap
+
 <<text>>=
 \begin_inset Newline newline
 \end_inset
@@ -11320,6 +11424,7 @@ R#
 \end_layout
 
 \begin_layout Scrap
+
 <<binary>>=
 \begin_inset Newline newline
 \end_inset
@@ -11581,6 +11686,7 @@ not-binary,
 \end_layout
 
 \begin_layout Scrap
+
 <<-binary>>=
 \begin_inset Newline newline
 \end_inset
@@ -11636,6 +11742,7 @@ not-binary,
 \end_layout
 
 \begin_layout Scrap
+
 <<+ordered>>=
 \begin_inset Newline newline
 \end_inset
@@ -12046,6 +12153,7 @@ holds
 \end_layout
 
 \begin_layout Scrap
+
 <<ordered>>=
 \begin_inset Newline newline
 \end_inset
@@ -12175,6 +12283,7 @@ ed index which is the current file.
 \end_layout
 
 \begin_layout Scrap
+
 <<-ordered>>=
 \begin_inset Newline newline
 \end_inset
@@ -12452,6 +12561,7 @@ PERSON-HELP
 \end_layout
 
 \begin_layout Scrap
+
 <<personnel>>=
 \begin_inset Newline newline
 \end_inset
@@ -12674,6 +12784,7 @@ The offset for the field types is carried on the stack so that it may be
 \end_layout
 
 \begin_layout Scrap
+
 <<personnel-layout>>=
 \begin_inset Newline newline
 \end_inset
@@ -12711,8 +12822,26 @@ The offset for the field types is carried on the stack so that it may be
 \begin_inset Newline newline
 \end_inset
 
-.( Personnel.dbf records = ) .
+
+\change_inserted 193454332 1356332007
+
+\backslash
+ 
+\change_unchanged
+.( Personnel.dbf records = ) 
+\change_inserted 193454332 1356331980
+DUP 
+\change_unchanged
+.
   .( Bytes ) CR
+\change_inserted 193454332 1356331996
+
+\begin_inset Newline newline
+\end_inset
+
+CONSTANT |PERSONNEL|
+\change_unchanged
+
 \begin_inset Newline newline
 \end_inset
 
@@ -12747,6 +12876,7 @@ NICKNAME
 \end_layout
 
 \begin_layout Scrap
+
 <<person>>=
 \begin_inset Newline newline
 \end_inset
@@ -12767,6 +12897,7 @@ DIGITS
 \end_layout
 
 \begin_layout Scrap
+
 <<digits>>=
 \begin_inset Newline newline
 \end_inset
@@ -12799,6 +12930,7 @@ DIGITS
 \end_layout
 
 \begin_layout Scrap
+
 <<!label>>=
 \begin_inset Newline newline
 \end_inset
@@ -12842,6 +12974,7 @@ enter
 \end_layout
 
 \begin_layout Scrap
+
 <<enter>>=
 \begin_inset Newline newline
 \end_inset
@@ -12879,6 +13012,7 @@ fix
 \end_layout
 
 \begin_layout Scrap
+
 <<fix>>=
 \begin_inset Newline newline
 \end_inset
@@ -12899,6 +13033,7 @@ remove
 \end_layout
 
 \begin_layout Scrap
+
 <<remove>>=
 \begin_inset Newline newline
 \end_inset
@@ -12931,6 +13066,7 @@ PHONE-NUMBER
 \end_layout
 
 \begin_layout Scrap
+
 <<.phone>>=
 \begin_inset Newline newline
 \end_inset
@@ -12971,6 +13107,7 @@ nnnnn
 \end_layout
 
 \begin_layout Scrap
+
 <<.zip>>=
 \begin_inset Newline newline
 \end_inset
@@ -13001,6 +13138,7 @@ PERSONNEL
 \end_layout
 
 \begin_layout Scrap
+
 <<.person>>=
 \begin_inset Newline newline
 \end_inset
@@ -13042,6 +13180,7 @@ R#
 \end_layout
 
 \begin_layout Scrap
+
 <<view>>=
 \begin_inset Newline newline
 \end_inset
@@ -13092,6 +13231,7 @@ PERSONNEL
 \end_layout
 
 \begin_layout Scrap
+
 <<all>>=
 \begin_inset Newline newline
 \end_inset
@@ -13857,6 +13997,7 @@ a) A user variable that points to the first record (head) of the current
 \end_layout
 
 \begin_layout Scrap
+
 <<head>>=
 \begin_inset Newline newline
 \end_inset
@@ -13888,6 +14029,7 @@ a) A pre-defined field (the first four bytes of any record) which may be
 \end_layout
 
 \begin_layout Scrap
+
 <<link>>=
 \begin_inset Newline newline
 \end_inset
@@ -13926,6 +14068,7 @@ HEAD
 \end_layout
 
 \begin_layout Scrap
+
 <<first>>=
 \begin_inset Newline newline
 \end_inset
@@ -14006,6 +14149,7 @@ not-next.
 \end_layout
 
 \begin_layout Scrap
+
 <<-next>>=
 \begin_inset Newline newline
 \end_inset
@@ -14075,6 +14219,7 @@ R#
 \end_layout
 
 \begin_layout Scrap
+
 <<-locate>>=
 \begin_inset Newline newline
 \end_inset
@@ -14122,6 +14267,7 @@ n
 \end_layout
 
 \begin_layout Scrap
+
 <<chain>>=
 \begin_inset Newline newline
 \end_inset
@@ -14150,6 +14296,7 @@ n) Removes the nth record from the chain.
 \end_layout
 
 \begin_layout Scrap
+
 <<unchain>>=
 \begin_inset Newline newline
 \end_inset
@@ -14192,6 +14339,7 @@ r) Given a field address and record number, fetches the record number from
 \end_layout
 
 \begin_layout Scrap
+
 <<snatch>>=
 \begin_inset Newline newline
 \end_inset
@@ -14890,6 +15038,7 @@ An application example using the standard polyFORTH chaining operators.
 \end_layout
 
 \begin_layout Scrap
+
 <<customers>>=
 \begin_inset Newline newline
 \end_inset
@@ -15287,6 +15436,7 @@ Here are the re-definitions, followed by the new versions of the affected
 \end_layout
 
 \begin_layout Scrap
+
 <<alt-locate>>=
 \begin_inset Newline newline
 \end_inset
@@ -15323,6 +15473,7 @@ Here are the re-definitions, followed by the new versions of the affected
 \end_layout
 
 \begin_layout Scrap
+
 <<alt-add>>=
 \begin_inset Newline newline
 \end_inset
@@ -15351,6 +15502,7 @@ LINK L@ HEAD !  SAVE  SERIALS
 \end_layout
 
 \begin_layout Scrap
+
 <<alt-serials>>=
 \begin_inset Newline newline
 \end_inset
@@ -15554,6 +15706,7 @@ An optional feature of the Report Generator allows subtotals and grand totals
 \end_layout
 
 \begin_layout Scrap
+
 <<reports>>=
 \begin_inset Newline newline
 \end_inset
@@ -15635,6 +15788,7 @@ reference "sub:Overview"
 \end_layout
 
 \begin_layout Scrap
+
 <<all-people>>=
 \begin_inset Newline newline
 \end_inset
@@ -16149,6 +16303,7 @@ RPT
 \end_layout
 
 \begin_layout Scrap
+
 <<layout>>=
 \begin_inset Newline newline
 \end_inset
@@ -16296,6 +16451,7 @@ An additional word,
 \end_layout
 
 \begin_layout Scrap
+
 <<title-heading>>=
 \begin_inset Newline newline
 \end_inset
@@ -16678,6 +16834,7 @@ s the width of the new field, and then right-justifies the output string
 \end_layout
 
 \begin_layout Scrap
+
 <<output>>=
 \begin_inset Newline newline
 \end_inset
@@ -16944,6 +17101,7 @@ a
 \end_layout
 
 \begin_layout Scrap
+
 <<rlc>>=
 \begin_inset Newline newline
 \end_inset
@@ -17061,6 +17219,7 @@ Here is an example:
 \end_layout
 
 \begin_layout Scrap
+
 <<accounts>>=
 \begin_inset Newline newline
 \end_inset
@@ -17387,6 +17546,7 @@ n
 \end_layout
 
 \begin_layout Scrap
+
 <<cols>>=
 \begin_inset Newline newline
 \end_inset
@@ -17517,6 +17677,7 @@ P#
 \end_layout
 
 \begin_layout Scrap
+
 <<page>>=
 \begin_inset Newline newline
 \end_inset
@@ -17585,6 +17746,7 @@ L#
 \end_layout
 
 \begin_layout Scrap
+
 <<line>>=
 \begin_inset Newline newline
 \end_inset
@@ -17765,6 +17927,7 @@ a) Saves the address of a title/heading table, and outputs the title and
 \end_layout
 
 \begin_layout Scrap
+
 <<heading>>=
 \begin_inset Newline newline
 \end_inset
@@ -18114,6 +18277,7 @@ TITLE
 \end_layout
 
 \begin_layout Scrap
+
 <<title>>=
 \begin_inset Newline newline
 \end_inset
@@ -18545,6 +18709,7 @@ REGISTER
 \end_layout
 
 \begin_layout Scrap
+
 <<register>>=
 \begin_inset Newline newline
 \end_inset
@@ -18690,6 +18855,7 @@ TOTALS
 \end_layout
 
 \begin_layout Scrap
+
 <<totals>>=
 \begin_inset Newline newline
 \end_inset
@@ -18723,6 +18889,7 @@ d
 \end_layout
 
 \begin_layout Scrap
+
 <<sum>>=
 \begin_inset Newline newline
 \end_inset
@@ -18794,6 +18961,7 @@ total register, then
 \end_layout
 
 \begin_layout Scrap
+
 <<foot>>=
 \begin_inset Newline newline
 \end_inset
@@ -18837,6 +19005,7 @@ d) Advances to the next subtotal register and fetches its contents.
 \end_layout
 
 \begin_layout Scrap
+
 <<sub>>=
 \begin_inset Newline newline
 \end_inset
@@ -18861,6 +19030,7 @@ TOTAL
 \end_layout
 
 \begin_layout Scrap
+
 <<total>>=
 \begin_inset Newline newline
 \end_inset
@@ -18939,6 +19109,7 @@ will display the grand total of the next field.
 \end_layout
 
 \begin_layout Scrap
+
 <<grand>>=
 \begin_inset Newline newline
 \end_inset
@@ -19049,6 +19220,7 @@ Here is the code that produced this display:
 \end_layout
 
 \begin_layout Scrap
+
 <<wines>>=
 \begin_inset Newline newline
 \end_inset
@@ -21738,6 +21910,7 @@ Glossary
 \end_layout
 
 \begin_layout Scrap
+
 <<glossary>>=
 \begin_inset Newline newline
 \end_inset
@@ -21937,6 +22110,7 @@ Here is a sample definition for a glossary file that contains 450 entries.
 \end_layout
 
 \begin_layout Scrap
+
 <<glossary-file>>=
 \begin_inset Newline newline
 \end_inset
@@ -22162,6 +22336,7 @@ VOCAB vocabulary-name
 \end_layout
 
 \begin_layout Scrap
+
 <<vocab>>=
 \begin_inset Newline newline
 \end_inset
@@ -22292,6 +22467,7 @@ Glossary
 \end_layout
 
 \begin_layout Scrap
+
 <<new>>=
 \begin_inset Newline newline
 \end_inset
@@ -22497,6 +22673,7 @@ new text line
 \end_layout
 
 \begin_layout Scrap
+
 <<u>>=
 \begin_inset Newline newline
 \end_inset
@@ -22580,6 +22757,7 @@ T to display the fourth line)
 \end_layout
 
 \begin_layout Scrap
+
 <<t>>=
 \begin_inset Newline newline
 \end_inset
@@ -22608,6 +22786,7 @@ P replacement-text-line
 \end_layout
 
 \begin_layout Scrap
+
 <<p>>=
 \begin_inset Newline newline
 \end_inset
@@ -22654,6 +22833,7 @@ T
 \end_layout
 
 \begin_layout Scrap
+
 <<x>>=
 \begin_inset Newline newline
 \end_inset
@@ -22738,6 +22918,7 @@ F
 \end_layout
 
 \begin_layout Scrap
+
 <<f>>=
 \begin_inset Newline newline
 \end_inset
@@ -22825,6 +23006,7 @@ FIND
 \end_layout
 
 \begin_layout Scrap
+
 <<summary>>=
 \begin_inset Newline newline
 \end_inset
@@ -22874,6 +23056,7 @@ SUMMARY
 \end_layout
 
 \begin_layout Scrap
+
 <<vocabulary>>=
 \begin_inset Newline newline
 \end_inset
@@ -23000,6 +23183,7 @@ FIND
 \end_layout
 
 \begin_layout Scrap
+
 <<find>>=
 \begin_inset Newline newline
 \end_inset
@@ -23029,6 +23213,7 @@ STACKS
 \end_layout
 
 \begin_layout Scrap
+
 <<stacks>>=
 \begin_inset Newline newline
 \end_inset
@@ -23060,6 +23245,7 @@ new-blk# AT
 \end_layout
 
 \begin_layout Scrap
+
 <<at>>=
 \begin_inset Newline newline
 \end_inset
@@ -23083,6 +23269,7 @@ old-blk# new-mlk# MOVED
 \end_layout
 
 \begin_layout Scrap
+
 <<moved>>=
 \begin_inset Newline newline
 \end_inset
@@ -23194,6 +23381,7 @@ DELETE word-name
 \end_layout
 
 \begin_layout Scrap
+
 <<delete>>=
 \begin_inset Newline newline
 \end_inset
@@ -23264,6 +23452,7 @@ assert( ...
 \end_layout
 
 \begin_layout Scrap
+
 <<test>>=
 \begin_inset Newline newline
 \end_inset
@@ -23351,6 +23540,7 @@ PEOPLE
 \end_layout
 
 \begin_layout Scrap
+
 <<fits>>=
 \begin_inset Newline newline
 \end_inset
@@ -23387,6 +23577,7 @@ BIG-ENDIAN
 \end_layout
 
 \begin_layout Scrap
+
 <<text=>>=
 \begin_inset Newline newline
 \end_inset
@@ -23435,6 +23626,7 @@ N@
 \end_layout
 
 \begin_layout Scrap
+
 <<-linked>>=
 \begin_inset Newline newline
 \end_inset
@@ -23484,6 +23676,7 @@ DOUBLE
 \end_layout
 
 \begin_layout Scrap
+
 <<double-stacked>>=
 \begin_inset Newline newline
 \end_inset

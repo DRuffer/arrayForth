@@ -1,8 +1,11 @@
 [defined] 2+! 0= [IF] : 2+! ( d a -- )   DUP >R 2@ D+ R> 2! ; [THEN]
 
+warnings @  0 warnings !
 : append ( from len to -- )   2DUP >R >R  COUNT + SWAP MOVE
     R> R@ C@ + R> C! ;
 : place ( from len to -- )   0 OVER C! SWAP 255 MIN SWAP APPEND ;
+warnings !
+
 : prepend ( from len to -- )   dup count  dup 1+ allocate throw  dup >r place
     dup >r place  r> r@ count rot append  r> free throw ;
 
@@ -750,7 +753,8 @@ FILE Personnel.dbf
      LONG ZIP-CODE       ( Note: can only handle US zips)
      NUMERIC AREA-CODE
      LONG PHONE-NUMBER
-.( Personnel.dbf records = ) .  .( Bytes ) CR
+\ .( Personnel.dbf records = ) DUP .  .( Bytes ) CR
+CONSTANT |PERSONNEL|
 : PERSON ( - n a)   1 TEXT  NICKNAME S!  (PERSONNEL) NICKNAME ;
 : DIGITS ( - n)   QUERY  32 WORD COUNT  0 0 2SWAP
     BEGIN  >NUMBER  DUP

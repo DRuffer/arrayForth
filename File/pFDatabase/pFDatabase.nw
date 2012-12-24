@@ -680,8 +680,11 @@ the following file:
 <<pFDatabase.fth>>=
 [defined] 2+! 0= [IF] : 2+! ( d a -- )   DUP >R 2@ D+ R> 2! ; [THEN]
 
+warnings @  0 warnings !
 <<append>>
 <<place>>
+warnings !
+
 : prepend ( from len to -- )   dup count  dup 1+ allocate throw  dup >r place
     dup >r place  r> r@ count rot append  r> free throw ;
 
@@ -3212,7 +3215,8 @@ it in this case to display the record size.
      LONG ZIP-CODE       ( Note: can only handle US zips)
      NUMERIC AREA-CODE
      LONG PHONE-NUMBER
-.( Personnel.dbf records = ) .  .( Bytes ) CR
+\ .( Personnel.dbf records = ) DUP .  .( Bytes ) CR
+CONSTANT |PERSONNEL|
 @
 
 \begin{description}
