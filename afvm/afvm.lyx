@@ -210,7 +210,6 @@ README
 \end_layout
 
 \begin_layout Scrap
-
 <<README>>=
 \begin_inset Newline newline
 \end_inset
@@ -321,7 +320,6 @@ simple.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
-
 <<simple.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -346,7 +344,6 @@ fib.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
-
 <<fib.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -416,7 +413,6 @@ test.mini - example mini program (tests everything)
 \end_layout
 
 \begin_layout Scrap
-
 <<test.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -801,7 +797,6 @@ test.out - test.mini output
 \end_layout
 
 \begin_layout Scrap
-
 <<test.out>>=
 \begin_inset Newline newline
 \end_inset
@@ -960,7 +955,6 @@ Makefile
 \end_layout
 
 \begin_layout Scrap
-
 <<Makefile>>=
 \begin_inset Newline newline
 \end_inset
@@ -1029,7 +1023,7 @@ mini: $(OBJECTS_MINI)
 \begin_inset Newline newline
 \end_inset
 
- 	$(CC) $(OBJECTS_MINI) -o $@
+	$(CC) $(OBJECTS_MINI) -o $@
 \begin_inset Newline newline
 \end_inset
 
@@ -1041,7 +1035,7 @@ lex.yy.c: mini.l
 \begin_inset Newline newline
 \end_inset
 
- 	$(LEX) mini.l
+	$(LEX) mini.l
 \begin_inset Newline newline
 \end_inset
 
@@ -1053,7 +1047,7 @@ mini.tab.c: mini.y lex.yy.c
 \begin_inset Newline newline
 \end_inset
 
- 	$(YACC) mini.y && mv y.tab.c $@
+	$(YACC) mini.y && mv y.tab.c $@
 \begin_inset Newline newline
 \end_inset
 
@@ -1066,7 +1060,7 @@ mini-vm.i mini-disasm.i mini-gen.i mini-labels.i mini-profile.i mini-peephole.i:
 \begin_inset Newline newline
 \end_inset
 
- 	$(VMGEN) mini.vmg
+	$(VMGEN) mini.vmg
 \begin_inset Newline newline
 \end_inset
 
@@ -1078,7 +1072,7 @@ mini.vmg: mini-inst.vmg mini-super.vmg
 \begin_inset Newline newline
 \end_inset
 
- 	$(M4) mini-inst.vmg >$@
+	$(M4) mini-inst.vmg >$@
 \begin_inset Newline newline
 \end_inset
 
@@ -1176,7 +1170,7 @@ checkall:
 \begin_inset Newline newline
 \end_inset
 
-	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=../vmgen
+	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen
  CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i
  >>xxx-bench; 
 \backslash
@@ -1208,7 +1202,6 @@ Support.c - main() and other support functions
 \end_layout
 
 \begin_layout Scrap
-
 <<support.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -2031,7 +2024,6 @@ mini.h - common declarations
 \end_layout
 
 \begin_layout Scrap
-
 <<mini.h>>=
 \begin_inset Newline newline
 \end_inset
@@ -2369,7 +2361,6 @@ mini-inst.vmg - simple VM instructions
 \end_layout
 
 \begin_layout Scrap
-
 <<mini-inst.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -2946,7 +2937,6 @@ mini-super.vmg - superinstructions (empty at first)
 \end_layout
 
 \begin_layout Scrap
-
 <<mini-super.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -2963,7 +2953,6 @@ mini.l - scanner
 \end_layout
 
 \begin_layout Scrap
-
 <<mini.l>>=
 \begin_inset Newline newline
 \end_inset
@@ -3129,7 +3118,6 @@ mini.y - front end (parser, VM code generator)
 \end_layout
 
 \begin_layout Scrap
-
 <<mini.y>>=
 \begin_inset Newline newline
 \end_inset
@@ -3664,7 +3652,6 @@ peephole-blacklist - list of instructions not allowed in superinstructions
 \end_layout
 
 \begin_layout Scrap
-
 <<peephole-blacklist>>=
 \begin_inset Newline newline
 \end_inset
@@ -3693,9 +3680,7 @@ peephole.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<peephole.c>>=
-
 \begin_inset Newline newline
 \end_inset
 
@@ -4060,7 +4045,6 @@ profile.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<profile.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -4675,7 +4659,6 @@ disasm.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<disasm.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -4782,7 +4765,6 @@ engine.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<engine.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -5606,7 +5588,6 @@ stat.awk - script for aggregating profile information
 \end_layout
 
 \begin_layout Scrap
-
 <<stat.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -5681,7 +5662,6 @@ seq2rule.awk - script for creating superinstructions
 \end_layout
 
 \begin_layout Scrap
-
 <<seq2rule.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -5732,7 +5712,6 @@ A script for converting this document to PDF form follows:
 \end_layout
 
 \begin_layout Scrap
-
 <<final>>=
 \begin_inset Newline newline
 \end_inset
@@ -5754,7 +5733,6 @@ Each of these scripts can be pulled out manually given the default * script
 \end_layout
 
 \begin_layout Scrap
-
 <<*>>=
 \begin_inset Newline newline
 \end_inset
@@ -5792,7 +5770,6 @@ Once that script is pulled out and named extract, the following script can
 \end_layout
 
 \begin_layout Scrap
-
 <<extract-all>>=
 \begin_inset Newline newline
 \end_inset
@@ -5890,7 +5867,6 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
-
 <<copyright>>=
 \begin_inset Newline newline
 \end_inset
@@ -5964,7 +5940,6 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
-
 <<
 \backslash
 copyright>>=
@@ -6065,7 +6040,6 @@ copyright>>=
 \end_layout
 
 \begin_layout Scrap
-
 <<#copyright>>=
 \begin_inset Newline newline
 \end_inset

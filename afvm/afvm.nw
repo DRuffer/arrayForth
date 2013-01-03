@@ -283,19 +283,19 @@ M4=m4
 OBJECTS_MINI=mini.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
 
 mini: $(OBJECTS_MINI)
- 	$(CC) $(OBJECTS_MINI) -o $@
+	$(CC) $(OBJECTS_MINI) -o $@
 
 lex.yy.c: mini.l
- 	$(LEX) mini.l
+	$(LEX) mini.l
 
 mini.tab.c: mini.y lex.yy.c
- 	$(YACC) mini.y && mv y.tab.c $@
+	$(YACC) mini.y && mv y.tab.c $@
 
 mini-vm.i mini-disasm.i mini-gen.i mini-labels.i mini-profile.i mini-peephole.i: mini.vmg
- 	$(VMGEN) mini.vmg
+	$(VMGEN) mini.vmg
 
 mini.vmg: mini-inst.vmg mini-super.vmg
- 	$(M4) mini-inst.vmg >$@
+	$(M4) mini-inst.vmg >$@
 
 mini.tab.o: mini.tab.c mini-gen.i lex.yy.c mini.h
 
