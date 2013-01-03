@@ -1,0 +1,2 @@
+lyx -e pdf $1
+lyx -e latex $1

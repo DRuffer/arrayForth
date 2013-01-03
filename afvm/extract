@@ -1,0 +1,6 @@
+echo "Extract file $1 from afvm.lyx..."
+rm -f afvm.nw
+lyx -e literate afvm.lyx
+notangle -R$1 afvm.nw > $1
+chmod a+x $1
+#rm -f afvm.nw

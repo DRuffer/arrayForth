@@ -1,0 +1,39 @@
+This directory contains a working example for using vmgen.  It's a
+small Modula-2-like programming language.
+
+You can build the example by first installing Gforth and then saying,
+in this directory:
+
+make
+
+Ignore the warnings.  You can check that it works with
+
+make check
+
+You can run mini programs like this:
+
+./mini fib.mini
+
+To learn about the options, type
+
+./mini -h
+
+More information can be found in the vmgen documentation.
+
+-----
+  Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
+
+  This file is part of Gforth.
+
+  Gforth is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public License
+  as published by the Free Software Foundation, either version 3
+  of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, see http://www.gnu.org/licenses/.

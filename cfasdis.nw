@@ -1974,7 +1974,7 @@ Build a bag (i.e. stack) with X items.
 Create a bag \textquotedbl{}x\textquotedbl{} with X items.
 
 <<BAG>>=
-: BAG ( n -- )   CREATE HERE CELL+ , CELLS ALLOT DOES> ;
+: BAG ( n -name- )   CREATE BUILD-BAG DOES> ;
 @
 
 Make the BAG empty.
@@ -3977,7 +3977,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
    0 4  8008 00002 ' (L,) COMMAER L,     ( immediate data : address/offset )
    0 2  4008 00002 ' (W,) COMMAER W,     ( immediate data : address/offset )
    0 1  0004 00002 ' AS-C, COMMAER B,    ( immediate byte : address/offset )
-   _ 1  0000 00001 _    COMMAER SIB,, ( An instruction with in an instruction )
+   _ 1  0000 00001 _    COMMAER SIB,, ( An instruction within an instruction )
 
  ( Meaning of the bits in TALLY-BA :                                     )
  ( Inconsistent:  0001 OPERAND IS BYTE     0002 OPERAND IS CELL  W/L     )
@@ -6641,6 +6641,17 @@ is detected.
 
 <<STARTERS>>=
 1000 BAG STARTERS
+
+Files  FILE Starters.dbf  FILE= Starters.dbf
+
+( Bytes  records   origin             name )
+      4     1000        0 BLOCK-DATA (STARTERS)
+
+: /Starters ( -- )   Starters.dbf  FILE-HANDLE @ 0= IF
+        S" Starters.dbf" >FILE  THEN
+    (STARTERS) INITIALIZE ;
+
+Assem
 @
 
 Required xt. Return the XT that is required for the current disassembly.
@@ -6764,7 +6775,7 @@ ranges to '\texttt{\textbf{LABELS}}'.
 Analyse code from ADDRESS , unless already known.
 
 <<?CRAWL-ONE?>>=
-: ?CRAWL-ONE? DUP STARTER? IF CRAWL-ONE _ THEN DROP ;
+: ?CRAWL-ONE? ( a -- )   DUP STARTER? IF CRAWL-ONE _ THEN DROP ;
 @
 
 Crawl through code from all points in '\texttt{\textbf{STARTERS}}'.
@@ -6777,7 +6788,7 @@ ADDRESS points into code. Crawl through code from there, i.e. add
 all information about code ranges that can be derived from that.
 
 <<CRAWL>>=
-: CRAWL   DUP ?INSERT-EQU?   RANGE-LABELS SORT-LABELS
+: CRAWL ( a -- )   DUP ?INSERT-EQU?   RANGE-LABELS SORT-LABELS
     STARTERS DUP !BAG BAG+!   SHUTUP (CRAWL) ;
 @
 
@@ -6787,7 +6798,7 @@ resp. Crawl through 16 / 32 bits code. The other owns change it all
 the time.
 
 <<CRAWL16>>=
-: CRAWL16  ['] D-R-T-16 (R-XT) ! BITS-16 CRAWL NORMAL-DISASSEMBLY ;
+: CRAWL16 ( a -- )  ['] D-R-T-16 (R-XT) ! BITS-16 CRAWL NORMAL-DISASSEMBLY ;
 @
 
 

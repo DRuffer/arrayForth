@@ -1,0 +1,20 @@
+echo "Extract all files..."
+./extract README
+./extract simple.mini
+./extract fib.mini
+./extract test.mini
+./extract test.out
+./extract Makefile
+./extract support.c
+./extract mini.h
+./extract mini-inst.vmg
+./extract mini-super.vmg
+./extract mini.l
+./extract mini.y
+./extract peephole-blacklist
+./extract peephole.c
+./extract profile.c
+./extract disasm.c
+./extract engine.c
+./extract stat.awk
+./extract seq2rule.awk

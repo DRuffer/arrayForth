@@ -176,7 +176,7 @@ CREATE CHAR-BUF   0 C,
      0 value _  ' _ to _
 
     : BUILD-BAG ( n -- )   HERE CELL+ , CELLS ALLOT ;
-    : BAG ( n -- )   CREATE HERE CELL+ , CELLS ALLOT DOES> ;
+    : BAG ( n -name- )   CREATE BUILD-BAG DOES> ;
     : !BAG ( bag -- )   DUP CELL+ SWAP ! ;
     : BAG? ( bag -- )   @+ = 0= ;
     : BAG+! ( x bag -- )   DUP >R @ ! 0 CELL+ R> +! ;
@@ -810,7 +810,7 @@ ALSO ASSEMBLER DEFINITIONS HEX
    0 4  8008 00002 ' (L,) COMMAER L,     ( immediate data : address/offset )
    0 2  4008 00002 ' (W,) COMMAER W,     ( immediate data : address/offset )
    0 1  0004 00002 ' AS-C, COMMAER B,    ( immediate byte : address/offset )
-   _ 1  0000 00001 _    COMMAER SIB,, ( An instruction with in an instruction )
+   _ 1  0000 00001 _    COMMAER SIB,, ( An instruction within an instruction )
 
  ( Meaning of the bits in TALLY-BA :                                     )
  ( Inconsistent:  0001 OPERAND IS BYTE     0002 OPERAND IS CELL  W/L     )
@@ -1867,7 +1867,18 @@ DECIMAL
 
 ALSO ASSEMBLER
 
-1000 BAG STARTERS
+1000 BAG STARTERS
+
+Files  FILE Starters.dbf  FILE= Starters.dbf
+
+( Bytes  records   origin             name )
+      4     1000        0 BLOCK-DATA (STARTERS)
+
+: /Starters ( -- )   Starters.dbf  FILE-HANDLE @ 0= IF
+        S" Starters.dbf" >FILE  THEN
+    (STARTERS) INITIALIZE ;
+
+Assem
 VARIABLE (R-XT)
 : REQUIRED-XT (R-XT) @ ;
 : NORMAL-DISASSEMBLY ['] D-R-T (R-XT) ! BITS-32 ;
@@ -1908,9 +1919,9 @@ DECIMAL
         (DISASSEMBLE) ANALYSE-INSTRUCTION DUP HOST-END >=
         LATEST-INSTRUCTION @ UNCONDITIONAL-TRANSFERS IN-BAG? OR
     UNTIL R> SWAP HOST>TARGET INSERT-RANGE ;
-: ?CRAWL-ONE? DUP STARTER? IF CRAWL-ONE _ THEN DROP ;
+: ?CRAWL-ONE? ( a -- )   DUP STARTER? IF CRAWL-ONE _ THEN DROP ;
 : (CRAWL)   BEGIN STARTERS BAG? WHILE STARTERS BAG@- ?CRAWL-ONE? REPEAT ;
-: CRAWL   DUP ?INSERT-EQU?   RANGE-LABELS SORT-LABELS
+: CRAWL ( a -- )   DUP ?INSERT-EQU?   RANGE-LABELS SORT-LABELS
     STARTERS DUP !BAG BAG+!   SHUTUP (CRAWL) ;
 : NEW-LABEL? ( a -- )   DUP PLAUSIBLE-LABEL? IF  ?INSERT-EQU? _  THEN  DROP ;
 : ADD-L-LABELS ( l h -- )   SWAP DO  I L@ NEW-LABEL?  0 CELL+ +LOOP ;
@@ -1918,7 +1929,7 @@ DECIMAL
         I CELL+ @ RANGE-SECTION  RANGE-XT ['] DUMP-L = IF
             RANGE-START RANGE-END ADD-L-LABELS  THEN
     LOOP-LAB  TO CURRENT-SECTION ;
-: CRAWL16  ['] D-R-T-16 (R-XT) ! BITS-16 CRAWL NORMAL-DISASSEMBLY ;
+: CRAWL16 ( a -- )  ['] D-R-T-16 (R-XT) ! BITS-16 CRAWL NORMAL-DISASSEMBLY ;
 
 PREVIOUS
 \ Copyright (c) 2012 Dennis Ruffer
