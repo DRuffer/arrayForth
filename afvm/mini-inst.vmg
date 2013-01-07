@@ -24,15 +24,16 @@
 \ comments start with "\ "
 
 \ stack definitions:
-\E stack data-stack sp Cell
+\E stack data-stack sp Cell
 
 \ stack prefix definitions
 \E inst-stream stack-prefix #
+\E data-stack  stack-prefix S:
 
 \ type prefix definitions:
 \E s" Cell"   single data-stack type-prefix i
 \E s" char *" single data-stack type-prefix a
-\E s" Inst *" single data-stack type-prefix target
+\E s" Inst *" single data-stack type-prefix target
 
 \ simple VM instructions:
 add ( i1 i2 -- i )
@@ -62,21 +63,21 @@ i2 = !i1;
 negate ( i1 -- i2 )
 i2 = -i1;
 
-lit ( #i -- i )
+lit ( #i -- i )
 
 drop ( i -- )
 
 print ( i -- )
-printf("%ld\n", i);
+printf("%ld\n", i);
 
 branch ( #target -- )
-SET_IP(target);
+SET_IP(target);
 
 zbranch ( #target i -- )
 if (i==0) {
   SET_IP(target);
   INST_TAIL;
-}
+}
 
 \  The stack is organized as follows:
 \  The stack grows downwards; a stack usually looks like this:
@@ -93,7 +94,7 @@ if (i==0) {
 \  +--oldfp                <-- fp
 \     intermediate results <-- sp
 \  ---------------------- top of stack
-\  lower addresses
+\  lower addresses
 
 \ The following VM instructions also explicitly reference sp and
 \ therefore may have to do something about spTOS caching.
@@ -122,7 +123,7 @@ loadlocal ( #ioffset -- i )
 i = *(Cell *)(fp+ioffset);
 
 storelocal ( #ioffset i -- )
-*(Cell *)(fp+ioffset) = i;
+*(Cell *)(fp+ioffset) = i;
 
 end ( i -- )
 /* SUPER_END would increment the next BB count (because IP points there);
@@ -131,6 +132,6 @@ end ( i -- )
 #ifdef VM_PROFILING
 block_insert(IP); /* we also do this at compile time, so this is unnecessary */
 #endif
-return i;
+return i;
 
 include(mini-super.vmg)

@@ -15,7 +15,7 @@
 #GNU General Public License for more details.
 
 #You should have received a copy of the GNU General Public License
-#along with this program; if not, see http://www.gnu.org/licenses/.
+#along with this program; if not, see http://www.gnu.org/licenses/.
 
 LEX=flex -l
 YACC=bison -y
@@ -61,7 +61,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 clean:
 	rm -f *.o mini mini-*.i lex.yy.c mini.tab.c mini.vmg
 
-check:  mini
+check:	mini
 	./mini test.mini | tr -d '\015' | diff - test.out
 
 checkall:

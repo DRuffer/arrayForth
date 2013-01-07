@@ -80,13 +80,13 @@ customHeadersFooters
 \begin_layout Title
 
 \series bold
-ArrayForth Virtual Machine
+Virtual Machine Generator
 \end_layout
 
 \begin_layout Standard
 \noindent
 \align center
-Copyright © 2013 Dennis Ruffer
+Copyright © 2002,2003,2005,2007,2008 Free Software Foundation, Inc.
 \begin_inset Newline newline
 \end_inset
 
@@ -94,8 +94,14 @@ Permission is granted to copy, distribute and/or modify this document under
  the terms of the GNU Free Documentation License, Version 1.3 or any later
  version published by the Free Software Foundation; with no Invariant Sections,
  no Front-Cover Texts, and no Back-Cover Texts.
- A copy of the license is included in the section entitled "GNU Free Documentati
-on License".
+ A copy of the license is included in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:GNU-Free-Documentation"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -202,10 +208,5342 @@ Make sure the afvmConfig.tex file is setup properly before exporting to PDF.
 \end_layout
 
 \begin_layout Section
-ArrayForth application files
+Vmgen documentation
+\end_layout
+
+\begin_layout Standard
+This documentation is for Vmgen (version 0.7.9-20120209, November 17, 2011),
+ the virtual machine interpreter generator.
 \end_layout
 
 \begin_layout Subsection
+Introduction
+\end_layout
+
+\begin_layout Standard
+Vmgen is a tool for writing efficient interpreters.
+ It takes a simple virtual machine description and generates efficient C
+ code for dealing with the virtual machine code in various ways (in particular,
+ executing it).
+ The run-time efficiency of the resulting interpreters is usually within
+ a factor of 10 of machine code produced by an optimizing compiler.
+\end_layout
+
+\begin_layout Standard
+The interpreter design strategy supported by Vmgen is to divide the interpreter
+ into two parts:
+\end_layout
+
+\begin_layout Itemize
+The front end takes the source code of the language to be implemented, and
+ translates it into virtual machine code.
+ This is similar to an ordinary compiler front end; typically an interpreter
+ front-end performs no optimization, so it is relatively simple to implement
+ and runs fast.
+\end_layout
+
+\begin_layout Itemize
+The virtual machine interpreter executes the virtual machine code.
+\end_layout
+
+\begin_layout Standard
+Such a division is usually used in interpreters, for modularity as well
+ as for efficiency.
+ The virtual machine code is typically passed between front end and virtual
+ machine interpreter in memory, like in a load-and-go compiler; this avoids
+ the complexity and time cost of writing the code to a file and reading
+ it again.
+\end_layout
+
+\begin_layout Standard
+A virtual machine (VM) represents the program as a sequence of VM instructions,
+ following each other in memory, similar to real machine code.
+ Control flow occurs through VM branch instructions, like in a real machine.
+\end_layout
+
+\begin_layout Standard
+In this setup, Vmgen can generate most of the code dealing with virtual
+ machine instructions from a simple description of the virtual machine instructi
+ons (see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Input-File-Format"
+
+\end_inset
+
+), in particular:
+\end_layout
+
+\begin_layout Description
+VM
+\begin_inset space ~
+\end_inset
+
+instruction
+\begin_inset space ~
+\end_inset
+
+execution
+\end_layout
+
+\begin_layout Description
+VM
+\begin_inset space ~
+\end_inset
+
+code
+\begin_inset space ~
+\end_inset
+
+generation Useful in the front end.
+\end_layout
+
+\begin_layout Description
+VM
+\begin_inset space ~
+\end_inset
+
+code
+\begin_inset space ~
+\end_inset
+
+decompiler Useful for debugging the front end.
+\end_layout
+
+\begin_layout Description
+VM
+\begin_inset space ~
+\end_inset
+
+code
+\begin_inset space ~
+\end_inset
+
+tracing Useful for debugging the front end and the VM interpreter.
+ You will typically provide other means for debugging the user's programs
+ at the source level.
+\end_layout
+
+\begin_layout Description
+VM
+\begin_inset space ~
+\end_inset
+
+code
+\begin_inset space ~
+\end_inset
+
+profiling Useful for optimizing the VM interpreter with superinstructions
+ (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:VM-profiler"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+To create parts of the interpretive system that do not deal with VM instructions
+, you have to use other tools (e.g., bison) and/or hand-code them.
+\end_layout
+
+\begin_layout Standard
+Vmgen supports efficient interpreters though various optimizations, in particula
+r
+\end_layout
+
+\begin_layout Itemize
+Threaded code
+\end_layout
+
+\begin_layout Itemize
+Caching the top-of-stack in a register
+\end_layout
+
+\begin_layout Itemize
+Combining VM instructions into superinstructions
+\end_layout
+
+\begin_layout Itemize
+Replicating VM (super)instructions for better BTB prediction accuracy (not
+ yet in vmgen-ex, but already in Gforth).
+\end_layout
+
+\begin_layout Standard
+As a result, Vmgen-based interpreters are only about an order of magnitude
+ slower than native code from an optimizing C compiler on small benchmarks;
+ on large benchmarks, which spend more time in the run-time system, the
+ slowdown is often less (e.g., the slowdown of a Vmgen-generated JVM interpreter
+ over the best JVM JIT compiler we measured is only a factor of 2-3 for
+ large benchmarks; some other JITs and all other interpreters we looked
+ at were slower than our interpreter).
+\end_layout
+
+\begin_layout Standard
+VMs are usually designed as stack machines (passing data between VM instructions
+ on a stack), and Vmgen supports such designs especially well; however,
+ you can also use Vmgen for implementing a register VM (see Register Machines)
+ and still benefit from most of the advantages offered by Vmgen.
+\end_layout
+
+\begin_layout Standard
+There are many potential uses of the instruction descriptions that are not
+ implemented at the moment, but we are open for feature requests, and we
+ will consider new features if someone asks for them; so the feature list
+ above is not exhaustive.
+\end_layout
+
+\begin_layout Subsection
+Why interpreters?
+\end_layout
+
+\begin_layout Standard
+Interpreters are a popular language implementation technique because they
+ combine all three of the following advantages:
+\end_layout
+
+\begin_layout Itemize
+Ease of implementation
+\end_layout
+
+\begin_layout Itemize
+Portability
+\end_layout
+
+\begin_layout Itemize
+Fast edit-compile-run cycle
+\end_layout
+
+\begin_layout Standard
+Vmgen makes it even easier to implement interpreters.
+\end_layout
+
+\begin_layout Standard
+The main disadvantage of interpreters is their run-time speed.
+ However, there are huge differences between different interpreters in this
+ area: the slowdown over optimized C code on programs consisting of simple
+ operations is typically a factor of 10 for the more efficient interpreters,
+ and a factor of 1000 for the less efficient ones (the slowdown for programs
+ executing complex operations is less, because the time spent in libraries
+ for executing complex operations is the same in all implementation strategies).
+\end_layout
+
+\begin_layout Standard
+Vmgen supports techniques for building efficient interpreters.
+\end_layout
+
+\begin_layout Subsection
+Concepts
+\end_layout
+
+\begin_layout Itemize
+Front end and VM interpreter: Modularizing an interpretive system
+\end_layout
+
+\begin_layout Itemize
+Data handling: Stacks, registers, immediate arguments
+\end_layout
+
+\begin_layout Itemize
+Dispatch: From one VM instruction to the next
+\end_layout
+
+\begin_layout Subsubsection
+Front end and VM interpreter
+\end_layout
+
+\begin_layout Standard
+Interpretive systems are typically divided into a front end that parses
+ the input language and produces an intermediate representation for the
+ program, and an interpreter that executes the intermediate representation
+ of the program.
+\end_layout
+
+\begin_layout Standard
+For efficient interpreters the intermediate representation of choice is
+ virtual machine code (rather than, e.g., an abstract syntax tree).
+ Virtual machine (VM) code consists of VM instructions arranged sequentially
+ in memory; they are executed in sequence by the VM interpreter, but VM
+ branch instructions can change the control flow and are used for implementing
+ control structures.
+ The conceptual similarity to real machine code results in the name virtual
+ machine.
+ Various terms similar to terms for real machines are used; e.g., there are
+ VM registers (like the instruction pointer and stack pointer(s)), and the
+ VM instruction consists of an opcode and immediate arguments.
+\end_layout
+
+\begin_layout Standard
+In this framework, Vmgen supports building the VM interpreter and any other
+ component dealing with VM instructions.
+ It does not have any support for the front end, apart from VM code generation
+ support.
+ The front end can be implemented with classical compiler front-end techniques,
+ supported by tools like flex and bison.
+\end_layout
+
+\begin_layout Standard
+The intermediate representation is usually just internal to the interpreter,
+ but some systems also support saving it to a file, either as an image file,
+ or in a full-blown linkable file format (e.g., JVM).
+ Vmgen currently has no special support for such features, but the information
+ in the instruction descriptions can be helpful, and we are open to feature
+ requests and suggestions.
+\end_layout
+
+\begin_layout Subsubsection
+Data handling
+\end_layout
+
+\begin_layout Standard
+Most VMs use one or more stacks for passing temporary data between VM instructio
+ns.
+ Another option is to use a register machine architecture for the virtual
+ machine; we believe that using a stack architecture is usually both simpler
+ and faster.
+\end_layout
+
+\begin_layout Standard
+However, this option is slower or significantly more complex to implement
+ than a stack machine architecture.
+\end_layout
+
+\begin_layout Standard
+Vmgen has special support and optimizations for stack VMs, making their
+ implementation easy and efficient.
+\end_layout
+
+\begin_layout Standard
+You can also implement a register VM with Vmgen (see Register Machines),
+ and you will still profit from most Vmgen features.
+\end_layout
+
+\begin_layout Standard
+Stack items all have the same size, so they typically will be as wide as
+ an integer, pointer, or floating-point value.
+ Vmgen supports treating two consecutive stack items as a single value,
+ but anything larger is best kept in some other memory area (e.g., the heap),
+ with pointers to the data on the stack.
+\end_layout
+
+\begin_layout Standard
+Another source of data is immediate arguments VM instructions (in the VM
+ instruction stream).
+ The VM instruction stream is handled similar to a stack in Vmgen.
+\end_layout
+
+\begin_layout Standard
+Vmgen has no built-in support for, nor restrictions against garbage collection.
+ If you need garbage collection, you need to provide it in your run-time
+ libraries.
+ Using reference counting is probably harder, but might be possible (contact
+ us if you are interested).
+\end_layout
+
+\begin_layout Subsubsection
+Dispatch
+\end_layout
+
+\begin_layout Standard
+Understanding this section is probably not necessary for using Vmgen, but
+ it may help.
+ You may want to skip it now, and read it if you find statements about dispatch
+ methods confusing.
+\end_layout
+
+\begin_layout Standard
+After executing one VM instruction, the VM interpreter has to dispatch the
+ next VM instruction (Vmgen calls the dispatch routine ‘
+\family typewriter
+\series bold
+NEXT
+\family default
+\series default
+’).
+ Vmgen supports two methods of dispatch:
+\end_layout
+
+\begin_layout Description
+switch
+\begin_inset space ~
+\end_inset
+
+dispatch In this method the VM interpreter contains a giant switch statement,
+ with one case for each VM instruction.
+ The VM instruction opcodes are represented by integers (e.g., produced by
+ an 
+\family typewriter
+\series bold
+enum
+\family default
+\series default
+) in the VM code, and dispatch occurs by loading the next opcode, switching
+ on it, and continuing at the appropriate 
+\family typewriter
+\series bold
+case
+\family default
+\series default
+; after executing the VM instruction, the VM interpreter jumps back to the
+ dispatch code.
+\end_layout
+
+\begin_layout Description
+threaded
+\begin_inset space ~
+\end_inset
+
+code This method represents a VM instruction opcode by the address of the
+ start of the machine code fragment for executing the VM instruction.
+ Dispatch consists of loading this address, jumping to it, and incrementing
+ the VM instruction pointer.
+ Typically the threaded-code dispatch code is appended directly to the code
+ for executing the VM instruction.
+ Threaded code cannot be implemented in ANSI C, but it can be implemented
+ using GNU C's labels-as-values extension (see Labels as Values).
+\end_layout
+
+\begin_layout Standard
+Threaded code can be twice as fast as switch dispatch, depending on the
+ interpreter, the benchmark, and the machine.
+\end_layout
+
+\begin_layout Subsection
+Invoking Vmgen
+\end_layout
+
+\begin_layout Standard
+The usual way to invoke Vmgen is as follows:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+vmgen inputfile
+\end_layout
+
+\begin_layout Standard
+Here 
+\family typewriter
+\series bold
+inputfile
+\family default
+\series default
+ is the VM instruction description file, which usually ends in 
+\family typewriter
+\series bold
+.vmg
+\family default
+\series default
+.
+ The output filenames are made by taking the basename of 
+\family typewriter
+\series bold
+inputfile
+\family default
+\series default
+ (i.e., the output files will be created in the current working directory)
+ and replacing 
+\family typewriter
+\series bold
+.vmg
+\family default
+\series default
+ with 
+\family typewriter
+\series bold
+-vm.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+-disasm.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+-gen.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+-labels.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+-profile.i
+\family default
+\series default
+, and 
+\family typewriter
+\series bold
+-peephole.i
+\family default
+\series default
+.
+ E.g., 
+\family typewriter
+\series bold
+vmgen hack/foo.vmg
+\family default
+\series default
+ will create 
+\family typewriter
+\series bold
+foo-vm.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+foo-disasm.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+foo-gen.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+foo-labels.i
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+foo-profile.i
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+foo-peephole.i
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+The command-line options supported by Vmgen are
+\end_layout
+
+\begin_layout Description
+--help
+\end_layout
+
+\begin_layout Description
+-h Print a message about the command-line options
+\end_layout
+
+\begin_layout Description
+--version
+\end_layout
+
+\begin_layout Description
+-v Print version and exit
+\end_layout
+
+\begin_layout Subsection
+Example
+\end_layout
+
+\begin_layout Itemize
+Example overview
+\end_layout
+
+\begin_layout Itemize
+Using profiling to create superinstructions
+\end_layout
+
+\begin_layout Subsubsection
+Example overview
+\end_layout
+
+\begin_layout Standard
+There are two versions of the same example for using Vmgen: 
+\family typewriter
+\series bold
+vmgen-ex
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+vmgen-ex2
+\family default
+\series default
+ (you can also see Gforth as example, but it uses additional (undocumented)
+ features, and also differs in some other respects).
+ The example implements 
+\family typewriter
+\series bold
+mini
+\family default
+\series default
+, a tiny Modula-2-like language with a small JavaVM-like virtual machine.
+\end_layout
+
+\begin_layout Standard
+The difference between the examples is that 
+\family typewriter
+\series bold
+vmgen-ex
+\family default
+\series default
+ uses many casts, and 
+\family typewriter
+\series bold
+vmgen-ex2
+\family default
+\series default
+ tries to avoids most casts and uses unions instead.
+ In the rest of this manual we usually mention just files in 
+\family typewriter
+\series bold
+vmgen-ex
+\family default
+\series default
+; if you want to use unions, use the equivalent file in 
+\family typewriter
+\series bold
+vmgen-ex2
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+You can build the example by cding into the example's directory, and then
+ typing 
+\family typewriter
+\series bold
+make
+\family default
+\series default
+; you can check that it works with 
+\family typewriter
+\series bold
+make check
+\family default
+\series default
+.
+ You can run run 
+\family typewriter
+\series bold
+mini
+\family default
+\series default
+ programs like this:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+./mini fib.mini
+\end_layout
+
+\begin_layout Standard
+To learn about the options, type 
+\family typewriter
+\series bold
+./mini -h
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Subsubsection
+Using profiling to create superinstructions
+\end_layout
+
+\begin_layout Standard
+I have not added rules for this in the 
+\family typewriter
+\series bold
+Makefile
+\family default
+\series default
+ (there are many options for selecting superinstructions, and I did not
+ want to hardcode one into the 
+\family typewriter
+\series bold
+Makefile
+\family default
+\series default
+), but there are some supporting scripts, and here's an example:
+\end_layout
+
+\begin_layout Standard
+Suppose you want to use 
+\family typewriter
+\series bold
+fib.mini
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+test.mini
+\family default
+\series default
+ as training programs, you get the profiles like this:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+make fib.prof test.prof
+\end_layout
+
+\begin_layout Standard
+It takes a few seconds and then you can aggregate these profiles with 
+\family typewriter
+\series bold
+stat.awk
+\family default
+\series default
+:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk -f stat.awk fib.prof test.prof
+\end_layout
+
+\begin_layout Standard
+The result contains lines like:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+2 16 36910041 loadlocal lit
+\end_layout
+
+\begin_layout Standard
+This means that the sequence 
+\family typewriter
+\series bold
+loadlocal lit
+\family default
+\series default
+ statically occurs a total of 16 times in 2 profiles, with a dynamic execution
+ count of 36910041.
+\end_layout
+
+\begin_layout Standard
+The numbers can be used in various ways to select superinstructions.
+ E.g., if you just want to select all sequences with a dynamic execution count
+ exceeding 10000, you would use the following pipeline:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk -f stat.awk fib.prof test.prof| 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk '$3>=10000'| #select sequences 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+fgrep -v -f peephole-blacklist| #eliminate wrong instructions 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk -f seq2rule.awk| #transform sequences into superinstruction rules 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+sort -k 3 >mini-super.vmg #sort sequences
+\end_layout
+
+\begin_layout Standard
+The file 
+\family typewriter
+\series bold
+peephole-blacklist
+\family default
+\series default
+ contains all instructions that directly access a stack or stack pointer
+ (for mini: 
+\family typewriter
+\series bold
+call
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+return
+\family default
+\series default
+); the sort step is necessary to ensure that prefixes precede larger superinstru
+ctions.
+\end_layout
+
+\begin_layout Standard
+Now you can create a version of mini with superinstructions by just saying
+ ‘
+\family typewriter
+\series bold
+make
+\family default
+\series default
+’
+\end_layout
+
+\begin_layout Subsection
+Input File Format
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Input-File-Format"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Vmgen takes as input a file containing specifications of virtual machine
+ instructions.
+ This file usually has a name ending in 
+\family typewriter
+\series bold
+.vmg
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+Most examples are taken from the example in 
+\family typewriter
+\series bold
+vmgen-ex
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Itemize
+Input File Grammar
+\end_layout
+
+\begin_layout Itemize
+Simple instructions
+\end_layout
+
+\begin_layout Itemize
+Superinstructions
+\end_layout
+
+\begin_layout Itemize
+Store Optimization
+\end_layout
+
+\begin_layout Itemize
+Register Machines: How to define register VM instructions
+\end_layout
+
+\begin_layout Subsubsection
+Input File Grammar
+\end_layout
+
+\begin_layout Standard
+The grammar is in EBNF format, with 
+\family typewriter
+\series bold
+a|b
+\family default
+\series default
+ meaning “a or b”, 
+\family typewriter
+\series bold
+{c}
+\family default
+\series default
+ meaning 0 or more repetitions of c and 
+\family typewriter
+\series bold
+[d]
+\family default
+\series default
+ meaning 0 or 1 repetitions of d.
+\end_layout
+
+\begin_layout Standard
+Vmgen input is not free-format, so you have to take care where you put newlines
+ (and, in a few cases, white space).
+\end_layout
+
+\begin_layout Description
+description: {instruction|comment|eval-escape|c-escape}
+\end_layout
+
+\begin_layout Description
+instruction: simple-inst|super-inst
+\end_layout
+
+\begin_layout Description
+simple-inst: ident '(' stack-effect ')' newline c-code newline newline
+\end_layout
+
+\begin_layout Description
+stack-effect: {ident} '--' {ident}
+\end_layout
+
+\begin_layout Description
+super-inst: ident '=' ident {ident}
+\end_layout
+
+\begin_layout Description
+comment: '
+\backslash
+ ' text newline
+\end_layout
+
+\begin_layout Description
+eval-escape: '
+\backslash
+E ' text newline
+\end_layout
+
+\begin_layout Description
+c-escape: '
+\backslash
+C ' text newline
+\end_layout
+
+\begin_layout Standard
+Note that the 
+\backslash
+s in this grammar are meant literally, not as C-style encodings for non-printabl
+e characters.
+\end_layout
+
+\begin_layout Standard
+There are two ways to delimit the C code in simple-inst:
+\end_layout
+
+\begin_layout Itemize
+If you start it with a ‘
+\family typewriter
+\series bold
+{
+\family default
+\series default
+’ at the start of a line (i.e., not even white space before it), you have
+ to end it with a ‘
+\family typewriter
+\series bold
+}
+\family default
+\series default
+’ at the start of a line (followed by a newline).
+ In this case you may have empty lines within the C code (typically used
+ between variable definitions and statements).
+\end_layout
+
+\begin_layout Itemize
+You do not start it with ‘
+\family typewriter
+\series bold
+{
+\family default
+\series default
+’.
+ Then the C code ends at the first empty line, so you cannot have empty
+ lines within this code.
+\end_layout
+
+\begin_layout Standard
+The text in 
+\family typewriter
+\series bold
+comment
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+eval-escape
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+c-escape
+\family default
+\series default
+ must not contain a newline.
+ 
+\family typewriter
+\series bold
+Ident
+\family default
+\series default
+ must conform to the usual conventions of C identifiers (otherwise the C
+ compiler would choke on the Vmgen output), except that idents in 
+\family typewriter
+\series bold
+stack-effect
+\family default
+\series default
+ may have a stack prefix (for stack prefix syntax, see Eval escapes).
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+\series bold
+c-escape
+\family default
+\series default
+ passes the text through to each output file (without the ‘
+\family typewriter
+\series bold
+
+\backslash
+C
+\family default
+\series default
+’).
+ This is useful mainly for conditional compilation (i.e., you write ‘
+\family typewriter
+\series bold
+
+\backslash
+C #if ...
+\family default
+\series default
+’ etc.).
+\end_layout
+
+\begin_layout Standard
+In addition to the syntax given in the grammer, Vmgen also processes sync
+ lines (lines starting with ‘
+\family typewriter
+\series bold
+#line
+\family default
+\series default
+’), as produced by ‘
+\family typewriter
+\series bold
+m4 -s
+\family default
+\series default
+’ (see Invoking m4) and similar tools.
+ This allows associating C compiler error messages with the original source
+ of the C code.
+\end_layout
+
+\begin_layout Standard
+Vmgen understands a few extensions beyond the grammar given here, but these
+ extensions are only useful for building Gforth.
+ You can find a description of the format used for Gforth in 
+\family typewriter
+\series bold
+prim
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Paragraph
+Eval escapes
+\end_layout
+
+\begin_layout Standard
+The text in 
+\family typewriter
+\series bold
+eval-escape
+\family default
+\series default
+ is Forth code that is evaluated when Vmgen reads the line.
+ You will normally use this feature to define stacks and types.
+\end_layout
+
+\begin_layout Standard
+If you do not know (and do not want to learn) Forth, you can build the text
+ according to the following grammar; these rules are normally all Forth
+ you need for using Vmgen:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+text: stack-decl|type-prefix-decl|stack-prefix-decl|set-flag
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+stack-decl: 'stack ' ident ident ident
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+type-prefix-decl: 's" ' string '" ' ('single'|'double') ident 'type-prefix'
+ ident
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+stack-prefix-decl: ident 'stack-prefix' string
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+set-flag: ('store-optimization'|'include-skipped-insts') ('on'|'off')
+\end_layout
+
+\begin_layout Standard
+Note that the syntax of this code is not checked thoroughly (there are many
+ other Forth program fragments that could be written in an 
+\family typewriter
+\series bold
+eval-escape
+\family default
+\series default
+).
+\end_layout
+
+\begin_layout Standard
+A stack prefix can contain letters, digits, or ‘
+\family typewriter
+\series bold
+:
+\family default
+\series default
+’, and may start with an ‘
+\family typewriter
+\series bold
+#
+\family default
+\series default
+’; e.g., in Gforth the return stack has the stack prefix ‘
+\family typewriter
+\series bold
+R:
+\family default
+\series default
+’.
+ This restriction is not checked during the stack prefix definition, but
+ it is enforced by the parsing rules for stack items later.
+\end_layout
+
+\begin_layout Standard
+If you know Forth, the stack effects of the non-standard words involved
+ are:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+stack ( "name" "pointer" "type" -- ) ( name execution: -- stack )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+type-prefix ( addr u item-size stack "prefix" -- )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+single ( -- item-size )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+double ( -- item-size )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+stack-prefix ( stack "prefix" -- )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+store-optimization ( -- addr )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+include-skipped-insts ( -- addr )
+\end_layout
+
+\begin_layout Standard
+An 
+\family typewriter
+\series bold
+item-size
+\family default
+\series default
+ takes three cells on the stack.
+\end_layout
+
+\begin_layout Subsubsection
+Simple instructions
+\end_layout
+
+\begin_layout Standard
+We will use the following simple VM instruction descriptions as examples:
+\end_layout
+
+\begin_layout Scrap
+<<simple-instructions>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ simple VM instructions:
+\begin_inset Newline newline
+\end_inset
+
+add ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1+i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+sub ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1-i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+mul ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1*i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+and ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1 & i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+or ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1 | i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+lessthan ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1<i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+equals ( i1 i2 -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = i1==i2;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+not ( i1 -- i2 )
+\begin_inset Newline newline
+\end_inset
+
+i2 = !i1;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+negate ( i1 -- i2 )
+\begin_inset Newline newline
+\end_inset
+
+i2 = -i1;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+<<lit>>
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+drop ( i -- )
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+print ( i -- )
+\begin_inset Newline newline
+\end_inset
+
+printf("%ld
+\backslash
+n", i);
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The first line specifies the name of the VM instruction (e.g.
+ 
+\family typewriter
+\series bold
+sub
+\family default
+\series default
+) and its stack effect (e.g.
+ 
+\family typewriter
+\series bold
+i1 i2 -- i
+\family default
+\series default
+).
+ The rest of the description is just plain C code.
+\end_layout
+
+\begin_layout Standard
+The stack effect specifies that sub pulls two integers from the data stack
+ and puts them in the C variables 
+\family typewriter
+\series bold
+i1
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+i2
+\family default
+\series default
+ (with the rightmost item (
+\family typewriter
+\series bold
+i2
+\family default
+\series default
+) taken from the top of stack; intuition: if you push 
+\family typewriter
+\series bold
+i1
+\family default
+\series default
+, then 
+\family typewriter
+\series bold
+i2
+\family default
+\series default
+ on the stack, the resulting stack picture is 
+\family typewriter
+\series bold
+i1 i2
+\family default
+\series default
+) and later pushes one integer (
+\family typewriter
+\series bold
+i
+\family default
+\series default
+) on the data stack (the rightmost item is on the top afterwards).
+\end_layout
+
+\begin_layout Standard
+How do we know the type and stack of the stack items? Vmgen uses prefixes,
+ similar to Fortran; in contrast to Fortran, you have to define the prefix
+ first:
+\end_layout
+
+\begin_layout Scrap
+<<type-prefix>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ type prefix definitions:
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Cell"   single data-stack type-prefix i
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" char *" single data-stack type-prefix a
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Inst *" single data-stack type-prefix target
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This defines the prefix 
+\family typewriter
+\series bold
+i
+\family default
+\series default
+ to refer to the type 
+\family typewriter
+\series bold
+Cell
+\family default
+\series default
+ (defined as 
+\family typewriter
+\series bold
+long
+\family default
+\series default
+ in 
+\family typewriter
+\series bold
+mini.h
+\family default
+\series default
+) and, by default, to the 
+\family typewriter
+\series bold
+data-stack
+\family default
+\series default
+.
+ It also specifies that this type takes one stack item (
+\family typewriter
+\series bold
+single
+\family default
+\series default
+).
+ The type prefix is part of the variable name.
+\end_layout
+
+\begin_layout Standard
+Before we can use 
+\family typewriter
+\series bold
+data-stack
+\family default
+\series default
+ in this way, we have to define it:
+\end_layout
+
+\begin_layout Scrap
+<<stack-definitions>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ stack definitions:
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E stack data-stack sp Cell
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This line defines the stack data-stack, which uses the stack pointer 
+\family typewriter
+\series bold
+sp
+\family default
+\series default
+, and each item has the basic type 
+\family typewriter
+\series bold
+Cell
+\family default
+\series default
+; other types have to fit into one or two Cells (depending on whether the
+ type is single or double wide), and are cast from and to Cells on accessing
+ the data-stack with type cast macros (see VM engine).
+ By default, stacks grow towards lower addresses in Vmgen-erated interpreters
+ (see Stack growth direction).
+\end_layout
+
+\begin_layout Standard
+We can override the default stack of a stack item by using a stack prefix.
+ E.g., consider the following instruction:
+\end_layout
+
+\begin_layout Scrap
+<<lit>>=
+\begin_inset Newline newline
+\end_inset
+
+lit ( #i -- i )
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The VM instruction 
+\family typewriter
+\series bold
+lit
+\family default
+\series default
+ takes the item 
+\family typewriter
+\series bold
+i
+\family default
+\series default
+ from the instruction stream (indicated by the prefix 
+\family typewriter
+\series bold
+#
+\family default
+\series default
+), and pushes it on the (default) data stack.
+ The stack prefix is not part of the variable name.
+ Stack prefixes are defined like this:
+\end_layout
+
+\begin_layout Scrap
+<<stack-prefix>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ stack prefix definitions
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E inst-stream stack-prefix #
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E data-stack  stack-prefix S:
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This definition defines that the stack prefix 
+\family typewriter
+\series bold
+#
+\family default
+\series default
+ specifies the “stack” 
+\family typewriter
+\series bold
+inst-stream
+\family default
+\series default
+.
+ Since the instruction stream behaves a little differently than an ordinary
+ stack, it is predefined, and you do not need to define it.
+\end_layout
+
+\begin_layout Standard
+The instruction stream contains instructions and their immediate arguments,
+ so specifying that an argument comes from the instruction stream indicates
+ an immediate argument.
+ Of course, instruction stream arguments can only appear to the left of
+ 
+\family typewriter
+\series bold
+--
+\family default
+\series default
+ in the stack effect.
+ If there are multiple instruction stream arguments, the leftmost is the
+ first one (just as the intuition suggests).
+\end_layout
+
+\begin_layout Paragraph
+Explicit stack access
+\end_layout
+
+\begin_layout Standard
+This feature is not needed and not supported in the 0.7.9 version of vmgen
+ that is documented here (and that is invoked by default).
+\end_layout
+
+\begin_layout Standard
+Not all stack effects can be specified using the stack effect specifications
+ above.
+ For VM instructions that have other stack effects, you can specify them
+ explicitly by accessing the stack pointer in the C code; however, you have
+ to notify Vmgen of such explicit stack accesses, otherwise Vmgens optimizations
+ could conflict with your explicit stack accesses.
+\end_layout
+
+\begin_layout Standard
+You notify Vmgen by putting 
+\family typewriter
+\series bold
+...
+
+\family default
+\series default
+ with the appropriate stack prefix into the stack comment.
+ Then the VM instruction will first take the other stack items specified
+ in the stack effect into C variables, then make sure that all other stack
+ items for that stack are in memory, and that the stack pointer for the
+ stack points to the top-of-stack (by default, unless you change the stack
+ access transformation: see Stack growth direction).
+\end_layout
+
+\begin_layout Standard
+The general rule is: If you mention a stack pointer in the C code of a VM
+ instruction, you should put a 
+\family typewriter
+\series bold
+...
+
+\family default
+\series default
+ for that stack in the stack effect.
+\end_layout
+
+\begin_layout Standard
+Consider this example:
+\end_layout
+
+\begin_layout Scrap
+<<unused-stack-adjust>>=
+\begin_inset Newline newline
+\end_inset
+
+return ( #iadjust S:...
+ target afp i1 -- i2 )
+\begin_inset Newline newline
+\end_inset
+
+SET_IP(target);
+\begin_inset Newline newline
+\end_inset
+
+sp = (Cell *)(((char *)sp)+iadjust);
+\begin_inset Newline newline
+\end_inset
+
+fp = afp;
+\begin_inset Newline newline
+\end_inset
+
+i2=i1;
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+First the variables 
+\family typewriter
+\series bold
+target afp i1
+\family default
+\series default
+ are popped off the stack, then the stack pointer 
+\family typewriter
+\series bold
+sp
+\family default
+\series default
+ is set correctly for the new stack depth, then the C code changes the stack
+ depth and does other things, and finally 
+\family typewriter
+\series bold
+i2
+\family default
+\series default
+ is pushed on the stack with the new depth.
+\end_layout
+
+\begin_layout Standard
+The position of the 
+\family typewriter
+\series bold
+...
+
+\family default
+\series default
+ within the stack effect does not matter.
+ You can use several 
+\family typewriter
+\series bold
+...
+\family default
+\series default
+s, for different stacks, and also several for the same stack (that has no
+ additional effect).
+ If you use 
+\family typewriter
+\series bold
+...
+
+\family default
+\series default
+ without a stack prefix, this specifies all the stacks except the instruction
+ stream.
+\end_layout
+
+\begin_layout Standard
+You cannot use 
+\family typewriter
+\series bold
+...
+
+\family default
+\series default
+ for the instruction stream, but that is not necessary: At the start of
+ the C code, IP points to the start of the next VM instruction (i.e., right
+ beyond the end of the current VM instruction), and you can change the instructi
+on pointer with 
+\family typewriter
+\series bold
+SET_IP
+\family default
+\series default
+ (see VM engine).
+\end_layout
+
+\begin_layout Paragraph
+C Code Macros
+\begin_inset CommandInset label
+LatexCommand label
+name "par:C-Code-Macros"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Vmgen recognizes the following strings in the C code part of simple instructions
+:
+\end_layout
+
+\begin_layout Description
+SET_IP As far as Vmgen is concerned, a VM instruction containing this ends
+ a VM basic block (used in profiling to delimit profiled sequences).
+ On the C level, this also sets the instruction pointer.
+\end_layout
+
+\begin_layout Scrap
+<<branch>>=
+\begin_inset Newline newline
+\end_inset
+
+branch ( #target -- )
+\begin_inset Newline newline
+\end_inset
+
+SET_IP(target);
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+SUPER_END This ends a basic block (for profiling), even if the instruction
+ contains no 
+\family typewriter
+\series bold
+SET_IP
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Scrap
+<<end>>=
+\begin_inset Newline newline
+\end_inset
+
+end ( i -- )
+\begin_inset Newline newline
+\end_inset
+
+/* SUPER_END would increment the next BB count (because IP points there);
+\begin_inset Newline newline
+\end_inset
+
+   this would be a problem if there is no following BB.
+\begin_inset Newline newline
+\end_inset
+
+   Instead, we do the following to add an end point for the current BB:
+ */
+\begin_inset Newline newline
+\end_inset
+
+#ifdef VM_PROFILING
+\begin_inset Newline newline
+\end_inset
+
+block_insert(IP); /* we also do this at compile time, so this is unnecessary
+ */
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+return i;
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+INST_TAIL; Vmgen replaces ‘
+\family typewriter
+\series bold
+INST_TAIL;
+\family default
+\series default
+’ with code for ending a VM instruction and dispatching the next VM instruction.
+ Even without a ‘
+\family typewriter
+\series bold
+INST_TAIL;
+\family default
+\series default
+’ this happens automatically when control reaches the end of the C code.
+ If you want to have this in the middle of the C code, you need to use ‘
+\family typewriter
+\series bold
+INST_TAIL;
+\family default
+\series default
+’.
+ A typical example is a conditional VM branch.
+ In this example, ‘
+\family typewriter
+\series bold
+INST_TAIL;
+\family default
+\series default
+’ is not strictly necessary, because there is another one implicitly after
+ the if-statement, but using it improves branch prediction accuracy slightly
+ and allows other optimizations.
+\end_layout
+
+\begin_layout Scrap
+<<zbranch>>=
+\begin_inset Newline newline
+\end_inset
+
+zbranch ( #target i -- )
+\begin_inset Newline newline
+\end_inset
+
+if (i==0) {
+\begin_inset Newline newline
+\end_inset
+
+  SET_IP(target);
+\begin_inset Newline newline
+\end_inset
+
+  INST_TAIL;
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+SUPER_CONTINUE This indicates that the implicit tail at the end of the VM
+ instruction dispatches the sequentially next VM instruction even if there
+ is a 
+\family typewriter
+\series bold
+SET_IP
+\family default
+\series default
+ in the VM instruction.
+ This enables an optimization that is not yet implemented in the vmgen-ex
+ code (but in Gforth).
+ The typical application is in conditional VM branches.
+\end_layout
+
+\begin_layout Scrap
+<<unused-branch>>=
+\begin_inset Newline newline
+\end_inset
+
+unused-branch ( #target i -- )
+\begin_inset Newline newline
+\end_inset
+
+if (i==0) {
+\begin_inset Newline newline
+\end_inset
+
+  SET_IP(target);
+\begin_inset Newline newline
+\end_inset
+
+  INST_TAIL;
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+SUPER_CONTINUE;
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Note that Vmgen is not smart about C-level tokenization, comments, strings,
+ or conditional compilation, so it will interpret even a commented-out 
+\family typewriter
+\series bold
+SUPER_END
+\family default
+\series default
+ as ending a basic block (or, e.g., ‘
+\family typewriter
+\series bold
+RESET_IP
+\family default
+\series default
+;’ as ‘
+\family typewriter
+\series bold
+SET_IP
+\family default
+\series default
+;’).
+ Conversely, Vmgen requires the literal presence of these strings; Vmgen
+ will not see them if they are hiding in a C preprocessor macro.
+\end_layout
+
+\begin_layout Paragraph
+C Code restrictions
+\end_layout
+
+\begin_layout Standard
+Vmgen generates code and performs some optimizations under the assumption
+ that the user-supplied C code does not access the stack pointers or stack
+ items, and that accesses to the instruction pointer only occur through
+ special macros.
+ In general you should heed these restrictions.
+ However, if you need to break these restrictions, read the following.
+\end_layout
+
+\begin_layout Standard
+Accessing a stack or stack pointer directly can be a problem for several
+ reasons:
+\end_layout
+
+\begin_layout Itemize
+Vmgen optionally supports caching the top-of-stack item in a local variable
+ (that is allocated to a register).
+ This is the most frequent source of trouble.
+ You can deal with it either by not using top-of-stack caching (slowdown
+ factor 1-1.4, depending on machine), or by inserting flushing code (e.g.,
+ ‘
+\family typewriter
+\series bold
+IF_spTOS(sp[...] = spTOS);
+\family default
+\series default
+’) at the start and reloading code (e.g., ‘
+\family typewriter
+\series bold
+IF_spTOS(spTOS = sp[0])
+\family default
+\series default
+’) at the end of problematic C code.
+ Vmgen inserts a stack pointer update before the start of the user-supplied
+ C code, so the flushing code has to use an index that corrects for that.
+ In the future, this flushing may be done automatically by mentioning a
+ special string in the C code.
+\end_layout
+
+\begin_layout Scrap
+<<stack-caching>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ The following VM instructions also explicitly reference sp and
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ therefore may have to do something about spTOS caching.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+call ( #target #iadjust -- targetret aoldfp )
+\begin_inset Newline newline
+\end_inset
+
+/* IF_spTOS(sp[2] = spTOS);*/ /* unnecessary; vmgen inserts a flush anyway
+ */
+\begin_inset Newline newline
+\end_inset
+
+targetret = IP;
+\begin_inset Newline newline
+\end_inset
+
+SET_IP(target);
+\begin_inset Newline newline
+\end_inset
+
+aoldfp = fp;
+\begin_inset Newline newline
+\end_inset
+
+sp = (Cell *)(((char *)sp)+iadjust);
+\begin_inset Newline newline
+\end_inset
+
+fp = (char *)sp;
+\begin_inset Newline newline
+\end_inset
+
+/* IF_spTOS(spTOS = sp[0]); */ /* dead, thus unnecessary; vmgen copies aoldfp
+ there */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+return ( #iadjust target afp i1 -- i2 )
+\begin_inset Newline newline
+\end_inset
+
+/* IF_spTOS(sp[-2] = spTOS); */ /* unnecessary; that stack item is dead
+ */
+\begin_inset Newline newline
+\end_inset
+
+SET_IP(target);
+\begin_inset Newline newline
+\end_inset
+
+sp = (Cell *)(((char *)sp)+iadjust);
+\begin_inset Newline newline
+\end_inset
+
+fp = afp;
+\begin_inset Newline newline
+\end_inset
+
+i2=i1;
+\begin_inset Newline newline
+\end_inset
+
+/* IF_spTOS(spTOS = sp[0]); */ /* dead, thus unnecessary; vmgen copies i2
+ there */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ loadlocal and storelocal access stack items below spTOS, so we can
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+ ignore spTOS caching.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+loadlocal ( #ioffset -- i )
+\begin_inset Newline newline
+\end_inset
+
+i = *(Cell *)(fp+ioffset);
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+storelocal ( #ioffset i -- )
+\begin_inset Newline newline
+\end_inset
+
+*(Cell *)(fp+ioffset) = i;
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Itemize
+The Vmgen-erated code loads the stack items from stack-pointer-indexed memory
+ into variables before the user-supplied C code, and stores them from variables
+ to stack-pointer-indexed memory afterwards.
+ If you do any writes to the stack through its stack pointer in your C code,
+ it will not affect the variables, and your write may be overwritten by
+ the stores after the C code.
+ Similarly, a read from a stack using a stack pointer will not reflect computati
+ons of stack items in the same VM instruction.
+\end_layout
+
+\begin_layout Itemize
+Superinstructions keep stack items in variables across the whole superinstructio
+n.
+ So you should not include VM instructions, that access a stack or stack
+ pointer, as components of superinstructions (see VM profiler).
+\end_layout
+
+\begin_layout Standard
+You should access the instruction pointer only through its special macros
+ (‘
+\family typewriter
+\series bold
+IP
+\family default
+\series default
+’, ‘
+\family typewriter
+\series bold
+SET_IP
+\family default
+\series default
+’, ‘
+\family typewriter
+\series bold
+IPTOS
+\family default
+\series default
+’); this ensure that these macros can be implemented in several ways for
+ best performance.
+ ‘
+\family typewriter
+\series bold
+IP
+\family default
+\series default
+’ points to the next instruction, and ‘
+\family typewriter
+\series bold
+IPTOS
+\family default
+\series default
+’ is its contents.
+\end_layout
+
+\begin_layout Paragraph
+Stack growth direction
+\end_layout
+
+\begin_layout Standard
+By default, the stacks grow towards lower addresses.
+ You can change this for a stack by setting the 
+\family typewriter
+\series bold
+stack-access-transform
+\family default
+\series default
+ field of the stack to an xt ( 
+\family typewriter
+\series bold
+itemnum -- index
+\family default
+\series default
+ ) that performs the appropriate index transformation.
+\end_layout
+
+\begin_layout Standard
+E.g., if you want to let 
+\family typewriter
+\series bold
+data-stack
+\family default
+\series default
+ grow towards higher addresses, with the stack pointer always pointing just
+ beyond the top-of-stack, use this right after defining 
+\family typewriter
+\series bold
+data-stack
+\family default
+\series default
+:
+\end_layout
+
+\begin_layout Scrap
+<<unused-stack-transform>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E : sp-access-transform ( itemnum -- index ) negate 1- ;
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E ' sp-access-transform ' data-stack >body stack-access-transform !
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This means that 
+\family typewriter
+\series bold
+sp-access-transform
+\family default
+\series default
+ will be used to generate indexes for accessing 
+\family typewriter
+\series bold
+data-stack
+\family default
+\series default
+.
+ The definition of 
+\family typewriter
+\series bold
+sp-access-transform
+\family default
+\series default
+ above transforms 
+\family typewriter
+\series bold
+n
+\family default
+\series default
+ into 
+\family typewriter
+\series bold
+-n-1
+\family default
+\series default
+, e.g, 1 into -2.
+ This will access the 0th data-stack element (top-of-stack) at sp[-1], the
+ 1st at sp[-2], etc., which is the typical way upward-growing stacks are
+ used.
+ If you need a different transform and do not know enough Forth to program
+ it, let me know.
+\end_layout
+
+\begin_layout Scrap
+<<stack-organization>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  The stack is organized as follows:
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  The stack grows downwards; a stack usually looks like this:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  higher addresses
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  --------------------- bottom of stack
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+     locals of main
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+     return address (points to VM code after call)
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  +->oldfp (NULL)
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  |  intermediate results (e.g., 1 for a call like 1+foo(...))
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  |  arguments passed to the called function
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  |  locals of the called function
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  |  return address (points to VM code after call)
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  +--oldfp                <-- fp
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+     intermediate results <-- sp
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  ---------------------- top of stack
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+  lower addresses
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsubsection
+Superinstructions
+\end_layout
+
+\begin_layout Standard
+Note: don't invest too much work in (static) superinstructions; a future
+ version of Vmgen will support dynamic superinstructions (see Ian Piumarta
+ and Fabio Riccardi, Optimizing Direct Threaded Code by Selective Inlining,
+ PLDI'98), and static superinstructions have much less benefit in that context
+ (preliminary results indicate only a factor 1.1 speedup).
+\end_layout
+
+\begin_layout Standard
+Here is an example of a superinstruction definition:
+\end_layout
+
+\begin_layout Scrap
+<<ll>>=
+\begin_inset Newline newline
+\end_inset
+
+ll = loadlocal lit
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+ll
+\family default
+\series default
+ is the name of the superinstruction, and 
+\family typewriter
+\series bold
+loadlocal
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+lit
+\family default
+\series default
+ are its components.
+ This superinstruction performs the same action as the sequence 
+\family typewriter
+\series bold
+loadlocal
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+lit
+\family default
+\series default
+.
+ It is generated automatically by the VM code generation functions whenever
+ that sequence occurs, so if you want to use this superinstruction, you
+ just need to add this definition (and even that can be partially automatized,
+ see VM profiler).
+\end_layout
+
+\begin_layout Standard
+Vmgen requires that the component instructions are simple instructions defined
+ before superinstructions using the components.
+ Currently, Vmgen also requires that all the subsequences at the start of
+ a superinstruction (prefixes) must be defined as superinstruction before
+ the superinstruction.
+ I.e., if you want to define a superinstruction
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+foo4 = load add sub mul
+\end_layout
+
+\begin_layout Standard
+you first have to define 
+\family typewriter
+\series bold
+load
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+add
+\family default
+\series default
+, 
+\family typewriter
+\series bold
+sub
+\family default
+\series default
+ and 
+\family typewriter
+\series bold
+mul
+\family default
+\series default
+, plus
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+foo2 = load add
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+foo3 = load add sub
+\end_layout
+
+\begin_layout Standard
+Here, 
+\family typewriter
+\series bold
+foo2
+\family default
+\series default
+ is the longest prefix of 
+\family typewriter
+\series bold
+foo3
+\family default
+\series default
+, and 
+\family typewriter
+\series bold
+foo3
+\family default
+\series default
+ is the longest prefix of 
+\family typewriter
+\series bold
+foo4
+\family default
+\series default
+.
+\end_layout
+
+\begin_layout Standard
+Note that Vmgen assumes that only the code it generates accesses stack pointers,
+ the instruction pointer, and various stack items, and it performs optimizations
+ based on this assumption.
+ Therefore, VM instructions where your C code changes the instruction pointer
+ should only be used as last component; a VM instruction where your C code
+ accesses a stack pointer should not be used as component at all.
+ Vmgen does not check these restrictions, they just result in bugs in your
+ interpreter.
+\end_layout
+
+\begin_layout Standard
+The Vmgen flag 
+\family typewriter
+\series bold
+include-skipped-insts
+\family default
+\series default
+ influences superinstruction code generation.
+ Currently there is no support in the peephole optimizer for both variations,
+ so leave this flag alone for now.
+\end_layout
+
+\begin_layout Subsubsection
+Store Optimization
+\end_layout
+
+\begin_layout Standard
+This minor optimization (0.6%–0.8% reduction in executed instructions for
+ Gforth) puts additional requirements on the instruction descriptions and
+ is therefore disabled by default.
+\end_layout
+
+\begin_layout Standard
+What does it do? Consider an instruction like
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+dup ( n -- n n )
+\end_layout
+
+\begin_layout Standard
+For simplicity, also assume that we are not caching the top-of-stack in
+ a register.
+ Now, the C code for dup first loads n from the stack, and then stores it
+ twice to the stack, one time to the address where it came from; that time
+ is unnecessary, but gcc does not optimize it away, so vmgen can do it instead
+ (if you turn on the store optimization).
+\end_layout
+
+\begin_layout Standard
+Vmgen uses the stack item's name to determine if the stack item contains
+ the same value as it did at the start.
+ Therefore, if you use the store optimization, you have to ensure that stack
+ items that have the same name on input and output also have the same value,
+ and are not changed in the C code you supply.
+ I.e., the following code could fail if you turn on the store optimization:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+add1 ( n -- n )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+n++;
+\end_layout
+
+\begin_layout Standard
+Instead, you have to use different names, i.e.:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+add1 ( n1 -- n2 )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+n2=n1+1;
+\end_layout
+
+\begin_layout Standard
+Similarly, the store optimization assumes that the stack pointer is only
+ changed by Vmgen-erated code.
+ If your C code changes the stack pointer, use different names in input
+ and output stack items to avoid a (probably wrong) store optimization,
+ or turn the store optimization off for this VM instruction.
+\end_layout
+
+\begin_layout Standard
+To turn on the store optimization, write
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+
+\backslash
+E store-optimization on
+\end_layout
+
+\begin_layout Standard
+at the start of the file.
+ You can turn this optimization on or off between any two VM instruction
+ descriptions.
+ For turning it off again, you can use
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+
+\backslash
+E store-optimization off
+\end_layout
+
+\begin_layout Subsubsection
+Register Machines
+\end_layout
+
+\begin_layout Standard
+If you want to implement a register VM rather than a stack VM with Vmgen,
+ there are two ways to do it: Directly and through superinstructions.
+\end_layout
+
+\begin_layout Standard
+If you use the direct way, you define instructions that take the register
+ numbers as immediate arguments, like this:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+add3 ( #src1 #src2 #dest -- )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+reg[dest] = reg[src1]+reg[src2];
+\end_layout
+
+\begin_layout Standard
+A disadvantage of this method is that during tracing you only see the register
+ numbers, but not the register contents.
+ Actually, with an appropriate definition of 
+\family typewriter
+\series bold
+printarg_src
+\family default
+\series default
+ (see VM engine), you can print the values of the source registers on entry,
+ but you cannot print the value of the destination register on exit.
+\end_layout
+
+\begin_layout Standard
+If you use superinstructions to define a register VM, you define simple
+ instructions that use a stack, and then define superinstructions that have
+ no overall stack effect, like this:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+loadreg ( #src -- n )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+n = reg[src];
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+storereg ( n #dest -- )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+reg[dest] = n;
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+adds ( n1 n2 -- n )
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+n = n1+n2;
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+add3 = loadreg loadreg adds storereg
+\end_layout
+
+\begin_layout Standard
+An advantage of this method is that you see the values and not just the
+ register numbers in tracing.
+ A disadvantage of this method is that currently you cannot generate superinstru
+ctions directly, but only through generating a sequence of simple instructions
+ (we might change this in the future if there is demand).
+\end_layout
+
+\begin_layout Standard
+Could the register VM support be improved, apart from the issues mentioned
+ above? It is hard to see how to do it in a general way, because there are
+ a number of different designs that different people mean when they use
+ the term register machine in connection with VM interpreters.
+ However, if you have ideas or requests in that direction, please let me
+ know (see Contact).
+\end_layout
+
+\begin_layout Subsection
+Error messages
+\end_layout
+
+\begin_layout Standard
+These error messages are created by Vmgen:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+# can only be on the input side
+\end_layout
+
+\begin_layout Standard
+You have used an instruction-stream prefix (usually ‘#’) after the ‘--’
+ (the output side); you can only use it before (the input side).
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+the prefix for this superinstruction must be defined earlier
+\end_layout
+
+\begin_layout Standard
+You have defined a superinstruction (e.g.
+ abc = a b c) without defining its direct prefix (e.g., ab = a b), See Superinstru
+ctions.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+sync line syntax
+\end_layout
+
+\begin_layout Standard
+If you are using a preprocessor (e.g., m4) to generate Vmgen input code, you
+ may want to create #line directives (aka sync lines).
+ This error indicates that such a line is not in th syntax expected by Vmgen
+ (this should not happen; please report the offending line in a bug report).
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+syntax error, wrong char
+\end_layout
+
+\begin_layout Standard
+A syntax error.
+ If you do not see right away where the error is, it may be helpful to check
+ the following: Did you put an empty line in a VM instruction where the
+ C code is not delimited by braces (then the empty line ends the VM instruction)
+? If you used brace-delimited C code, did you put the delimiting braces
+ (and only those) at the start of the line, without preceding white space?
+ Did you forget a delimiting brace?
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+too many stacks
+\end_layout
+
+\begin_layout Standard
+Vmgen currently supports 3 stacks (plus the instruction stream); if you
+ need more, let us know.
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+unknown prefix
+\end_layout
+
+\begin_layout Standard
+The stack item does not match any defined type prefix (after stripping away
+ any stack prefix).
+ You should either declare the type prefix you want for that stack item,
+ or use a different type prefix
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+unknown primitive
+\end_layout
+
+\begin_layout Standard
+You have used the name of a simple VM instruction in a superinstruction
+ definition without defining the simple VM instruction first.
+\end_layout
+
+\begin_layout Standard
+In addition, the C compiler can produce errors due to code produced by Vmgen;
+ e.g., you need to define type cast functions.
+\end_layout
+
+\begin_layout Subsection
+Using the generated code
+\end_layout
+
+\begin_layout Standard
+The easiest way to create a working VM interpreter with Vmgen is probably
+ to start with 
+\family typewriter
+\series bold
+vmgen-ex
+\family default
+\series default
+, and modify it for your purposes.
+ This chapter explains what the various wrapper and generated files do.
+ It also contains reference-manual style descriptions of the macros, variables
+ etc.
+ used by the generated code, and you can skip that on first reading.
+\end_layout
+
+\begin_layout Itemize
+VM engine: Executing VM code
+\end_layout
+
+\begin_layout Itemize
+VM instruction table
+\end_layout
+
+\begin_layout Itemize
+VM code generation: Creating VM code (in the front-end)
+\end_layout
+
+\begin_layout Itemize
+Peephole optimization: Creating VM superinstructions
+\end_layout
+
+\begin_layout Itemize
+VM disassembler: for debugging the front end
+\end_layout
+
+\begin_layout Itemize
+VM profiler: for finding worthwhile superinstructions
+\end_layout
+
+\begin_layout Subsubsection
+VM engine
+\end_layout
+
+\begin_layout Standard
+The VM engine is the VM interpreter that executes the VM code.
+ It is essential for an interpretive system.
+\end_layout
+
+\begin_layout Standard
+Vmgen supports two methods of VM instruction dispatch: threaded code (fast,
+ but gcc-specific), and switch dispatch (slow, but portable across C compilers);
+ you can use conditional compilation (‘
+\family typewriter
+\series bold
+defined(__GNUC__)
+\family default
+\series default
+’) to choose between these methods, and our example does so.
+\end_layout
+
+\begin_layout Scrap
+<<dispatch>>=
+\begin_inset Newline newline
+\end_inset
+
+/* different threading schemes for different architectures; the sparse
+\begin_inset Newline newline
+\end_inset
+
+   numbering is there for historical reasons */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+/* here you select the threading scheme; I have only set this up for
+\begin_inset Newline newline
+\end_inset
+
+   386 and generic, because I don't know what preprocessor macros to
+\begin_inset Newline newline
+\end_inset
+
+   test for (Gforth uses config.guess instead).
+  Anyway, it's probably
+\begin_inset Newline newline
+\end_inset
+
+   best to build them all and select the fastest instead of hardwiring
+\begin_inset Newline newline
+\end_inset
+
+   a specific scheme for an architecture.
+  E.g., scheme 8 is fastest
+\begin_inset Newline newline
+\end_inset
+
+   for Gforth "make bench" on a 486, whereas scheme 5 is fastest for
+\begin_inset Newline newline
+\end_inset
+
+   "mini fib.mini" on an Athlon */
+\begin_inset Newline newline
+\end_inset
+
+#ifndef THREADING_SCHEME
+\begin_inset Newline newline
+\end_inset
+
+#define THREADING_SCHEME 5
+\begin_inset Newline newline
+\end_inset
+
+#endif /* defined(THREADING_SCHEME) */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#ifdef __GNUC__
+\begin_inset Newline newline
+\end_inset
+
+#if THREADING_SCHEME==1
+\begin_inset Newline newline
+\end_inset
+
+/* direct threading scheme 1: autoinc, long latency (HPPA, Sharc) */
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P0_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<SET_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_INST_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<INC_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P2_1>>
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#if THREADING_SCHEME==3
+\begin_inset Newline newline
+\end_inset
+
+/* direct threading scheme 3: autoinc, low latency (68K) */
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P0>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<SET_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_INST>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<INC_IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P1_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P2_1>>
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#if THREADING_SCHEME==5
+\begin_inset Newline newline
+\end_inset
+
+/* direct threading scheme 5: early fetching (Alpha, MIPS) */
+\begin_inset Newline newline
+\end_inset
+
+#  define CFA_NEXT
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P0_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<SET_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_INST_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<INC_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P1_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P2_1>>
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#if THREADING_SCHEME==8
+\begin_inset Newline newline
+\end_inset
+
+/* direct threading scheme 8: i386 hack */
+\begin_inset Newline newline
+\end_inset
+
+#  define NEXT_P0
+\begin_inset Newline newline
+\end_inset
+
+#  <<IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<SET_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_INST>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<INC_IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P1_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P2_2>>
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#if THREADING_SCHEME==9
+\begin_inset Newline newline
+\end_inset
+
+/* direct threading scheme 9: prefetching (for PowerPC) */
+\begin_inset Newline newline
+\end_inset
+
+/* note that the "cfa=next_cfa;" occurs only in NEXT_P1, because this
+\begin_inset Newline newline
+\end_inset
+
+   works out better with the capabilities of gcc to introduce and
+\begin_inset Newline newline
+\end_inset
+
+   schedule the mtctr instruction.
+ */
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P0>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<IP>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<SET_IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_INST_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<INC_IP_3>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P1_3>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P2_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  define MORE_VARS     Inst next_cfa;
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#if THREADING_SCHEME==10
+\begin_inset Newline newline
+\end_inset
+
+/* direct threading scheme 10: plain (no attempt at scheduling) */
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P0>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<SET_IP_1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_INST>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<INC_IP_2>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P1>>
+\begin_inset Newline newline
+\end_inset
+
+#  <<NEXT_P2_3>>
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#define NEXT ({DEF_CA NEXT_P1; NEXT_P2;})
+\begin_inset Newline newline
+\end_inset
+
+#<<IPTOS>>
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#<<jump_INST_ADDR>>
+\begin_inset Newline newline
+\end_inset
+
+#<<jump_LABEL>>
+\begin_inset Newline newline
+\end_inset
+
+#else /* !defined(__GNUC__) */
+\begin_inset Newline newline
+\end_inset
+
+/* use switch dispatch */
+\begin_inset Newline newline
+\end_inset
+
+#<<DEF_CA>>
+\begin_inset Newline newline
+\end_inset
+
+#<<NEXT_P0>>
+\begin_inset Newline newline
+\end_inset
+
+#<<NEXT_P1>>
+\begin_inset Newline newline
+\end_inset
+
+#<<NEXT_P2>>
+\begin_inset Newline newline
+\end_inset
+
+#<<SET_IP>>
+\begin_inset Newline newline
+\end_inset
+
+#<<IP>>
+\begin_inset Newline newline
+\end_inset
+
+#<<NEXT_INST>>
+\begin_inset Newline newline
+\end_inset
+
+#<<INC_IP>>
+\begin_inset Newline newline
+\end_inset
+
+#<<IPTOS>>
+\begin_inset Newline newline
+\end_inset
+
+#<<switch_INST_ADDR>>
+\begin_inset Newline newline
+\end_inset
+
+#<<switch_LABEL>>
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#endif /* !defined(__GNUC__) */
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+For both methods, the VM engine is contained in a C-level function.
+ Vmgen generates most of the contents of the function for you (name-vm.i),
+ but you have to define this function, and macros and variables used in
+ the engine, and initialize the variables.
+ In our example the engine function also includes name-labels.i (see VM instructi
+on table).
+\end_layout
+
+\begin_layout Standard
+In addition to executing the code, the VM engine can optionally also print
+ out a trace of the executed instructions, their arguments and results.
+ For superinstructions it prints the trace as if only component instructions
+ were executed; this allows to introduce new superinstructions while keeping
+ the traces comparable to old ones (important for regression tests).
+\end_layout
+
+\begin_layout Standard
+It costs significant performance to check in each instruction whether to
+ print tracing code, so we recommend producing two copies of the engine:
+ one for fast execution, and one for tracing.
+ See the rules for engine.o and engine-debug.o in vmgen-ex/Makefile for an
+ example.
+\end_layout
+
+\begin_layout Standard
+The following macros and variables are used in name-vm.i:
+\end_layout
+
+\begin_layout Description
+LABEL(inst_name) This is used just before each VM instruction to provide
+ a jump or switch label (the ‘
+\family typewriter
+\series bold
+:
+\family default
+\series default
+’ is provided by Vmgen).
+ For switch dispatch this should expand to ‘
+\family typewriter
+\series bold
+case label:
+\family default
+\series default
+’; for threaded-code dispatch this should just expand to ‘
+\family typewriter
+\series bold
+label:
+\family default
+\series default
+’.
+ In either case label is usually the 
+\family typewriter
+\series bold
+inst_name
+\family default
+\series default
+ with some prefix or suffix to avoid naming conflicts.
+\end_layout
+
+\begin_layout Scrap
+<<jump_LABEL>>=
+\begin_inset Newline newline
+\end_inset
+
+define LABEL(name) I_##name:
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<switch_LABEL>>=
+\begin_inset Newline newline
+\end_inset
+
+define LABEL(name) case I_##name:
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+LABEL2(inst_name) This will be used for dynamic superinstructions; at the
+ moment, this should expand to nothing.
+\end_layout
+
+\begin_layout Scrap
+<<LABEL2>>=
+\begin_inset Newline newline
+\end_inset
+
+#define LABEL2(x)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+NAME(inst_name_string) Called on entering a VM instruction with a string
+ containing the name of the VM instruction as parameter.
+ In normal execution this should be expand to nothing, but for tracing this
+ usually prints the name, and possibly other information (several VM registers
+ in our example).
+\end_layout
+
+\begin_layout Scrap
+<<NAME>>=
+\begin_inset Newline newline
+\end_inset
+
+#ifdef VM_DEBUG
+\begin_inset Newline newline
+\end_inset
+
+#define NAME(_x) if (vm_debug) {fprintf(vm_out, "%p: %-20s, ", ip-1, _x);
+ 
+\backslash
+
+\begin_inset Newline newline
+\end_inset
+
+                                fprintf(vm_out,"fp=%p, sp=%p", fp, sp);}
+\begin_inset Newline newline
+\end_inset
+
+#else
+\begin_inset Newline newline
+\end_inset
+
+#define NAME(_x)
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+DEF_CA Usually empty.
+ Called just inside a new scope at the start of a VM instruction.
+ Can be used to define variables that should be visible during every VM
+ instruction.
+ If you define this macro as non-empty, you have to provide the finishing
+ ‘
+\family typewriter
+\series bold
+;
+\family default
+\series default
+’ in the macro.
+\end_layout
+
+\begin_layout Scrap
+<<DEF_CA>>=
+\begin_inset Newline newline
+\end_inset
+
+define DEF_CA
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+NEXT_P0
+\begin_inset space ~
+\end_inset
+
+NEXT_P1
+\begin_inset space ~
+\end_inset
+
+NEXT_P2 The three parts of instruction dispatch.
+ They can be defined in different ways for best performance on various processor
+s (see engine.c in the example or engine/threaded.h in Gforth).
+ ‘
+\family typewriter
+\series bold
+NEXT_P0
+\family default
+\series default
+’ is invoked right at the start of the VM instruction (but after ‘
+\family typewriter
+\series bold
+DEF_CA
+\family default
+\series default
+’), ‘
+\family typewriter
+\series bold
+NEXT_P1
+\family default
+\series default
+’ right after the user-supplied C code, and ‘
+\family typewriter
+\series bold
+NEXT_P2
+\family default
+\series default
+’ at the end.
+ The actual jump has to be performed by ‘
+\family typewriter
+\series bold
+NEXT_P2
+\family default
+\series default
+’ (if you would do it earlier, important parts of the VM instruction would
+ not be executed).
+ The simplest variant is if ‘
+\family typewriter
+\series bold
+NEXT_P2
+\family default
+\series default
+’ does everything and the other macros do nothing.
+ Then also related macros like ‘
+\family typewriter
+\series bold
+IP
+\family default
+\series default
+’, ‘
+\family typewriter
+\series bold
+SET_IP
+\family default
+\series default
+’, ‘
+\family typewriter
+\series bold
+INC_IP
+\family default
+\series default
+’ and ‘
+\family typewriter
+\series bold
+IPTOS
+\family default
+\series default
+’ are very straightforward to define.
+ For switch dispatch this code consists just of a jump to the dispatch code
+ (‘
+\family typewriter
+\series bold
+goto next_inst;
+\family default
+\series default
+’ in our example); for direct threaded code it consists of something like
+ ‘({cfa=*ip++; goto *cfa;})’.
+ Pulling code (usually the ‘
+\family typewriter
+\series bold
+cfa=*ip++;
+\family default
+\series default
+’) up into ‘
+\family typewriter
+\series bold
+NEXT_P1
+\family default
+\series default
+’ usually does not cause problems, but pulling things up into ‘
+\family typewriter
+\series bold
+NEXT_P0
+\family default
+\series default
+’ usually requires changing the other macros (and, at least for Gforth on
+ Alpha, it does not buy much, because the compiler often manages to schedule
+ the relevant stuff up by itself).
+ An even more extreme variant is to pull code up even further, into, e.g.,
+ 
+\family typewriter
+\series bold
+NEXT_P1
+\family default
+\series default
+ of the previous VM instruction (prefetching, useful on PowerPCs).
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P0>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P0
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P0_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P0       ({cfa=*ip++;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P0_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P0       ({cfa=*ip;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P1>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P1
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P1_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P1       ({cfa=*ip++;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P1_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P1       (ip++)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P1_3>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P2>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P2 goto next_inst;
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P2_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P2       ({goto *cfa;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P2_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P2       ({goto **(ip-1);})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_P2_3>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_P2       ({cfa=*ip++; goto *cfa;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_INST>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_INST     (*ip)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_INST_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_INST     (cfa)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<NEXT_INST_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define NEXT_INST     (next_cfa)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+INC_IP(n) This increments IP by n.
+\end_layout
+
+\begin_layout Scrap
+<<INC_IP>>=
+\begin_inset Newline newline
+\end_inset
+
+define INC_IP(const_inc) (ip+=(const_inc))
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<INC_IP_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<INC_IP_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define INC_IP(const_inc) ({ip+=(const_inc);})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<INC_IP_3>>=
+\begin_inset Newline newline
+\end_inset
+
+define INC_IP(const_inc) ({next_cfa=IP[const_inc]; ip+=(const_inc);})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+SET_IP(target) This sets IP to target.
+\end_layout
+
+\begin_layout Scrap
+<<SET_IP>>=
+\begin_inset Newline newline
+\end_inset
+
+define SET_IP(p)     (ip=(p))
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<SET_IP_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define SET_IP(p)     ({ip=(p); NEXT_P0;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<SET_IP_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define SET_IP(p)     ({ip=(p); next_cfa=*ip; NEXT_P0;})
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+vm_A2B(a,b) Type casting macro that assigns ‘a’ (of type A) to ‘b’ (of type
+ B).
+ This is mainly used for getting stack items into variables and back.
+ So you need to define macros for every combination of stack basic type
+ (Cell in our example) and type-prefix types used with that stack (in both
+ directions).
+ For the type-prefix type, you use the type-prefix (not the C type string)
+ as type name (e.g., ‘vm_Cell2i’, not ‘vm_Cell2Cell’).
+ In addition, you have to define a vm_X2X macro for the stack's basic type
+ X (used in superinstructions).
+ The stack basic type for the predefined ‘inst-stream’ is ‘Cell’.
+ If you want a stack with the same item size, making its basic type ‘Cell’
+ usually reduces the number of macros you have to define.
+ Here our examples differ a lot: vmgen-ex uses casts in these macros, whereas
+ vmgen-ex2 uses union-field selection (or assignment to union fields).
+ Note that casting floats into integers and vice versa changes the bit pattern
+ (and you do not want that).
+ In this case your options are to use a (temporary) union, or to take the
+ address of the value, cast the pointer, and dereference that (not always
+ possible, and sometimes expensive).
+\end_layout
+
+\begin_layout Scrap
+<<vm_A2B(a,b)>>=
+\begin_inset Newline newline
+\end_inset
+
+/* type change macros; these are specific to the types you use, so you
+\begin_inset Newline newline
+\end_inset
+
+   have to change this part */
+\begin_inset Newline newline
+\end_inset
+
+#define vm_Cell2i(_cell,x)      ((x)=(long)(_cell))
+\begin_inset Newline newline
+\end_inset
+
+#define vm_Cell2target(_cell,x) ((x)=(Inst *)(_cell))
+\begin_inset Newline newline
+\end_inset
+
+#define vm_Cell2a(_cell,x)      ((x)=(char *)(_cell))
+\begin_inset Newline newline
+\end_inset
+
+#define vm_i2Cell(x,_cell)      ((_cell)=(Cell)(x))
+\begin_inset Newline newline
+\end_inset
+
+#define vm_target2Cell(x,_cell) ((_cell)=(Cell)(x))
+\begin_inset Newline newline
+\end_inset
+
+#define vm_a2Cell(x,_cell)      ((_cell)=(Cell)(x))
+\begin_inset Newline newline
+\end_inset
+
+#define vm_Cell2Cell(_x,_y)     ((_y)=(Cell)(_x))
+\begin_inset Newline newline
+\end_inset
+
+/* the cast in vm_Cell2Cell is needed because the base type for
+\begin_inset Newline newline
+\end_inset
+
+   inst-stream is Cell, but *IP is an Inst */
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+vm_twoA2B(a1,a2,b)
+\begin_inset space ~
+\end_inset
+
+vm_B2twoA(b,a1,a2) Type casting between two stack items (a1, a2) and a variable
+ b of a type that takes two stack items.
+ This does not occur in our small examples, but you can look at Gforth for
+ examples (see vm_twoCell2d in engine/forth.h).
+\end_layout
+
+\begin_layout Description
+stackpointer For each stack used, the stackpointer name given in the stack
+ declaration is used.
+ For a regular stack this must be an l-expression; typically it is a variable
+ declared as a pointer to the stack's basic type.
+ For ‘inst-stream’, the name is ‘
+\family typewriter
+\series bold
+IP
+\family default
+\series default
+’, and it can be a plain r-value; typically it is a macro that abstracts
+ away the differences between the various implementations of 
+\family typewriter
+\series bold
+NEXT_P
+\family default
+\series default
+*.
+\end_layout
+
+\begin_layout Scrap
+<<IP>>=
+\begin_inset Newline newline
+\end_inset
+
+define IP            ip
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<IP_1>>=
+\begin_inset Newline newline
+\end_inset
+
+define IP            (ip-1)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<IP_2>>=
+\begin_inset Newline newline
+\end_inset
+
+define IP            (ip)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+IMM_ARG(access,value) Define this to expland to “(access)”.
+ This is just a placeholder for future extensions.
+\end_layout
+
+\begin_layout Scrap
+<<IMM_ARG>>=
+\begin_inset Newline newline
+\end_inset
+
+/* for future extensions */
+\begin_inset Newline newline
+\end_inset
+
+#define IMM_ARG(access,value) (access)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+stackpointerTOS The top-of-stack for the stack pointed to by stackpointer.
+ If you are using top-of-stack caching for that stack, this should be defined
+ as variable; if you are not using top-of-stack caching for that stack,
+ this should be a macro expanding to ‘stackpointer[0]’.
+ The stack pointer for the predefined ‘inst-stream’ is called ‘IP’, so the
+ top-of-stack is called ‘IPTOS’.
+\end_layout
+
+\begin_layout Scrap
+<<spTOS>>=
+\begin_inset Newline newline
+\end_inset
+
+#ifdef USE_spTOS
+\begin_inset Newline newline
+\end_inset
+
+  Cell   spTOS;
+\begin_inset Newline newline
+\end_inset
+
+#else
+\begin_inset Newline newline
+\end_inset
+
+#define spTOS (sp[0])
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<IPTOS>>=
+\begin_inset Newline newline
+\end_inset
+
+define IPTOS NEXT_INST
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+IF_stackpointerTOS(expr) Macro for executing expr, if top-of-stack caching
+ is used for the stackpointer stack.
+ I.e., this should do expr if there is top-of-stack caching for stackpointer;
+ otherwise it should do nothing.
+\end_layout
+
+\begin_layout Scrap
+<<IF_spTOS>>=
+\begin_inset Newline newline
+\end_inset
+
+#define USE_spTOS 1
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+#ifdef USE_spTOS
+\begin_inset Newline newline
+\end_inset
+
+#define IF_spTOS(x) x
+\begin_inset Newline newline
+\end_inset
+
+#else
+\begin_inset Newline newline
+\end_inset
+
+#define IF_spTOS(x)
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+SUPER_END This is used by the VM profiler (see VM profiler); it should not
+ do anything in normal operation, and call 
+\family typewriter
+\series bold
+vm_count_block(IP)
+\family default
+\series default
+ for profiling.
+\end_layout
+
+\begin_layout Scrap
+<<SUPER_END>>=
+\begin_inset Newline newline
+\end_inset
+
+#ifdef VM_PROFILING
+\begin_inset Newline newline
+\end_inset
+
+#define SUPER_END  vm_count_block(IP)
+\begin_inset Newline newline
+\end_inset
+
+#else
+\begin_inset Newline newline
+\end_inset
+
+#define SUPER_END
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+SUPER_CONTINUE This is just a hint to Vmgen and does nothing at the C level.
+ See 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "par:C-Code-Macros"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+MAYBE_UNUSED This should be defined as 
+\family typewriter
+\series bold
+__attribute__((unused))
+\family default
+\series default
+ for gcc-2.7 and higher.
+ It suppresses the warnings about unused variables in the code for superinstruct
+ions.
+ You need to define this only if you are using superinstructions.
+\end_layout
+
+\begin_layout Scrap
+<<MAYBE_UNUSED>>=
+\begin_inset Newline newline
+\end_inset
+
+#if defined(__GNUC__) && ((__GNUC__==2 && defined(__GNUC_MINOR__) && __GNUC_MINO
+R__>=7)||(__GNUC__>2))
+\begin_inset Newline newline
+\end_inset
+
+#define MAYBE_UNUSED __attribute__((unused))
+\begin_inset Newline newline
+\end_inset
+
+#else
+\begin_inset Newline newline
+\end_inset
+
+#define MAYBE_UNUSED
+\begin_inset Newline newline
+\end_inset
+
+#endif
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Description
+VM_DEBUG If this is defined, the tracing code will be compiled in (slower
+ interpretation, but better debugging).
+ Our example compiles two versions of the engine, a fast-running one that
+ cannot trace, and one with potential tracing and profiling.
+\end_layout
+
+\begin_layout Description
+vm_debug Needed only if ‘VM_DEBUG’ is defined.
+ If this variable contains true, the VM instructions produce trace output.
+ It can be turned on or off at any time.
+\end_layout
+
+\begin_layout Description
+vm_out Needed only if ‘VM_DEBUG’ is defined.
+ Specifies the file on which to print the trace output (type ‘FILE *’).
+\end_layout
+
+\begin_layout Description
+printarg_type(value) Needed only if ‘VM_DEBUG’ is defined.
+ Macro or function for printing value in a way appropriate for the type.
+ This is used for printing the values of stack items during tracing.
+ Type is normally the type prefix specified in a type-prefix definition
+ (e.g., ‘printarg_i’); in superinstructions it is currently the basic type
+ of the stack.
+\end_layout
+
+\begin_layout Subsubsection
+VM instruction table
+\end_layout
+
+\begin_layout Standard
+For threaded code we also need to produce a table containing the labels
+ of all VM instructions.
+ This is needed for VM code generation (see VM code generation), and it
+ has to be done in the engine function, because the labels are not visible
+ outside.
+ It then has to be passed outside the function (and assigned to ‘
+\family typewriter
+\series bold
+vm_prim
+\family default
+\series default
+’), to be used by the VM code generation functions.
+\end_layout
+
+\begin_layout Standard
+This means that the engine function has to be called first to produce the
+ VM instruction table, and later, after generating VM code, it has to be
+ called again to execute the generated VM code (yes, this is ugly).
+ In our example program, these two modes of calling the engine function
+ are differentiated by the value of the parameter 
+\family typewriter
+\series bold
+ip0
+\family default
+\series default
+ (if it equals 0, then the table is passed out, otherwise the VM code is
+ executed); in our example, we pass the table out by assigning it to ‘
+\family typewriter
+\series bold
+vm_prim
+\family default
+\series default
+’ and returning from ‘
+\family typewriter
+\series bold
+engine
+\family default
+\series default
+’.
+\end_layout
+
+\begin_layout Standard
+In our example (
+\family typewriter
+\series bold
+vmgen-ex/engine.c
+\family default
+\series default
+), we also build such a table for switch dispatch; this is mainly done for
+ uniformity.
+\end_layout
+
+\begin_layout Standard
+For switch dispatch, we also need to define the VM instruction opcodes used
+ as case labels in an enum.
+\end_layout
+
+\begin_layout Standard
+For both purposes (VM instruction table, and enum), the file 
+\family typewriter
+\series bold
+name-labels.i 
+\family default
+\series default
+is generated by Vmgen.
+ You have to define the following macro used in this file:
+\end_layout
+
+\begin_layout Description
+INST_ADDR(inst_name) For switch dispatch, this is just the name of the switch
+ label (the same name as used in ‘
+\family typewriter
+\series bold
+LABEL(inst_name)
+\family default
+\series default
+’), for both uses of name-labels.i.
+ For threaded-code dispatch, this is the address of the label defined in
+ ‘
+\family typewriter
+\series bold
+LABEL(inst_name)
+\family default
+\series default
+’); the address is taken with ‘&&’ (see Labels as Values).
+\end_layout
+
+\begin_layout Scrap
+<<jump_INST_ADDR>>=
+\begin_inset Newline newline
+\end_inset
+
+define INST_ADDR(name) (Label)&&I_##name
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+<<switch_INST_ADDR>>=
+\begin_inset Newline newline
+\end_inset
+
+define INST_ADDR(name) I_##name
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsubsection
+VM code generation
+\end_layout
+
+\begin_layout Standard
+Vmgen generates VM code generation functions in 
+\family typewriter
+\series bold
+name-gen.i
+\family default
+\series default
+ that the front end can call to generate VM code.
+ This is essential for an interpretive system.
+\end_layout
+
+\begin_layout Standard
+For a VM instruction ‘
+\family typewriter
+\series bold
+x ( #a b #c -- d )
+\family default
+\series default
+’, Vmgen generates a function with the prototype
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+void gen_x(Inst **ctp, a_type a, c_type c)
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+\series bold
+ctp
+\family default
+\series default
+ argument points to a pointer to the next instruction.
+ 
+\family typewriter
+\series bold
+*ctp
+\family default
+\series default
+ is increased by the generation functions; i.e., you should allocate memory
+ for the code to be generated beforehand, and start with 
+\family typewriter
+\series bold
+*ctp
+\family default
+\series default
+ set at the start of this memory area.
+ Before running out of memory, allocate a new area, and generate a VM-level
+ jump to the new area (this overflow handling is not implemented in our
+ examples).
+\end_layout
+
+\begin_layout Standard
+The other arguments correspond to the immediate arguments of the VM instruction
+ (with their appropriate types as defined in the 
+\family typewriter
+\series bold
+type_prefix
+\family default
+\series default
+ declaration.
+\end_layout
+
+\begin_layout Standard
+The following types, variables, and functions are used in 
+\family typewriter
+\series bold
+name-gen.i
+\family default
+\series default
+:
+\end_layout
+
+\begin_layout Description
+Inst The type of the VM instruction; if you use threaded code, this is 
+\family typewriter
+\series bold
+void *
+\family default
+\series default
+; for switch dispatch this is an integer type.
+\end_layout
+
+\begin_layout Description
+vm_prim The VM instruction table (type: 
+\family typewriter
+\series bold
+Inst *
+\family default
+\series default
+, see VM instruction table).
+\end_layout
+
+\begin_layout Description
+gen_inst(Inst
+\begin_inset space ~
+\end_inset
+
+**ctp,
+\begin_inset space ~
+\end_inset
+
+Inst
+\begin_inset space ~
+\end_inset
+
+i) This function compiles the instruction i.
+ Take a look at it in 
+\family typewriter
+\series bold
+vmgen-ex/peephole.c
+\family default
+\series default
+.
+ It is trivial when you don't want to use superinstructions (just the last
+ two lines of the example function), and slightly more complicated in the
+ example due to its ability to use superinstructions (see Peephole optimization).
+\end_layout
+
+\begin_layout Description
+genarg_type_prefix(Inst
+\begin_inset space ~
+\end_inset
+
+**ctp,
+\begin_inset space ~
+\end_inset
+
+type
+\begin_inset space ~
+\end_inset
+
+type_prefix) This compiles an immediate argument of type (as defined in
+ a 
+\family typewriter
+\series bold
+type-prefix
+\family default
+\series default
+ definition).
+ These functions are trivial to define (see 
+\family typewriter
+\series bold
+vmgen-ex/support.c
+\family default
+\series default
+).
+ You need one of these functions for every type that you use as immediate
+ argument.
+\end_layout
+
+\begin_layout Standard
+In addition to using these functions to generate code, you should call 
+\family typewriter
+\series bold
+BB_BOUNDARY
+\family default
+\series default
+ at every basic block entry point if you ever want to use superinstructions
+ (or if you want to use the profiling supported by Vmgen; but this support
+ is also useful mainly for selecting superinstructions).
+ If you use 
+\family typewriter
+\series bold
+BB_BOUNDARY
+\family default
+\series default
+, you should also define it (take a look at its definition in 
+\family typewriter
+\series bold
+vmgen-ex/mini.y
+\family default
+\series default
+).
+\end_layout
+
+\begin_layout Standard
+You do not need to call 
+\family typewriter
+\series bold
+BB_BOUNDARY
+\family default
+\series default
+ after branches, because you will not define superinstructions that contain
+ branches in the middle (and if you did, and it would work, there would
+ be no reason to end the superinstruction at the branch), and because the
+ branches announce themselves to the profiler.
+\end_layout
+
+\begin_layout Subsubsection
+Peephole optimization
+\end_layout
+
+\begin_layout Standard
+You need peephole optimization only if you want to use superinstructions.
+ But having the code for it does not hurt much if you do not use superinstructio
+ns.
+\end_layout
+
+\begin_layout Standard
+A simple greedy peephole optimization algorithm is used for superinstruction
+ selection: every time 
+\family typewriter
+\series bold
+gen_inst
+\family default
+\series default
+ compiles a VM instruction, it checks if it can combine it with the last
+ VM instruction (which may also be a superinstruction resulting from a previous
+ peephole optimization); if so, it changes the last instruction to the combined
+ instruction instead of laying down i at the current ‘
+\family typewriter
+\series bold
+*ctp
+\family default
+\series default
+’.
+\end_layout
+
+\begin_layout Standard
+The code for peephole optimization is in 
+\family typewriter
+\series bold
+vmgen-ex/peephole.c
+\family default
+\series default
+.
+ You can use this file almost verbatim.
+ Vmgen generates 
+\family typewriter
+\series bold
+file-peephole.i
+\family default
+\series default
+ which contains data for the peephole optimizer.
+\end_layout
+
+\begin_layout Standard
+You have to call ‘
+\family typewriter
+\series bold
+init_peeptable()
+\family default
+\series default
+’ after initializing ‘
+\family typewriter
+\series bold
+vm_prim
+\family default
+\series default
+’, and before compiling any VM code to initialize data structures for peephole
+ optimization.
+ After that, compiling with the VM code generation functions will automatically
+ combine VM instructions into superinstructions.
+ Since you do not want to combine instructions across VM branch targets
+ (otherwise there will not be a proper VM instruction to branch to), you
+ have to call 
+\family typewriter
+\series bold
+BB_BOUNDARY
+\family default
+\series default
+ (see VM code generation) at branch targets.
+\end_layout
+
+\begin_layout Subsubsection
+VM disassembler
+\end_layout
+
+\begin_layout Standard
+A VM code disassembler is optional for an interpretive system, but highly
+ recommended during its development and maintenance, because it is very
+ useful for detecting bugs in the front end (and for distinguishing them
+ from VM interpreter bugs).
+\end_layout
+
+\begin_layout Standard
+Vmgen supports VM code disassembling by generating 
+\family typewriter
+\series bold
+file-disasm.i
+\family default
+\series default
+.
+ This code has to be wrapped into a function, as is done in 
+\family typewriter
+\series bold
+vmgen-ex/disasm.c
+\family default
+\series default
+.
+ You can use this file almost verbatim.
+ In addition to ‘
+\family typewriter
+\series bold
+vm_A2B(a,b)
+\family default
+\series default
+’, ‘
+\family typewriter
+\series bold
+vm_out
+\family default
+\series default
+’, ‘
+\family typewriter
+\series bold
+printarg_type(value)
+\family default
+\series default
+’, which are explained above, the following macros and variables are used
+ in file-disasm.i (and you have to define them):
+\end_layout
+
+\begin_layout Description
+ip This variable points to the opcode of the current VM instruction.
+\end_layout
+
+\begin_layout Description
+IP
+\begin_inset space ~
+\end_inset
+
+IPTOS ‘
+\family typewriter
+\series bold
+IPTOS
+\family default
+\series default
+’ is the first argument of the current VM instruction, and ‘
+\family typewriter
+\series bold
+IP
+\family default
+\series default
+’ points to it; this is just as in the engine, but here ‘
+\family typewriter
+\series bold
+ip
+\family default
+\series default
+’ points to the opcode of the VM instruction (in contrast to the engine,
+ where ‘
+\family typewriter
+\series bold
+ip
+\family default
+\series default
+’ points to the next cell, or even one further).
+\end_layout
+
+\begin_layout Description
+VM_IS_INST(Inst
+\begin_inset space ~
+\end_inset
+
+i,
+\begin_inset space ~
+\end_inset
+
+int
+\begin_inset space ~
+\end_inset
+
+n) Tests if the opcode ‘
+\family typewriter
+\series bold
+i
+\family default
+\series default
+’ is the same as the ‘n’th entry in the VM instruction table.
+\end_layout
+
+\begin_layout Subsubsection
+VM profiler
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:VM-profiler"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The VM profiler is designed for getting execution and occurence counts for
+ VM instruction sequences, and these counts can then be used for selecting
+ sequences as superinstructions.
+ The VM profiler is probably not useful as profiling tool for the interpretive
+ system.
+ I.e., the VM profiler is useful for the developers, but not the users of
+ the interpretive system.
+\end_layout
+
+\begin_layout Standard
+The output of the profiler is: for each basic block (executed at least once),
+ it produces the dynamic execution count of that basic block and all its
+ subsequences; e.g.,
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+9227465 lit storelocal
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+9227465 storelocal branch
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+9227465 lit storelocal branch
+\end_layout
+
+\begin_layout Standard
+I.e., a basic block consisting of ‘
+\family typewriter
+\series bold
+lit storelocal branch
+\family default
+\series default
+’ is executed 9227465 times.
+\end_layout
+
+\begin_layout Standard
+This output can be combined in various ways.
+ E.g., 
+\family typewriter
+\series bold
+vmgen-ex/stat.awk
+\family default
+\series default
+ adds up the occurences of a given sequence wrt dynamic execution, static
+ occurence, and per-program occurence.
+ E.g.,
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+2 16 36910041 loadlocal lit
+\end_layout
+
+\begin_layout Standard
+indicates that the sequence ‘
+\family typewriter
+\series bold
+loadlocal lit
+\family default
+\series default
+’ occurs in 2 programs, in 16 places, and has been executed 36910041 times.
+ Now you can select superinstructions in any way you like (note that compile
+ time and space typically limit the number of superinstructions to 100–1000).
+ After you have done that, 
+\family typewriter
+\series bold
+vmgen/seq2rule.awk
+\family default
+\series default
+ turns lines of the form above into rules for inclusion in a Vmgen input
+ file.
+ Note that this script does not ensure that all prefixes are defined, so
+ you have to do that in other ways.
+ So, an overall script for turning profiles into superinstructions can look
+ like this:
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk -f stat.awk fib.prof test.prof| 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk '$3>=10000'| #select sequences 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+fgrep -v -f peephole-blacklist| #eliminate wrong instructions 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+awk -f seq2rule.awk| #turn into superinstructions 
+\end_layout
+
+\begin_layout Quotation
+
+\family typewriter
+\series bold
+sort -k 3 >mini-super.vmg #sort sequences
+\end_layout
+
+\begin_layout Standard
+Here the dynamic count is used for selecting sequences (preliminary results
+ indicate that the static count gives better results, though); the third
+ line eliminates sequences containing instructions that must not occur in
+ a superinstruction, because they access a stack directly.
+ The dynamic count selection ensures that all subsequences (including prefixes)
+ of longer sequences occur (because subsequences have at least the same
+ count as the longer sequences); the sort in the last line ensures that
+ longer superinstructions occur after their prefixes.
+\end_layout
+
+\begin_layout Standard
+But before using this, you have to have the profiler.
+ Vmgen supports its creation by generating 
+\family typewriter
+\series bold
+file-profile.i
+\family default
+\series default
+; you also need the wrapper file 
+\family typewriter
+\series bold
+vmgen-ex/profile.c
+\family default
+\series default
+ that you can use almost verbatim.
+\end_layout
+
+\begin_layout Standard
+The profiler works by recording the targets of all VM control flow changes
+ (through 
+\family typewriter
+\series bold
+SUPER_END
+\family default
+\series default
+ during execution, and through 
+\family typewriter
+\series bold
+BB_BOUNDARY
+\family default
+\series default
+ in the front end), and counting (through 
+\family typewriter
+\series bold
+SUPER_END
+\family default
+\series default
+) how often they were targeted.
+ After the program run, the numbers are corrected such that each VM basic
+ block has the correct count (entering a block without executing a branch
+ does not increase the count, and the correction fixes that), then the subsequen
+ces of all basic blocks are printed.
+ To get all this, you just have to define 
+\family typewriter
+\series bold
+SUPER_END
+\family default
+\series default
+ (and 
+\family typewriter
+\series bold
+BB_BOUNDARY
+\family default
+\series default
+) appropriately, and call 
+\family typewriter
+\series bold
+vm_print_profile(FILE *file)
+\family default
+\series default
+ when you want to output the profile on file.
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+\series bold
+file-profile.i
+\family default
+\series default
+ is similar to the disassembler file, and it uses variables and functions
+ defined in 
+\family typewriter
+\series bold
+vmgen-ex/profile.c
+\family default
+\series default
+, plus VM_IS_INST already defined for the VM disassembler (see VM disassembler).
+\end_layout
+
+\begin_layout Subsection
+Hints
+\end_layout
+
+\begin_layout Itemize
+Floating point: and stacks
+\end_layout
+
+\begin_layout Subsubsection
+Floating point
+\end_layout
+
+\begin_layout Standard
+How should you deal with floating point values? Should you use the same
+ stack as for integers/pointers, or a different one? This section discusses
+ this issue with a view on execution speed.
+\end_layout
+
+\begin_layout Standard
+The simpler approach is to use a separate floating-point stack.
+ This allows you to choose FP value size without considering the size of
+ the integers/pointers, and you avoid a number of performance problems.
+ The main downside is that this needs an FP stack pointer (and that may
+ not fit in the register file on the 386 arhitecture, costing some performance,
+ but comparatively little if you take the other option into account).
+ If you use a separate FP stack (with stack pointer 
+\family typewriter
+\series bold
+fp
+\family default
+\series default
+), using an 
+\family typewriter
+\series bold
+fpTOS
+\family default
+\series default
+ is helpful on most machines, but some spill the 
+\family typewriter
+\series bold
+fpTOS
+\family default
+\series default
+ register into memory, and 
+\family typewriter
+\series bold
+fpTOS
+\family default
+\series default
+ should not be used there.
+\end_layout
+
+\begin_layout Standard
+The other approach is to share one stack (pointed to by, say, sp) between
+ integer/pointer and floating-point values.
+ This is ok if you do not use 
+\family typewriter
+\series bold
+spTOS
+\family default
+\series default
+.
+ If you do use 
+\family typewriter
+\series bold
+spTOS
+\family default
+\series default
+, the compiler has to decide whether to put that variable into an integer
+ or a floating point register, and the other type of operation becomes quite
+ expensive on most machines (because moving values between integer and FP
+ registers is quite expensive).
+ If a value of one type has to be synthesized out of two values of the other
+ type (double types), things are even more interesting.
+\end_layout
+
+\begin_layout Standard
+One way around this problem would be to not use the 
+\family typewriter
+\series bold
+spTOS
+\family default
+\series default
+ supported by Vmgen, but to use explicit top-of-stack variables (one for
+ integers, one for FP values), and having a kind of accumulator+stack architectu
+re (e.g., Ocaml bytecode uses this approach); however, this is a major change,
+ and it's ramifications are not completely clear.
+\end_layout
+
+\begin_layout Subsection
+The future
+\end_layout
+
+\begin_layout Standard
+We have a number of ideas for future versions of Vmgen.
+ However, there are so many possible things to do that we would like some
+ feedback from you.
+ What are you doing with Vmgen, what features are you missing, and why?
+\end_layout
+
+\begin_layout Standard
+One idea we are thinking about is to generate just one .c file instead of
+ letting you copy and adapt all the wrapper files (you would still have
+ to define stuff like the type-specific macros, and stack pointers etc.
+ somewhere).
+ The advantage would be that, if we change the wrapper files between versions,
+ you would not need to integrate your changes and our changes to them; Vmgen
+ would also be easier to use for beginners.
+ The main disadvantage of that is that it would reduce the flexibility of
+ Vmgen a little (well, those who like flexibility could still patch the
+ resulting .c file, like they are now doing for the wrapper files).
+ In any case, if you are doing things to the wrapper files that would cause
+ problems in a generated-.c-file approach, please let us know.
+\end_layout
+
+\begin_layout Subsection
+Contact
+\end_layout
+
+\begin_layout Standard
+To report a bug, use 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://savannah.gnu.org/bugs/?func=addbug&group_id=2672
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For discussion on Vmgen (e.g., how to use it), use the mailing list bug-vmgen@mail.
+freesoftware.fsf.org (use 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://mail.gnu.org/mailman/listinfo/help-vmgen
+\end_layout
+
+\end_inset
+
+ to subscribe).
+\end_layout
+
+\begin_layout Standard
+You can find vmgen information at 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.complang.tuwien.ac.at/anton/vmgen/
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Virtual machine implementation
+\end_layout
+
+\begin_layout Subsection
+ArrayForth application files
+\end_layout
+
+\begin_layout Subsubsection
 README
 \end_layout
 
@@ -315,7 +5653,7 @@ More information can be found in the vmgen documentation.
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 simple.mini - example mini program
 \end_layout
 
@@ -339,7 +5677,7 @@ end func;
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 fib.mini - example mini program
 \end_layout
 
@@ -408,7 +5746,7 @@ end func;
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 test.mini - example mini program (tests everything)
 \end_layout
 
@@ -792,7 +6130,7 @@ end func;
 @
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 test.out - test.mini output
 \end_layout
 
@@ -940,11 +6278,15 @@ result = 0
 @
 \end_layout
 
-\begin_layout Section
-ArrayForth specific files
+\begin_layout Subsection
+Mini specific files
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Standard
+You would typically change much in or replace the following files:
+\end_layout
+
+\begin_layout Subsubsection
 
 \series bold
 \shape italic
@@ -1120,19 +6462,7 @@ disasm.o: disasm.c mini-disasm.i mini.h
 \begin_inset Newline newline
 \end_inset
 
-engine.o: engine.c mini-vm.i mini-labels.i mini.h
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
-\begin_inset Newline newline
-\end_inset
-
-	$(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
+<<engine>>
 \begin_inset Newline newline
 \end_inset
 
@@ -1197,7 +6527,7 @@ time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Support.c - main() and other support functions
 \end_layout
 
@@ -2019,7 +7349,7 @@ n",runvm(start, stack+STACK_SIZE-1, NULL));
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 mini.h - common declarations
 \end_layout
 
@@ -2185,47 +7515,7 @@ void vm_print_profile(FILE *file);
 \begin_inset Newline newline
 \end_inset
 
-/* type change macros; these are specific to the types you use, so you
-\begin_inset Newline newline
-\end_inset
-
-   have to change this part */
-\begin_inset Newline newline
-\end_inset
-
-#define vm_Cell2i(_cell,x)      ((x)=(long)(_cell))
-\begin_inset Newline newline
-\end_inset
-
-#define vm_Cell2target(_cell,x) ((x)=(Inst *)(_cell))
-\begin_inset Newline newline
-\end_inset
-
-#define vm_Cell2a(_cell,x)      ((x)=(char *)(_cell))
-\begin_inset Newline newline
-\end_inset
-
-#define vm_i2Cell(x,_cell)      ((_cell)=(Cell)(x))
-\begin_inset Newline newline
-\end_inset
-
-#define vm_target2Cell(x,_cell) ((_cell)=(Cell)(x))
-\begin_inset Newline newline
-\end_inset
-
-#define vm_a2Cell(x,_cell)      ((_cell)=(Cell)(x))
-\begin_inset Newline newline
-\end_inset
-
-#define vm_Cell2Cell(_x,_y)     ((_y)=(Cell)(_x))
-\begin_inset Newline newline
-\end_inset
-
-/* the cast in vm_Cell2Cell is needed because the base type for
-\begin_inset Newline newline
-\end_inset
-
-   inst-stream is Cell, but *IP is an Inst */
+<<vm_A2B(a,b)>>
 \begin_inset Newline newline
 \end_inset
 
@@ -2233,11 +7523,7 @@ void vm_print_profile(FILE *file);
 \begin_inset Newline newline
 \end_inset
 
-/* for future extensions */
-\begin_inset Newline newline
-\end_inset
-
-#define IMM_ARG(access,value) (access)
+<<IMM_ARG>>
 \begin_inset Newline newline
 \end_inset
 
@@ -2356,7 +7642,7 @@ void gen_main_end(void);
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 mini-inst.vmg - simple VM instructions
 \end_layout
 
@@ -2421,503 +7707,71 @@ copyright>>
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
- stack definitions:
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-E stack data-stack sp Cell
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
- stack prefix definitions
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-E inst-stream stack-prefix #
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
- type prefix definitions:
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-E s" Cell"   single data-stack type-prefix i
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-E s" char *" single data-stack type-prefix a
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-E s" Inst *" single data-stack type-prefix target
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
- simple VM instructions:
-\begin_inset Newline newline
-\end_inset
-
-add ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1+i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-sub ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1-i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-mul ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1*i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-and ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1 & i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-or ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1 | i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-lessthan ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1<i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-equals ( i1 i2 -- i )
-\begin_inset Newline newline
-\end_inset
-
-i = i1==i2;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-not ( i1 -- i2 )
-\begin_inset Newline newline
-\end_inset
-
-i2 = !i1;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-negate ( i1 -- i2 )
-\begin_inset Newline newline
-\end_inset
-
-i2 = -i1;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-lit ( #i -- i )
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-drop ( i -- )
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-print ( i -- )
-\begin_inset Newline newline
-\end_inset
-
-printf("%ld
-\backslash
-n", i);
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-branch ( #target -- )
-\begin_inset Newline newline
-\end_inset
-
-SET_IP(target);
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-zbranch ( #target i -- )
-\begin_inset Newline newline
-\end_inset
-
-if (i==0) {
-\begin_inset Newline newline
-\end_inset
-
-  SET_IP(target);
-\begin_inset Newline newline
-\end_inset
-
-  INST_TAIL;
-\begin_inset Newline newline
-\end_inset
-
-}
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  The stack is organized as follows:
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  The stack grows downwards; a stack usually looks like this:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  higher addresses
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  --------------------- bottom of stack
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-     locals of main
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-     return address (points to VM code after call)
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  +->oldfp (NULL)
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  |  intermediate results (e.g., 1 for a call like 1+foo(...))
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  |  arguments passed to the called function
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  |  locals of the called function
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  |  return address (points to VM code after call)
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  +--oldfp                <-- fp
+<<stack-definitions>>
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
-     intermediate results <-- sp
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
-  ---------------------- top of stack
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
-  lower addresses
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
- The following VM instructions also explicitly reference sp and
-\begin_inset Newline newline
-\end_inset
-
-
-\backslash
- therefore may have to do something about spTOS caching.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-call ( #target #iadjust -- targetret aoldfp )
-\begin_inset Newline newline
-\end_inset
-
-/* IF_spTOS(sp[2] = spTOS);*/ /* unnecessary; vmgen inserts a flush anyway
- */
-\begin_inset Newline newline
-\end_inset
-
-targetret = IP;
-\begin_inset Newline newline
-\end_inset
-
-SET_IP(target);
-\begin_inset Newline newline
-\end_inset
-
-aoldfp = fp;
-\begin_inset Newline newline
-\end_inset
-
-sp = (Cell *)(((char *)sp)+iadjust);
-\begin_inset Newline newline
-\end_inset
-
-fp = (char *)sp;
-\begin_inset Newline newline
-\end_inset
-
-/* IF_spTOS(spTOS = sp[0]); */ /* dead, thus unnecessary; vmgen copies aoldfp
- there */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-return ( #iadjust target afp i1 -- i2 )
-\begin_inset Newline newline
-\end_inset
-
-/* IF_spTOS(sp[-2] = spTOS); */ /* unnecessary; that stack item is dead
- */
-\begin_inset Newline newline
-\end_inset
-
-SET_IP(target);
-\begin_inset Newline newline
-\end_inset
-
-sp = (Cell *)(((char *)sp)+iadjust);
-\begin_inset Newline newline
-\end_inset
-
-fp = afp;
+<<stack-prefix>>
 \begin_inset Newline newline
 \end_inset
 
-i2=i1;
-\begin_inset Newline newline
-\end_inset
 
-/* IF_spTOS(spTOS = sp[0]); */ /* dead, thus unnecessary; vmgen copies i2
- there */
 \begin_inset Newline newline
 \end_inset
-
 
+<<type-prefix>>
 \begin_inset Newline newline
 \end_inset
 
 
-\backslash
- loadlocal and storelocal access stack items below spTOS, so we can
 \begin_inset Newline newline
 \end_inset
 
-
-\backslash
- ignore spTOS caching.
+<<simple-instructions>>
 \begin_inset Newline newline
 \end_inset
 
-
-\begin_inset Newline newline
-\end_inset
 
-loadlocal ( #ioffset -- i )
 \begin_inset Newline newline
 \end_inset
 
-i = *(Cell *)(fp+ioffset);
+<<branch>>
 \begin_inset Newline newline
 \end_inset
-
 
-\begin_inset Newline newline
-\end_inset
 
-storelocal ( #ioffset i -- )
 \begin_inset Newline newline
 \end_inset
 
-*(Cell *)(fp+ioffset) = i;
+<<zbranch>>
 \begin_inset Newline newline
 \end_inset
-
 
-\begin_inset Newline newline
-\end_inset
 
-end ( i -- )
 \begin_inset Newline newline
 \end_inset
 
-/* SUPER_END would increment the next BB count (because IP points there);
+<<stack-organization>>
 \begin_inset Newline newline
 \end_inset
 
-   this would be a problem if there is no following BB.
-\begin_inset Newline newline
-\end_inset
 
-   Instead, we do the following to add an end point for the current BB:
- */
 \begin_inset Newline newline
 \end_inset
 
-#ifdef VM_PROFILING
+<<stack-caching>>
 \begin_inset Newline newline
 \end_inset
 
-block_insert(IP); /* we also do this at compile time, so this is unnecessary
- */
-\begin_inset Newline newline
-\end_inset
 
-#endif
 \begin_inset Newline newline
 \end_inset
 
-return i;
+<<end>>
 \begin_inset Newline newline
 \end_inset
 
@@ -2932,7 +7786,7 @@ include(mini-super.vmg)
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 mini-super.vmg - superinstructions (empty at first)
 \end_layout
 
@@ -2941,14 +7795,14 @@ mini-super.vmg - superinstructions (empty at first)
 \begin_inset Newline newline
 \end_inset
 
-ll = loadlocal lit
+<<ll>>
 \begin_inset Newline newline
 \end_inset
 
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 mini.l - scanner
 \end_layout
 
@@ -3113,7 +7967,7 @@ n] ;
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 mini.y - front end (parser, VM code generator)
 \end_layout
 
@@ -3647,7 +8501,7 @@ int yywrap(void)
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 peephole-blacklist - list of instructions not allowed in superinstructions
 \end_layout
 
@@ -3671,11 +8525,16 @@ unknown
 @
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Generic support files
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Standard
+For your own interpreter, you would typically copy the following files and
+ change little, if anything:
+\end_layout
+
+\begin_layout Subsubsection
 peephole.c - wrapper file
 \end_layout
 
@@ -4040,7 +8899,7 @@ void gen_inst(Inst **vmcodepp, Inst i)
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 profile.c - wrapper file
 \end_layout
 
@@ -4654,7 +9513,7 @@ void vm_print_profile(FILE *file)
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 disasm.c - wrapper file
 \end_layout
 
@@ -4760,8 +9619,32 @@ n',vm_out);
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 engine.c - wrapper file
+\end_layout
+
+\begin_layout Scrap
+<<engine>>=
+\begin_inset Newline newline
+\end_inset
+
+engine.o: engine.c mini-vm.i mini-labels.i mini.h
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
+\begin_inset Newline newline
+\end_inset
+
+	$(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
+\begin_inset Newline newline
+\end_inset
+
+@
 \end_layout
 
 \begin_layout Scrap
@@ -4797,7 +9680,7 @@ engine.c - wrapper file
 \begin_inset Newline newline
 \end_inset
 
-#define USE_spTOS 1
+<<IF_spTOS>>
 \begin_inset Newline newline
 \end_inset
 
@@ -4805,541 +9688,31 @@ engine.c - wrapper file
 \begin_inset Newline newline
 \end_inset
 
-#ifdef USE_spTOS
+<<NAME>>
 \begin_inset Newline newline
 \end_inset
 
-#define IF_spTOS(x) x
-\begin_inset Newline newline
-\end_inset
-
-#else
-\begin_inset Newline newline
-\end_inset
-
-#define IF_spTOS(x)
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#ifdef VM_DEBUG
-\begin_inset Newline newline
-\end_inset
-
-#define NAME(_x) if (vm_debug) {fprintf(vm_out, "%p: %-20s, ", ip-1, _x);
- 
-\backslash
-
-\begin_inset Newline newline
-\end_inset
-
-                                fprintf(vm_out,"fp=%p, sp=%p", fp, sp);}
-\begin_inset Newline newline
-\end_inset
-
-#else
-\begin_inset Newline newline
-\end_inset
-
-#define NAME(_x)
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-/* different threading schemes for different architectures; the sparse
-\begin_inset Newline newline
-\end_inset
-
-   numbering is there for historical reasons */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-/* here you select the threading scheme; I have only set this up for
-\begin_inset Newline newline
-\end_inset
-
-   386 and generic, because I don't know what preprocessor macros to
-\begin_inset Newline newline
-\end_inset
-
-   test for (Gforth uses config.guess instead).
-  Anyway, it's probably
-\begin_inset Newline newline
-\end_inset
-
-   best to build them all and select the fastest instead of hardwiring
-\begin_inset Newline newline
-\end_inset
-
-   a specific scheme for an architecture.
-  E.g., scheme 8 is fastest
-\begin_inset Newline newline
-\end_inset
-
-   for Gforth "make bench" on a 486, whereas scheme 5 is fastest for
-\begin_inset Newline newline
-\end_inset
-
-   "mini fib.mini" on an Athlon */
-\begin_inset Newline newline
-\end_inset
-
-#ifndef THREADING_SCHEME
-\begin_inset Newline newline
-\end_inset
-
-#define THREADING_SCHEME 5
-\begin_inset Newline newline
-\end_inset
-
-#endif /* defined(THREADING_SCHEME) */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#ifdef __GNUC__
-\begin_inset Newline newline
-\end_inset
-
-#if THREADING_SCHEME==1
-\begin_inset Newline newline
-\end_inset
-
-/* direct threading scheme 1: autoinc, long latency (HPPA, Sharc) */
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P0       ({cfa=*ip++;})
-\begin_inset Newline newline
-\end_inset
-
-#  define IP            (ip-1)
-\begin_inset Newline newline
-\end_inset
-
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_INST     (cfa)
-\begin_inset Newline newline
-\end_inset
-
-#  define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
-\begin_inset Newline newline
-\end_inset
-
-#  define DEF_CA
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P1
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P2       ({goto *cfa;})
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#if THREADING_SCHEME==3
-\begin_inset Newline newline
-\end_inset
-
-/* direct threading scheme 3: autoinc, low latency (68K) */
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P0
-\begin_inset Newline newline
-\end_inset
-
-#  define IP            (ip)
-\begin_inset Newline newline
-\end_inset
-
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_INST     (*ip)
-\begin_inset Newline newline
-\end_inset
-
-#  define INC_IP(const_inc) ({ip+=(const_inc);})
-\begin_inset Newline newline
-\end_inset
-
-#  define DEF_CA
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P1       ({cfa=*ip++;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P2       ({goto *cfa;})
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#if THREADING_SCHEME==5
-\begin_inset Newline newline
-\end_inset
-
-/* direct threading scheme 5: early fetching (Alpha, MIPS) */
-\begin_inset Newline newline
-\end_inset
-
-#  define CFA_NEXT
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P0       ({cfa=*ip;})
-\begin_inset Newline newline
-\end_inset
-
-#  define IP            (ip)
-\begin_inset Newline newline
-\end_inset
-
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_INST     (cfa)
-\begin_inset Newline newline
-\end_inset
-
-#  define INC_IP(const_inc) ({cfa=ip[const_inc]; ip+=(const_inc);})
-\begin_inset Newline newline
-\end_inset
-
-#  define DEF_CA
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P1       (ip++)
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P2       ({goto *cfa;})
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
 
-
-\begin_inset Newline newline
-\end_inset
-
-#if THREADING_SCHEME==8
-\begin_inset Newline newline
-\end_inset
-
-/* direct threading scheme 8: i386 hack */
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P0
-\begin_inset Newline newline
-\end_inset
-
-#  define IP            (ip)
-\begin_inset Newline newline
-\end_inset
-
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_INST     (*IP)
-\begin_inset Newline newline
-\end_inset
-
-#  define INC_IP(const_inc) ({ ip+=(const_inc);})
-\begin_inset Newline newline
-\end_inset
-
-#  define DEF_CA
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P1       (ip++)
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P2       ({goto **(ip-1);})
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#if THREADING_SCHEME==9
-\begin_inset Newline newline
-\end_inset
-
-/* direct threading scheme 9: prefetching (for PowerPC) */
-\begin_inset Newline newline
-\end_inset
-
-/* note that the "cfa=next_cfa;" occurs only in NEXT_P1, because this
-\begin_inset Newline newline
-\end_inset
-
-   works out better with the capabilities of gcc to introduce and
-\begin_inset Newline newline
-\end_inset
-
-   schedule the mtctr instruction.
- */
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P0
-\begin_inset Newline newline
-\end_inset
-
-#  define IP            ip
-\begin_inset Newline newline
-\end_inset
-
-#  define SET_IP(p)     ({ip=(p); next_cfa=*ip; NEXT_P0;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_INST     (next_cfa)
-\begin_inset Newline newline
-\end_inset
-
-#  define INC_IP(const_inc) ({next_cfa=IP[const_inc]; ip+=(const_inc);})
-\begin_inset Newline newline
-\end_inset
-
-#  define DEF_CA
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P2       ({goto *cfa;})
-\begin_inset Newline newline
-\end_inset
-
-#  define MORE_VARS     Inst next_cfa;
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#if THREADING_SCHEME==10
-\begin_inset Newline newline
-\end_inset
-
-/* direct threading scheme 10: plain (no attempt at scheduling) */
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P0
-\begin_inset Newline newline
-\end_inset
-
-#  define IP            (ip)
-\begin_inset Newline newline
-\end_inset
-
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_INST     (*ip)
-\begin_inset Newline newline
-\end_inset
-
-#  define INC_IP(const_inc) ({ip+=(const_inc);})
-\begin_inset Newline newline
-\end_inset
-
-#  define DEF_CA
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P1
-\begin_inset Newline newline
-\end_inset
-
-#  define NEXT_P2       ({cfa=*ip++; goto *cfa;})
-\begin_inset Newline newline
-\end_inset
-
-#endif
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#define NEXT ({DEF_CA NEXT_P1; NEXT_P2;})
-\begin_inset Newline newline
-\end_inset
-
-#define IPTOS NEXT_INST
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#define INST_ADDR(name) (Label)&&I_##name
-\begin_inset Newline newline
-\end_inset
-
-#define LABEL(name) I_##name:
-\begin_inset Newline newline
-\end_inset
-
-#else /* !defined(__GNUC__) */
-\begin_inset Newline newline
-\end_inset
-
-/* use switch dispatch */
 \begin_inset Newline newline
 \end_inset
 
-#define DEF_CA
+<<dispatch>>
 \begin_inset Newline newline
 \end_inset
 
-#define NEXT_P0
-\begin_inset Newline newline
-\end_inset
-
-#define NEXT_P1
-\begin_inset Newline newline
-\end_inset
-
-#define NEXT_P2 goto next_inst;
-\begin_inset Newline newline
-\end_inset
-
-#define SET_IP(p)       (ip=(p))
-\begin_inset Newline newline
-\end_inset
-
-#define IP              ip
-\begin_inset Newline newline
-\end_inset
-
-#define NEXT_INST       (*ip)
-\begin_inset Newline newline
-\end_inset
-
-#define INC_IP(const_inc) (ip+=(const_inc))
-\begin_inset Newline newline
-\end_inset
-
-#define IPTOS NEXT_INST
-\begin_inset Newline newline
-\end_inset
-
-#define INST_ADDR(name) I_##name
-\begin_inset Newline newline
-\end_inset
-
-#define LABEL(name) case I_##name:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#endif /* !defined(__GNUC__) */
-\begin_inset Newline newline
-\end_inset
 
-
-\begin_inset Newline newline
-\end_inset
-
-#define LABEL2(x)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-#ifdef VM_PROFILING
 \begin_inset Newline newline
 \end_inset
 
-#define SUPER_END  vm_count_block(IP)
+<<LABEL2>>
 \begin_inset Newline newline
 \end_inset
 
-#else
-\begin_inset Newline newline
-\end_inset
 
-#define SUPER_END
 \begin_inset Newline newline
 \end_inset
 
-#endif
+<<SUPER_END>>
 \begin_inset Newline newline
 \end_inset
 
@@ -5371,24 +9744,7 @@ enum {
 \begin_inset Newline newline
 \end_inset
 
-#if defined(__GNUC__) && ((__GNUC__==2 && defined(__GNUC_MINOR__) && __GNUC_MINO
-R__>=7)||(__GNUC__>2))
-\begin_inset Newline newline
-\end_inset
-
-#define MAYBE_UNUSED __attribute__((unused))
-\begin_inset Newline newline
-\end_inset
-
-#else
-\begin_inset Newline newline
-\end_inset
-
-#define MAYBE_UNUSED
-\begin_inset Newline newline
-\end_inset
-
-#endif
+<<MAYBE_UNUSED>>
 \begin_inset Newline newline
 \end_inset
 
@@ -5420,23 +9776,7 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
 \begin_inset Newline newline
 \end_inset
 
-#ifdef USE_spTOS
-\begin_inset Newline newline
-\end_inset
-
-  Cell   spTOS;
-\begin_inset Newline newline
-\end_inset
-
-#else
-\begin_inset Newline newline
-\end_inset
-
-#define spTOS (sp[0])
-\begin_inset Newline newline
-\end_inset
-
-#endif
+<<spTOS>>
 \begin_inset Newline newline
 \end_inset
 
@@ -5583,7 +9923,7 @@ n", ip[-1], ip-1);
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 stat.awk - script for aggregating profile information
 \end_layout
 
@@ -5657,7 +9997,7 @@ n",files[i],stat[i],dyn[i],i);
 @
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 seq2rule.awk - script for creating superinstructions
 \end_layout
 
@@ -7315,6 +11655,13 @@ http://www.gnu.org/philosophy/why-not-lgpl.html
 
 \begin_layout Subsection
 GNU Free Documentation License
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:GNU-Free-Documentation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
