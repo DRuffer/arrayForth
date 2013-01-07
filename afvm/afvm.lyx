@@ -1446,6 +1446,7 @@ We will use the following simple VM instruction descriptions as examples:
 \end_layout
 
 \begin_layout Scrap
+
 <<simple-instructions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1666,6 +1667,7 @@ How do we know the type and stack of the stack items? Vmgen uses prefixes,
 \end_layout
 
 \begin_layout Scrap
+
 <<type-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1750,6 +1752,7 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-definitions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1795,6 +1798,7 @@ We can override the default stack of a stack item by using a stack prefix.
 \end_layout
 
 \begin_layout Scrap
+
 <<lit>>=
 \begin_inset Newline newline
 \end_inset
@@ -1831,6 +1835,7 @@ i
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1941,6 +1946,7 @@ Consider this example:
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-stack-adjust>>=
 \begin_inset Newline newline
 \end_inset
@@ -2063,6 +2069,7 @@ SET_IP As far as Vmgen is concerned, a VM instruction containing this ends
 \end_layout
 
 \begin_layout Scrap
+
 <<branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2090,6 +2097,7 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
+
 <<end>>=
 \begin_inset Newline newline
 \end_inset
@@ -2166,6 +2174,7 @@ INST_TAIL;
 \end_layout
 
 \begin_layout Scrap
+
 <<zbranch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2209,6 +2218,7 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2309,6 +2319,7 @@ IF_spTOS(spTOS = sp[0])
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-caching>>=
 \begin_inset Newline newline
 \end_inset
@@ -2534,6 +2545,7 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-stack-transform>>=
 \begin_inset Newline newline
 \end_inset
@@ -2594,6 +2606,7 @@ n
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-organization>>=
 \begin_inset Newline newline
 \end_inset
@@ -2712,6 +2725,7 @@ Here is an example of a superinstruction definition:
 \end_layout
 
 \begin_layout Scrap
+
 <<ll>>=
 \begin_inset Newline newline
 \end_inset
@@ -3338,35 +3352,35 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P0_1>>
+#  <<NEXT-P0-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<IP_1>>
+#  <<IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<SET_IP_1>>
+#  <<SET-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_INST_1>>
+#  <<NEXT-INST-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<INC_IP_1>>
+#  <<INC-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<DEF_CA>>
+#  <<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P1>>
+#  <<NEXT-P1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P2_1>>
+#  <<NEXT-P2-1>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3386,35 +3400,35 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P0>>
+#  <<NEXT-P0>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<IP_2>>
+#  <<IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<SET_IP_1>>
+#  <<SET-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_INST>>
+#  <<NEXT-INST>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<INC_IP_2>>
+#  <<INC-IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<DEF_CA>>
+#  <<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P1_1>>
+#  <<NEXT-P1-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P2_1>>
+#  <<NEXT-P2-1>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3438,35 +3452,35 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P0_2>>
+#  <<NEXT-P0-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<IP_2>>
+#  <<IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<SET_IP_1>>
+#  <<SET-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_INST_1>>
+#  <<NEXT-INST-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<INC_IP_1>>
+#  <<INC-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<DEF_CA>>
+#  <<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P1_2>>
+#  <<NEXT-P1-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P2_1>>
+#  <<NEXT-P2-1>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3486,35 +3500,35 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  define NEXT_P0
+#  <<NEXT-P0>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<IP_2>>
+#  <<IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<SET_IP_1>>
+#  <<SET-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_INST>>
+#  <<NEXT-INST>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<INC_IP_2>>
+#  <<INC-IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<DEF_CA>>
+#  <<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P1_2>>
+#  <<NEXT-P1-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P2_2>>
+#  <<NEXT-P2-2>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3547,7 +3561,7 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P0>>
+#  <<NEXT-P0>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3555,27 +3569,27 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  <<SET_IP_2>>
+#  <<SET-IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_INST_2>>
+#  <<NEXT-INST-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<INC_IP_3>>
+#  <<INC-IP-3>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<DEF_CA>>
+#  <<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P1_3>>
+#  <<NEXT-P1-3>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P2_1>>
+#  <<NEXT-P2-1>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3599,35 +3613,35 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P0>>
+#  <<NEXT-P0>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<IP_2>>
+#  <<IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<SET_IP_1>>
+#  <<SET-IP-1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_INST>>
+#  <<NEXT-INST>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<INC_IP_2>>
+#  <<INC-IP-2>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<DEF_CA>>
+#  <<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P1>>
+#  <<NEXT-P1>>
 \begin_inset Newline newline
 \end_inset
 
-#  <<NEXT_P2_3>>
+#  <<NEXT-P2-3>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3651,11 +3665,11 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#<<jump_INST_ADDR>>
+#<<jump-INST-ADDR>>
 \begin_inset Newline newline
 \end_inset
 
-#<<jump_LABEL>>
+#<<jump-LABEL>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3667,23 +3681,23 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#<<DEF_CA>>
+#<<DEF-CA>>
 \begin_inset Newline newline
 \end_inset
 
-#<<NEXT_P0>>
+#<<NEXT-P0>>
 \begin_inset Newline newline
 \end_inset
 
-#<<NEXT_P1>>
+#<<NEXT-P1>>
 \begin_inset Newline newline
 \end_inset
 
-#<<NEXT_P2>>
+#<<NEXT-P2>>
 \begin_inset Newline newline
 \end_inset
 
-#<<SET_IP>>
+#<<SET-IP>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3691,11 +3705,11 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#<<NEXT_INST>>
+#<<NEXT-INST>>
 \begin_inset Newline newline
 \end_inset
 
-#<<INC_IP>>
+#<<INC-IP>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3703,11 +3717,11 @@ defined(__GNUC__)
 \begin_inset Newline newline
 \end_inset
 
-#<<switch_INST_ADDR>>
+#<<switch-INST-ADDR>>
 \begin_inset Newline newline
 \end_inset
 
-#<<switch_LABEL>>
+#<<switch-LABEL>>
 \begin_inset Newline newline
 \end_inset
 
@@ -3783,7 +3797,7 @@ inst_name
 \end_layout
 
 \begin_layout Scrap
-<<jump_LABEL>>=
+<<jump-LABEL>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -3795,7 +3809,7 @@ define LABEL(name) I_##name:
 \end_layout
 
 \begin_layout Scrap
-<<switch_LABEL>>=
+<<switch-LABEL>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -3882,7 +3896,7 @@ DEF_CA Usually empty.
 \end_layout
 
 \begin_layout Scrap
-<<DEF_CA>>=
+<<DEF-CA>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4011,7 +4025,7 @@ NEXT_P1
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P0>>=
+<<NEXT-P0>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4023,7 +4037,7 @@ define NEXT_P0
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P0_1>>=
+<<NEXT-P0-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4035,7 +4049,7 @@ define NEXT_P0       ({cfa=*ip++;})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P0_2>>=
+<<NEXT-P0-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4047,7 +4061,7 @@ define NEXT_P0       ({cfa=*ip;})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P1>>=
+<<NEXT-P1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4059,7 +4073,7 @@ define NEXT_P1
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P1_1>>=
+<<NEXT-P1-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4071,7 +4085,7 @@ define NEXT_P1       ({cfa=*ip++;})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P1_2>>=
+<<NEXT-P1-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4083,7 +4097,7 @@ define NEXT_P1       (ip++)
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P1_3>>=
+<<NEXT-P1-3>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4095,7 +4109,7 @@ define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P2>>=
+<<NEXT-P2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4107,7 +4121,7 @@ define NEXT_P2 goto next_inst;
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P2_1>>=
+<<NEXT-P2-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4119,7 +4133,7 @@ define NEXT_P2       ({goto *cfa;})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P2_2>>=
+<<NEXT-P2-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4131,7 +4145,7 @@ define NEXT_P2       ({goto **(ip-1);})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_P2_3>>=
+<<NEXT-P2-3>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4143,7 +4157,7 @@ define NEXT_P2       ({cfa=*ip++; goto *cfa;})
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_INST>>=
+<<NEXT-INST>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4155,7 +4169,7 @@ define NEXT_INST     (*ip)
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_INST_1>>=
+<<NEXT-INST-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4167,7 +4181,7 @@ define NEXT_INST     (cfa)
 \end_layout
 
 \begin_layout Scrap
-<<NEXT_INST_2>>=
+<<NEXT-INST-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4183,7 +4197,7 @@ INC_IP(n) This increments IP by n.
 \end_layout
 
 \begin_layout Scrap
-<<INC_IP>>=
+<<INC-IP>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4195,7 +4209,7 @@ define INC_IP(const_inc) (ip+=(const_inc))
 \end_layout
 
 \begin_layout Scrap
-<<INC_IP_1>>=
+<<INC-IP-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4207,7 +4221,7 @@ define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
 \end_layout
 
 \begin_layout Scrap
-<<INC_IP_2>>=
+<<INC-IP-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4219,7 +4233,7 @@ define INC_IP(const_inc) ({ip+=(const_inc);})
 \end_layout
 
 \begin_layout Scrap
-<<INC_IP_3>>=
+<<INC-IP-3>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4235,7 +4249,7 @@ SET_IP(target) This sets IP to target.
 \end_layout
 
 \begin_layout Scrap
-<<SET_IP>>=
+<<SET-IP>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4247,7 +4261,7 @@ define SET_IP(p)     (ip=(p))
 \end_layout
 
 \begin_layout Scrap
-<<SET_IP_1>>=
+<<SET-IP-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4259,7 +4273,7 @@ define SET_IP(p)     ({ip=(p); NEXT_P0;})
 \end_layout
 
 \begin_layout Scrap
-<<SET_IP_2>>=
+<<SET-IP-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4294,7 +4308,7 @@ vm_A2B(a,b) Type casting macro that assigns ‘a’ (of type A) to ‘b’ (of t
 \end_layout
 
 \begin_layout Scrap
-<<vm_A2B(a,b)>>=
+<<vm-A2B(a,b)>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4390,7 +4404,7 @@ define IP            ip
 \end_layout
 
 \begin_layout Scrap
-<<IP_1>>=
+<<IP-1>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4402,7 +4416,7 @@ define IP            (ip-1)
 \end_layout
 
 \begin_layout Scrap
-<<IP_2>>=
+<<IP-2>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4419,7 +4433,7 @@ IMM_ARG(access,value) Define this to expland to “(access)”.
 \end_layout
 
 \begin_layout Scrap
-<<IMM_ARG>>=
+<<IMM-ARG>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4491,7 +4505,7 @@ IF_stackpointerTOS(expr) Macro for executing expr, if top-of-stack caching
 \end_layout
 
 \begin_layout Scrap
-<<IF_spTOS>>=
+<<IF-spTOS>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4538,7 +4552,7 @@ vm_count_block(IP)
 \end_layout
 
 \begin_layout Scrap
-<<SUPER_END>>=
+<<SUPER-END>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4591,7 +4605,7 @@ ions.
 \end_layout
 
 \begin_layout Scrap
-<<MAYBE_UNUSED>>=
+<<MAYBE-UNUSED>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4739,7 +4753,7 @@ LABEL(inst_name)
 \end_layout
 
 \begin_layout Scrap
-<<jump_INST_ADDR>>=
+<<jump-INST-ADDR>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -4751,7 +4765,7 @@ define INST_ADDR(name) (Label)&&I_##name
 \end_layout
 
 \begin_layout Scrap
-<<switch_INST_ADDR>>=
+<<switch-INST-ADDR>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -5548,6 +5562,7 @@ README
 \end_layout
 
 \begin_layout Scrap
+
 <<README>>=
 \begin_inset Newline newline
 \end_inset
@@ -5658,6 +5673,7 @@ simple.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
+
 <<simple.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -5682,6 +5698,7 @@ fib.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
+
 <<fib.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -5751,6 +5768,7 @@ test.mini - example mini program (tests everything)
 \end_layout
 
 \begin_layout Scrap
+
 <<test.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -6135,6 +6153,7 @@ test.out - test.mini output
 \end_layout
 
 \begin_layout Scrap
+
 <<test.out>>=
 \begin_inset Newline newline
 \end_inset
@@ -6297,6 +6316,7 @@ Makefile
 \end_layout
 
 \begin_layout Scrap
+
 <<Makefile>>=
 \begin_inset Newline newline
 \end_inset
@@ -6309,7 +6329,7 @@ Makefile
 \begin_inset Newline newline
 \end_inset
 
-<<#copyright>>
+<<make-copyright>>
 \begin_inset Newline newline
 \end_inset
 
@@ -6532,6 +6552,7 @@ Support.c - main() and other support functions
 \end_layout
 
 \begin_layout Scrap
+
 <<support.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -7354,6 +7375,7 @@ mini.h - common declarations
 \end_layout
 
 \begin_layout Scrap
+
 <<mini.h>>=
 \begin_inset Newline newline
 \end_inset
@@ -7515,7 +7537,7 @@ void vm_print_profile(FILE *file);
 \begin_inset Newline newline
 \end_inset
 
-<<vm_A2B(a,b)>>
+<<vm-A2B(a,b)>>
 \begin_inset Newline newline
 \end_inset
 
@@ -7523,7 +7545,7 @@ void vm_print_profile(FILE *file);
 \begin_inset Newline newline
 \end_inset
 
-<<IMM_ARG>>
+<<IMM-ARG>>
 \begin_inset Newline newline
 \end_inset
 
@@ -7647,6 +7669,7 @@ mini-inst.vmg - simple VM instructions
 \end_layout
 
 \begin_layout Scrap
+
 <<mini-inst.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -7791,6 +7814,7 @@ mini-super.vmg - superinstructions (empty at first)
 \end_layout
 
 \begin_layout Scrap
+
 <<mini-super.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -7807,6 +7831,7 @@ mini.l - scanner
 \end_layout
 
 \begin_layout Scrap
+
 <<mini.l>>=
 \begin_inset Newline newline
 \end_inset
@@ -7972,6 +7997,7 @@ mini.y - front end (parser, VM code generator)
 \end_layout
 
 \begin_layout Scrap
+
 <<mini.y>>=
 \begin_inset Newline newline
 \end_inset
@@ -8506,6 +8532,7 @@ peephole-blacklist - list of instructions not allowed in superinstructions
 \end_layout
 
 \begin_layout Scrap
+
 <<peephole-blacklist>>=
 \begin_inset Newline newline
 \end_inset
@@ -8539,6 +8566,7 @@ peephole.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<peephole.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -8904,6 +8932,7 @@ profile.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<profile.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9518,6 +9547,7 @@ disasm.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<disasm.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9624,6 +9654,7 @@ engine.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<engine>>=
 \begin_inset Newline newline
 \end_inset
@@ -9648,6 +9679,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 \end_layout
 
 \begin_layout Scrap
+
 <<engine.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9680,7 +9712,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 \begin_inset Newline newline
 \end_inset
 
-<<IF_spTOS>>
+<<IF-spTOS>>
 \begin_inset Newline newline
 \end_inset
 
@@ -9712,7 +9744,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 \begin_inset Newline newline
 \end_inset
 
-<<SUPER_END>>
+<<SUPER-END>>
 \begin_inset Newline newline
 \end_inset
 
@@ -9744,7 +9776,7 @@ enum {
 \begin_inset Newline newline
 \end_inset
 
-<<MAYBE_UNUSED>>
+<<MAYBE-UNUSED>>
 \begin_inset Newline newline
 \end_inset
 
@@ -9928,6 +9960,7 @@ stat.awk - script for aggregating profile information
 \end_layout
 
 \begin_layout Scrap
+
 <<stat.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10002,6 +10035,7 @@ seq2rule.awk - script for creating superinstructions
 \end_layout
 
 \begin_layout Scrap
+
 <<seq2rule.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10052,6 +10086,7 @@ A script for converting this document to PDF form follows:
 \end_layout
 
 \begin_layout Scrap
+
 <<final>>=
 \begin_inset Newline newline
 \end_inset
@@ -10110,6 +10145,7 @@ Once that script is pulled out and named extract, the following script can
 \end_layout
 
 \begin_layout Scrap
+
 <<extract-all>>=
 \begin_inset Newline newline
 \end_inset
@@ -10207,6 +10243,7 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
+
 <<copyright>>=
 \begin_inset Newline newline
 \end_inset
@@ -10280,6 +10317,7 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
+
 <<
 \backslash
 copyright>>=
@@ -10380,7 +10418,8 @@ copyright>>=
 \end_layout
 
 \begin_layout Scrap
-<<#copyright>>=
+
+<<make-copyright>>=
 \begin_inset Newline newline
 \end_inset
 

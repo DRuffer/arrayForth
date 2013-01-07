@@ -1,5 +1,7 @@
-%% LyX 2.0.2 created this file.  For more info, see http://www.lyx.org/.
-%% Do not edit unless you really know what you are doing.
+\batchmode% ===> this file was generated automatically by noweave --- better not edit it
+\makeatletter
+\def\input@path{{/home/druffer/Dropbox/afvm//}}
+\makeatother
 \documentclass[10pt,english]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
@@ -50,8 +52,10 @@ A copy of the license is included in section \ref{sub:GNU-Free-Documentation}.
 
 \begin{longtable}{cc}
 \hline 
-\multicolumn{1}{c}{\textbf{Software Version}} & \textbf{Date}\tabularnewline
-\multicolumn{1}{c}{\projectVersion} & \projectDate\tabularnewline
+\multicolumn{1}{c}{\textbf{Software Version}} &
+\textbf{Date}\tabularnewline
+\multicolumn{1}{c}{\projectVersion} &
+\projectDate\tabularnewline
 \hline 
 \end{longtable}
 
@@ -503,8 +507,8 @@ An \texttt{\textbf{item-size}} takes three cells on the stack.
 
 We will use the following simple VM instruction descriptions as examples:
 
-<<simple-instructions>>=
-\ simple VM instructions:
+\nwfilename{afvm.nw}\nwbegincode{1}\sublabel{NW2jw8wQ-30JyJS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-30JyJS-1}}}\moddef{simple-instructions~{\nwtagstyle{}\subpageref{NW2jw8wQ-30JyJS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\ simple VM instructions:
 add ( i1 i2 -- i )
 i = i1+i2;
 
@@ -532,13 +536,13 @@ i2 = !i1;
 negate ( i1 -- i2 )
 i2 = -i1;
 
-<<lit>>
+\LA{}lit~{\nwtagstyle{}\subpageref{NW2jw8wQ-zteG4-1}}\RA{}
 
 drop ( i -- )
 
 print ( i -- )
-printf("%ld\n", i);
-@
+printf("%ld\\n", i);
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{2}\nwdocspar
 
 The first line specifies the name of the VM instruction (e.g. \texttt{\textbf{sub}})
 and its stack effect (e.g. \texttt{\textbf{i1 i2 -{}- i}}). The rest
@@ -556,12 +560,12 @@ How do we know the type and stack of the stack items? Vmgen uses prefixes,
 similar to Fortran; in contrast to Fortran, you have to define the
 prefix first:
 
-<<type-prefix>>=
-\ type prefix definitions:
-\E s" Cell"   single data-stack type-prefix i
-\E s" char *" single data-stack type-prefix a
-\E s" Inst *" single data-stack type-prefix target
-@
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2jw8wQ-JTT27-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-JTT27-1}}}\moddef{type-prefix~{\nwtagstyle{}\subpageref{NW2jw8wQ-JTT27-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\ type prefix definitions:
+\\E s" Cell"   single data-stack type-prefix i
+\\E s" char *" single data-stack type-prefix a
+\\E s" Inst *" single data-stack type-prefix target
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{4}\nwdocspar
 
 This defines the prefix \texttt{\textbf{i}} to refer to the type \texttt{\textbf{Cell}}
 (defined as \texttt{\textbf{long}} in \texttt{\textbf{mini.h}}) and,
@@ -572,10 +576,10 @@ type prefix is part of the variable name.
 Before we can use \texttt{\textbf{data-stack}} in this way, we have
 to define it:
 
-<<stack-definitions>>=
-\ stack definitions:
-\E stack data-stack sp Cell
-@
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2jw8wQ-2yMZpu-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2yMZpu-1}}}\moddef{stack-definitions~{\nwtagstyle{}\subpageref{NW2jw8wQ-2yMZpu-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\ stack definitions:
+\\E stack data-stack sp Cell
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
 
 This line defines the stack data-stack, which uses the stack pointer
 \texttt{\textbf{sp}}, and each item has the basic type \texttt{\textbf{Cell}};
@@ -588,20 +592,20 @@ By default, stacks grow towards lower addresses in Vmgen-erated interpreters
 We can override the default stack of a stack item by using a stack
 prefix. E.g., consider the following instruction:
 
-<<lit>>=
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2jw8wQ-zteG4-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-zteG4-1}}}\moddef{lit~{\nwtagstyle{}\subpageref{NW2jw8wQ-zteG4-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-30JyJS-1}}\nwenddeflinemarkup
 lit ( #i -- i )
-@
+\nwused{\\{NW2jw8wQ-30JyJS-1}}\nwendcode{}\nwbegindocs{8}\nwdocspar
 
 The VM instruction \texttt{\textbf{lit}} takes the item \texttt{\textbf{i}}
 from the instruction stream (indicated by the prefix \texttt{\textbf{\#}}),
 and pushes it on the (default) data stack. The stack prefix is not
 part of the variable name. Stack prefixes are defined like this:
 
-<<stack-prefix>>=
-\ stack prefix definitions
-\E inst-stream stack-prefix #
-\E data-stack  stack-prefix S:
-@
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2jw8wQ-25BRy4-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-25BRy4-1}}}\moddef{stack-prefix~{\nwtagstyle{}\subpageref{NW2jw8wQ-25BRy4-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\ stack prefix definitions
+\\E inst-stream stack-prefix #
+\\E data-stack  stack-prefix S:
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{10}\nwdocspar
 
 This definition defines that the stack prefix \texttt{\textbf{\#}}
 specifies the \textquotedblleft{}stack\textquotedblright{} \texttt{\textbf{inst-stream}}.
@@ -642,13 +646,13 @@ stack in the stack effect.
 
 Consider this example:
 
-<<unused-stack-adjust>>=
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2jw8wQ-4cVj4O-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-4cVj4O-1}}}\moddef{unused-stack-adjust~{\nwtagstyle{}\subpageref{NW2jw8wQ-4cVj4O-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 return ( #iadjust S:... target afp i1 -- i2 )
 SET_IP(target);
 sp = (Cell *)(((char *)sp)+iadjust);
 fp = afp;
 i2=i1;
-@
+\nwnotused{unused-stack-adjust}\nwendcode{}\nwbegindocs{12}\nwdocspar
 
 First the variables \texttt{\textbf{target afp i1}} are popped off
 the stack, then the stack pointer \texttt{\textbf{sp}} is set correctly
@@ -678,16 +682,16 @@ instructions:
 this ends a VM basic block (used in profiling to delimit profiled
 sequences). On the C level, this also sets the instruction pointer.
 \end{description}
-<<branch>>=
+\nwenddocs{}\nwbegincode{13}\sublabel{NW2jw8wQ-3kTaNH-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3kTaNH-1}}}\moddef{branch~{\nwtagstyle{}\subpageref{NW2jw8wQ-3kTaNH-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
 branch ( #target -- )
 SET_IP(target);
-@
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{14}\nwdocspar
 
 \begin{description}
 \item [{SUPER\_END}] This ends a basic block (for profiling), even if the
 instruction contains no \texttt{\textbf{SET\_IP}}.
 \end{description}
-<<end>>=
+\nwenddocs{}\nwbegincode{15}\sublabel{NW2jw8wQ-139RGe-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-139RGe-1}}}\moddef{end~{\nwtagstyle{}\subpageref{NW2jw8wQ-139RGe-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
 end ( i -- )
 /* SUPER_END would increment the next BB count (because IP points there);
    this would be a problem if there is no following BB.
@@ -696,7 +700,7 @@ end ( i -- )
 block_insert(IP); /* we also do this at compile time, so this is unnecessary */
 #endif
 return i;
-@
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{16}\nwdocspar
 
 \begin{description}
 \item [{INST\_TAIL;}] Vmgen replaces \textquoteleft{}\texttt{\textbf{INST\_TAIL;}}\textquoteright{}
@@ -710,13 +714,13 @@ is not strictly necessary, because there is another one implicitly
 after the if-statement, but using it improves branch prediction accuracy
 slightly and allows other optimizations.
 \end{description}
-<<zbranch>>=
+\nwenddocs{}\nwbegincode{17}\sublabel{NW2jw8wQ-3gbMZA-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3gbMZA-1}}}\moddef{zbranch~{\nwtagstyle{}\subpageref{NW2jw8wQ-3gbMZA-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
 zbranch ( #target i -- )
-if (i==0) {
+if (i==0) \{
   SET_IP(target);
   INST_TAIL;
-}
-@
+\}
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{18}\nwdocspar
 
 \begin{description}
 \item [{SUPER\_CONTINUE}] This indicates that the implicit tail at the
@@ -726,14 +730,14 @@ This enables an optimization that is not yet implemented in the vmgen-ex
 code (but in Gforth). The typical application is in conditional VM
 branches.
 \end{description}
-<<unused-branch>>=
+\nwenddocs{}\nwbegincode{19}\sublabel{NW2jw8wQ-1LK2FX-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1LK2FX-1}}}\moddef{unused-branch~{\nwtagstyle{}\subpageref{NW2jw8wQ-1LK2FX-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 unused-branch ( #target i -- )
-if (i==0) {
+if (i==0) \{
   SET_IP(target);
   INST_TAIL;
-}
+\}
 SUPER_CONTINUE;
-@
+\nwnotused{unused-branch}\nwendcode{}\nwbegindocs{20}\nwdocspar
 
 Note that Vmgen is not smart about C-level tokenization, comments,
 strings, or conditional compilation, so it will interpret even a commented-out
@@ -767,9 +771,9 @@ has to use an index that corrects for that. In the future, this flushing
 may be done automatically by mentioning a special string in the C
 code.
 \end{itemize}
-<<stack-caching>>=
-\ The following VM instructions also explicitly reference sp and
-\ therefore may have to do something about spTOS caching.
+\nwenddocs{}\nwbegincode{21}\sublabel{NW2jw8wQ-1bm9o4-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1bm9o4-1}}}\moddef{stack-caching~{\nwtagstyle{}\subpageref{NW2jw8wQ-1bm9o4-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\ The following VM instructions also explicitly reference sp and
+\\ therefore may have to do something about spTOS caching.
 
 call ( #target #iadjust -- targetret aoldfp )
 /* IF_spTOS(sp[2] = spTOS);*/ /* unnecessary; vmgen inserts a flush anyway */
@@ -788,15 +792,15 @@ fp = afp;
 i2=i1;
 /* IF_spTOS(spTOS = sp[0]); */ /* dead, thus unnecessary; vmgen copies i2 there */
 
-\ loadlocal and storelocal access stack items below spTOS, so we can
-\ ignore spTOS caching.
+\\ loadlocal and storelocal access stack items below spTOS, so we can
+\\ ignore spTOS caching.
 
 loadlocal ( #ioffset -- i )
 i = *(Cell *)(fp+ioffset);
 
 storelocal ( #ioffset i -- )
 *(Cell *)(fp+ioffset) = i;
-@
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{22}\nwdocspar
 
 \begin{itemize}
 \item The Vmgen-erated code loads the stack items from stack-pointer-indexed
@@ -831,10 +835,10 @@ E.g., if you want to let \texttt{\textbf{data-stack}} grow towards
 higher addresses, with the stack pointer always pointing just beyond
 the top-of-stack, use this right after defining \texttt{\textbf{data-stack}}:
 
-<<unused-stack-transform>>=
-\E : sp-access-transform ( itemnum -- index ) negate 1- ;
-\E ' sp-access-transform ' data-stack >body stack-access-transform !
-@
+\nwenddocs{}\nwbegincode{23}\sublabel{NW2jw8wQ-Zmzq3-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-Zmzq3-1}}}\moddef{unused-stack-transform~{\nwtagstyle{}\subpageref{NW2jw8wQ-Zmzq3-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\\E : sp-access-transform ( itemnum -- index ) negate 1- ;
+\\E ' sp-access-transform ' data-stack >body stack-access-transform !
+\nwnotused{unused-stack-transform}\nwendcode{}\nwbegindocs{24}\nwdocspar
 
 This means that \texttt{\textbf{sp-access-transform}} will be used
 to generate indexes for accessing \texttt{\textbf{data-stack}}. The
@@ -845,24 +849,24 @@ the 1st at sp{[}-2{]}, etc., which is the typical way upward-growing
 stacks are used. If you need a different transform and do not know
 enough Forth to program it, let me know.
 
-<<stack-organization>>=
-\  The stack is organized as follows:
-\  The stack grows downwards; a stack usually looks like this:
+\nwenddocs{}\nwbegincode{25}\sublabel{NW2jw8wQ-1sBtWC-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1sBtWC-1}}}\moddef{stack-organization~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sBtWC-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\  The stack is organized as follows:
+\\  The stack grows downwards; a stack usually looks like this:
 
-\  higher addresses
-\  --------------------- bottom of stack
-\     locals of main
-\     return address (points to VM code after call)
-\  +->oldfp (NULL)
-\  |  intermediate results (e.g., 1 for a call like 1+foo(...))
-\  |  arguments passed to the called function
-\  |  locals of the called function
-\  |  return address (points to VM code after call)
-\  +--oldfp                <-- fp
-\     intermediate results <-- sp
-\  ---------------------- top of stack
-\  lower addresses
-@
+\\  higher addresses
+\\  --------------------- bottom of stack
+\\     locals of main
+\\     return address (points to VM code after call)
+\\  +->oldfp (NULL)
+\\  |  intermediate results (e.g., 1 for a call like 1+foo(...))
+\\  |  arguments passed to the called function
+\\  |  locals of the called function
+\\  |  return address (points to VM code after call)
+\\  +--oldfp                <-- fp
+\\     intermediate results <-- sp
+\\  ---------------------- top of stack
+\\  lower addresses
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{26}\nwdocspar
 
 
 \subsubsection{Superinstructions}
@@ -876,9 +880,9 @@ factor 1.1 speedup).
 
 Here is an example of a superinstruction definition:
 
-<<ll>>=
+\nwenddocs{}\nwbegincode{27}\sublabel{NW2jw8wQ-j70pE-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-j70pE-1}}}\moddef{ll~{\nwtagstyle{}\subpageref{NW2jw8wQ-j70pE-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-T30UU-1}}\nwenddeflinemarkup
 ll = loadlocal lit
-@
+\nwused{\\{NW2jw8wQ-T30UU-1}}\nwendcode{}\nwbegindocs{28}\nwdocspar
 
 \texttt{\textbf{ll}} is the name of the superinstruction, and \texttt{\textbf{loadlocal}}
 and \texttt{\textbf{lit}} are its components. This superinstruction
@@ -1101,7 +1105,7 @@ Vmgen supports two methods of VM instruction dispatch: threaded code
 across C compilers); you can use conditional compilation (\textquoteleft{}\texttt{\textbf{defined(\_\_GNUC\_\_)}}\textquoteright{})
 to choose between these methods, and our example does so.
 
-<<dispatch>>=
+\nwenddocs{}\nwbegincode{29}\sublabel{NW2jw8wQ-2Kr0uS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2Kr0uS-1}}}\moddef{dispatch~{\nwtagstyle{}\subpageref{NW2jw8wQ-2Kr0uS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 /* different threading schemes for different architectures; the sparse
    numbering is there for historical reasons */
 
@@ -1119,51 +1123,51 @@ to choose between these methods, and our example does so.
 #ifdef __GNUC__
 #if THREADING_SCHEME==1
 /* direct threading scheme 1: autoinc, long latency (HPPA, Sharc) */
-#  <<NEXT-P0-1>>
-#  <<IP-1>>
-#  <<SET-IP-1>>
-#  <<NEXT-INST-1>>
-#  <<INC-IP-1>>
-#  <<DEF-CA>>
-#  <<NEXT-P1>>
-#  <<NEXT-P2-1>>
+#  \LA{}NEXT-P0-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTFrz-1}}\RA{}
+#  \LA{}IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-3inKY8-1}}\RA{}
+#  \LA{}SET-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}\RA{}
+#  \LA{}NEXT-INST-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-2bLix5-1}}\RA{}
+#  \LA{}INC-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Gaga3-1}}\RA{}
+#  \LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#  \LA{}NEXT-P1~{\nwtagstyle{}\subpageref{NW2jw8wQ-3YEW15-1}}\RA{}
+#  \LA{}NEXT-P2-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTIdL-1}}\RA{}
 #endif
 
 #if THREADING_SCHEME==3
 /* direct threading scheme 3: autoinc, low latency (68K) */
-#  <<NEXT-P0>>
-#  <<IP-2>>
-#  <<SET-IP-1>>
-#  <<NEXT-INST>>
-#  <<INC-IP-2>>
-#  <<DEF-CA>>
-#  <<NEXT-P1-1>>
-#  <<NEXT-P2-1>>
+#  \LA{}NEXT-P0~{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}\RA{}
+#  \LA{}IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1G58ZQ-1}}\RA{}
+#  \LA{}SET-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}\RA{}
+#  \LA{}NEXT-INST~{\nwtagstyle{}\subpageref{NW2jw8wQ-rp6Mx-1}}\RA{}
+#  \LA{}INC-IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-3iAU2V-1}}\RA{}
+#  \LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#  \LA{}NEXT-P1-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTALH-1}}\RA{}
+#  \LA{}NEXT-P2-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTIdL-1}}\RA{}
 #endif
 
 #if THREADING_SCHEME==5
 /* direct threading scheme 5: early fetching (Alpha, MIPS) */
 #  define CFA_NEXT
-#  <<NEXT-P0-2>>
-#  <<IP-2>>
-#  <<SET-IP-1>>
-#  <<NEXT-INST-1>>
-#  <<INC-IP-1>>
-#  <<DEF-CA>>
-#  <<NEXT-P1-2>>
-#  <<NEXT-P2-1>>
+#  \LA{}NEXT-P0-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sAFS3-1}}\RA{}
+#  \LA{}IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1G58ZQ-1}}\RA{}
+#  \LA{}SET-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}\RA{}
+#  \LA{}NEXT-INST-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-2bLix5-1}}\RA{}
+#  \LA{}INC-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Gaga3-1}}\RA{}
+#  \LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#  \LA{}NEXT-P1-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sA9vL-1}}\RA{}
+#  \LA{}NEXT-P2-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTIdL-1}}\RA{}
 #endif
 
 #if THREADING_SCHEME==8
 /* direct threading scheme 8: i386 hack */
-#  <<NEXT-P0>>
-#  <<IP-2>>
-#  <<SET-IP-1>>
-#  <<NEXT-INST>>
-#  <<INC-IP-2>>
-#  <<DEF-CA>>
-#  <<NEXT-P1-2>>
-#  <<NEXT-P2-2>>
+#  \LA{}NEXT-P0~{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}\RA{}
+#  \LA{}IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1G58ZQ-1}}\RA{}
+#  \LA{}SET-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}\RA{}
+#  \LA{}NEXT-INST~{\nwtagstyle{}\subpageref{NW2jw8wQ-rp6Mx-1}}\RA{}
+#  \LA{}INC-IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-3iAU2V-1}}\RA{}
+#  \LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#  \LA{}NEXT-P1-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sA9vL-1}}\RA{}
+#  \LA{}NEXT-P2-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sAIDP-1}}\RA{}
 #endif
 
 #if THREADING_SCHEME==9
@@ -1171,50 +1175,50 @@ to choose between these methods, and our example does so.
 /* note that the "cfa=next_cfa;" occurs only in NEXT_P1, because this
    works out better with the capabilities of gcc to introduce and
    schedule the mtctr instruction. */
-#  <<NEXT-P0>>
-#  <<IP>>
-#  <<SET-IP-2>>
-#  <<NEXT-INST-2>>
-#  <<INC-IP-3>>
-#  <<DEF-CA>>
-#  <<NEXT-P1-3>>
-#  <<NEXT-P2-1>>
+#  \LA{}NEXT-P0~{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}\RA{}
+#  \LA{}IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-E6ZFY-1}}\RA{}
+#  \LA{}SET-IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1zfFOz-1}}\RA{}
+#  \LA{}NEXT-INST-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1p9qp-1}}\RA{}
+#  \LA{}INC-IP-3~{\nwtagstyle{}\subpageref{NW2jw8wQ-1ALVid-1}}\RA{}
+#  \LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#  \LA{}NEXT-P1-3~{\nwtagstyle{}\subpageref{NW2jw8wQ-2hFxKx-1}}\RA{}
+#  \LA{}NEXT-P2-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTIdL-1}}\RA{}
 #  define MORE_VARS     Inst next_cfa;
 #endif
 
 #if THREADING_SCHEME==10
 /* direct threading scheme 10: plain (no attempt at scheduling) */
-#  <<NEXT-P0>>
-#  <<IP-2>>
-#  <<SET-IP-1>>
-#  <<NEXT-INST>>
-#  <<INC-IP-2>>
-#  <<DEF-CA>>
-#  <<NEXT-P1>>
-#  <<NEXT-P2-3>>
+#  \LA{}NEXT-P0~{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}\RA{}
+#  \LA{}IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1G58ZQ-1}}\RA{}
+#  \LA{}SET-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}\RA{}
+#  \LA{}NEXT-INST~{\nwtagstyle{}\subpageref{NW2jw8wQ-rp6Mx-1}}\RA{}
+#  \LA{}INC-IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-3iAU2V-1}}\RA{}
+#  \LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#  \LA{}NEXT-P1~{\nwtagstyle{}\subpageref{NW2jw8wQ-3YEW15-1}}\RA{}
+#  \LA{}NEXT-P2-3~{\nwtagstyle{}\subpageref{NW2jw8wQ-2hG5d1-1}}\RA{}
 #endif
 
-#define NEXT ({DEF_CA NEXT_P1; NEXT_P2;})
-#<<IPTOS>>
+#define NEXT (\{DEF_CA NEXT_P1; NEXT_P2;\})
+#\LA{}IPTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-30DNwe-1}}\RA{}
 
-#<<jump-INST-ADDR>>
-#<<jump-LABEL>>
+#\LA{}jump-INST-ADDR~{\nwtagstyle{}\subpageref{NW2jw8wQ-dMsR7-1}}\RA{}
+#\LA{}jump-LABEL~{\nwtagstyle{}\subpageref{NW2jw8wQ-2GdOBm-1}}\RA{}
 #else /* !defined(__GNUC__) */
 /* use switch dispatch */
-#<<DEF-CA>>
-#<<NEXT-P0>>
-#<<NEXT-P1>>
-#<<NEXT-P2>>
-#<<SET-IP>>
-#<<IP>>
-#<<NEXT-INST>>
-#<<INC-IP>>
-#<<IPTOS>>
-#<<switch-INST-ADDR>>
-#<<switch-LABEL>>
+#\LA{}DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}\RA{}
+#\LA{}NEXT-P0~{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}\RA{}
+#\LA{}NEXT-P1~{\nwtagstyle{}\subpageref{NW2jw8wQ-3YEW15-1}}\RA{}
+#\LA{}NEXT-P2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1R5pvH-1}}\RA{}
+#\LA{}SET-IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-2wRxRx-1}}\RA{}
+#\LA{}IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-E6ZFY-1}}\RA{}
+#\LA{}NEXT-INST~{\nwtagstyle{}\subpageref{NW2jw8wQ-rp6Mx-1}}\RA{}
+#\LA{}INC-IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-1YfVQe-1}}\RA{}
+#\LA{}IPTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-30DNwe-1}}\RA{}
+#\LA{}switch-INST-ADDR~{\nwtagstyle{}\subpageref{NW2jw8wQ-3YsGWy-1}}\RA{}
+#\LA{}switch-LABEL~{\nwtagstyle{}\subpageref{NW2jw8wQ-2M831w-1}}\RA{}
 
 #endif /* !defined(__GNUC__) */
-@
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{30}\nwdocspar
 
 For both methods, the VM engine is contained in a C-level function.
 Vmgen generates most of the contents of the function for you (name-vm.i),
@@ -1244,20 +1248,20 @@ just expand to \textquoteleft{}\texttt{\textbf{label:}}\textquoteright{}.
 In either case label is usually the \texttt{\textbf{inst\_name}} with
 some prefix or suffix to avoid naming conflicts.
 \end{description}
-<<jump-LABEL>>=
+\nwenddocs{}\nwbegincode{31}\sublabel{NW2jw8wQ-2GdOBm-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2GdOBm-1}}}\moddef{jump-LABEL~{\nwtagstyle{}\subpageref{NW2jw8wQ-2GdOBm-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define LABEL(name) I_##name:
-@
-<<switch-LABEL>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{32}\nwdocspar
+\nwenddocs{}\nwbegincode{33}\sublabel{NW2jw8wQ-2M831w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2M831w-1}}}\moddef{switch-LABEL~{\nwtagstyle{}\subpageref{NW2jw8wQ-2M831w-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define LABEL(name) case I_##name:
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{34}\nwdocspar
 
 \begin{description}
 \item [{LABEL2(inst\_name)}] This will be used for dynamic superinstructions;
 at the moment, this should expand to nothing.
 \end{description}
-<<LABEL2>>=
+\nwenddocs{}\nwbegincode{35}\sublabel{NW2jw8wQ-GfBpN-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-GfBpN-1}}}\moddef{LABEL2~{\nwtagstyle{}\subpageref{NW2jw8wQ-GfBpN-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 #define LABEL2(x)
-@
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{36}\nwdocspar
 
 \begin{description}
 \item [{NAME(inst\_name\_string)}] Called on entering a VM instruction
@@ -1266,14 +1270,14 @@ In normal execution this should be expand to nothing, but for tracing
 this usually prints the name, and possibly other information (several
 VM registers in our example).
 \end{description}
-<<NAME>>=
+\nwenddocs{}\nwbegincode{37}\sublabel{NW2jw8wQ-4fcHYk-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-4fcHYk-1}}}\moddef{NAME~{\nwtagstyle{}\subpageref{NW2jw8wQ-4fcHYk-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 #ifdef VM_DEBUG
-#define NAME(_x) if (vm_debug) {fprintf(vm_out, "%p: %-20s, ", ip-1, _x); \
-                                fprintf(vm_out,"fp=%p, sp=%p", fp, sp);}
+#define NAME(_x) if (vm_debug) \{fprintf(vm_out, "%p: %-20s, ", ip-1, _x); \\
+                                fprintf(vm_out,"fp=%p, sp=%p", fp, sp);\}
 #else
 #define NAME(_x)
 #endif
-@
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{38}\nwdocspar
 
 \begin{description}
 \item [{DEF\_CA}] Usually empty. Called just inside a new scope at the
@@ -1282,9 +1286,9 @@ be visible during every VM instruction. If you define this macro as
 non-empty, you have to provide the finishing \textquoteleft{}\texttt{\textbf{;}}\textquoteright{}
 in the macro.
 \end{description}
-<<DEF-CA>>=
+\nwenddocs{}\nwbegincode{39}\sublabel{NW2jw8wQ-1b0vzS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}}\moddef{DEF-CA~{\nwtagstyle{}\subpageref{NW2jw8wQ-1b0vzS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define DEF_CA
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{40}\nwdocspar
 
 \begin{description}
 \item [{NEXT\_P0~NEXT\_P1~NEXT\_P2}] The three parts of instruction dispatch.
@@ -1314,77 +1318,77 @@ to schedule the relevant stuff up by itself). An even more extreme
 variant is to pull code up even further, into, e.g., \texttt{\textbf{NEXT\_P1}}
 of the previous VM instruction (prefetching, useful on PowerPCs).
 \end{description}
-<<NEXT-P0>>=
+\nwenddocs{}\nwbegincode{41}\sublabel{NW2jw8wQ-y8keh-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}}\moddef{NEXT-P0~{\nwtagstyle{}\subpageref{NW2jw8wQ-y8keh-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_P0
-@
-<<NEXT-P0-1>>=
-define NEXT_P0       ({cfa=*ip++;})
-@
-<<NEXT-P0-2>>=
-define NEXT_P0       ({cfa=*ip;})
-@
-<<NEXT-P1>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{42}\nwdocspar
+\nwenddocs{}\nwbegincode{43}\sublabel{NW2jw8wQ-4HTFrz-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTFrz-1}}}\moddef{NEXT-P0-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTFrz-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P0       (\{cfa=*ip++;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{44}\nwdocspar
+\nwenddocs{}\nwbegincode{45}\sublabel{NW2jw8wQ-1sAFS3-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1sAFS3-1}}}\moddef{NEXT-P0-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sAFS3-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P0       (\{cfa=*ip;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{46}\nwdocspar
+\nwenddocs{}\nwbegincode{47}\sublabel{NW2jw8wQ-3YEW15-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3YEW15-1}}}\moddef{NEXT-P1~{\nwtagstyle{}\subpageref{NW2jw8wQ-3YEW15-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_P1
-@
-<<NEXT-P1-1>>=
-define NEXT_P1       ({cfa=*ip++;})
-@
-<<NEXT-P1-2>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{48}\nwdocspar
+\nwenddocs{}\nwbegincode{49}\sublabel{NW2jw8wQ-4HTALH-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTALH-1}}}\moddef{NEXT-P1-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTALH-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P1       (\{cfa=*ip++;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{50}\nwdocspar
+\nwenddocs{}\nwbegincode{51}\sublabel{NW2jw8wQ-1sA9vL-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1sA9vL-1}}}\moddef{NEXT-P1-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sA9vL-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_P1       (ip++)
-@
-<<NEXT-P1-3>>=
-define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
-@
-<<NEXT-P2>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{52}\nwdocspar
+\nwenddocs{}\nwbegincode{53}\sublabel{NW2jw8wQ-2hFxKx-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2hFxKx-1}}}\moddef{NEXT-P1-3~{\nwtagstyle{}\subpageref{NW2jw8wQ-2hFxKx-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P1       (\{cfa=next_cfa; ip++; next_cfa=*ip;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{54}\nwdocspar
+\nwenddocs{}\nwbegincode{55}\sublabel{NW2jw8wQ-1R5pvH-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1R5pvH-1}}}\moddef{NEXT-P2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1R5pvH-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_P2 goto next_inst;
-@
-<<NEXT-P2-1>>=
-define NEXT_P2       ({goto *cfa;})
-@
-<<NEXT-P2-2>>=
-define NEXT_P2       ({goto **(ip-1);})
-@
-<<NEXT-P2-3>>=
-define NEXT_P2       ({cfa=*ip++; goto *cfa;})
-@
-<<NEXT-INST>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{56}\nwdocspar
+\nwenddocs{}\nwbegincode{57}\sublabel{NW2jw8wQ-4HTIdL-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTIdL-1}}}\moddef{NEXT-P2-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4HTIdL-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P2       (\{goto *cfa;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{58}\nwdocspar
+\nwenddocs{}\nwbegincode{59}\sublabel{NW2jw8wQ-1sAIDP-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1sAIDP-1}}}\moddef{NEXT-P2-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sAIDP-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P2       (\{goto **(ip-1);\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{60}\nwdocspar
+\nwenddocs{}\nwbegincode{61}\sublabel{NW2jw8wQ-2hG5d1-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2hG5d1-1}}}\moddef{NEXT-P2-3~{\nwtagstyle{}\subpageref{NW2jw8wQ-2hG5d1-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define NEXT_P2       (\{cfa=*ip++; goto *cfa;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{62}\nwdocspar
+\nwenddocs{}\nwbegincode{63}\sublabel{NW2jw8wQ-rp6Mx-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-rp6Mx-1}}}\moddef{NEXT-INST~{\nwtagstyle{}\subpageref{NW2jw8wQ-rp6Mx-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_INST     (*ip)
-@
-<<NEXT-INST-1>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{64}\nwdocspar
+\nwenddocs{}\nwbegincode{65}\sublabel{NW2jw8wQ-2bLix5-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2bLix5-1}}}\moddef{NEXT-INST-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-2bLix5-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_INST     (cfa)
-@
-<<NEXT-INST-2>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{66}\nwdocspar
+\nwenddocs{}\nwbegincode{67}\sublabel{NW2jw8wQ-1p9qp-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1p9qp-1}}}\moddef{NEXT-INST-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1p9qp-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define NEXT_INST     (next_cfa)
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{68}\nwdocspar
 
 \begin{description}
 \item [{INC\_IP(n)}] This increments IP by n.
 \end{description}
-<<INC-IP>>=
+\nwenddocs{}\nwbegincode{69}\sublabel{NW2jw8wQ-1YfVQe-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1YfVQe-1}}}\moddef{INC-IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-1YfVQe-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define INC_IP(const_inc) (ip+=(const_inc))
-@
-<<INC-IP-1>>=
-define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
-@
-<<INC-IP-2>>=
-define INC_IP(const_inc) ({ip+=(const_inc);})
-@
-<<INC-IP-3>>=
-define INC_IP(const_inc) ({next_cfa=IP[const_inc]; ip+=(const_inc);})
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{70}\nwdocspar
+\nwenddocs{}\nwbegincode{71}\sublabel{NW2jw8wQ-1Gaga3-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1Gaga3-1}}}\moddef{INC-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Gaga3-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define INC_IP(const_inc) (\{cfa=IP[const_inc]; ip+=(const_inc);\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{72}\nwdocspar
+\nwenddocs{}\nwbegincode{73}\sublabel{NW2jw8wQ-3iAU2V-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3iAU2V-1}}}\moddef{INC-IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-3iAU2V-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define INC_IP(const_inc) (\{ip+=(const_inc);\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{74}\nwdocspar
+\nwenddocs{}\nwbegincode{75}\sublabel{NW2jw8wQ-1ALVid-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1ALVid-1}}}\moddef{INC-IP-3~{\nwtagstyle{}\subpageref{NW2jw8wQ-1ALVid-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define INC_IP(const_inc) (\{next_cfa=IP[const_inc]; ip+=(const_inc);\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{76}\nwdocspar
 
 \begin{description}
 \item [{SET\_IP(target)}] This sets IP to target.
 \end{description}
-<<SET-IP>>=
+\nwenddocs{}\nwbegincode{77}\sublabel{NW2jw8wQ-2wRxRx-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2wRxRx-1}}}\moddef{SET-IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-2wRxRx-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define SET_IP(p)     (ip=(p))
-@
-<<SET-IP-1>>=
-define SET_IP(p)     ({ip=(p); NEXT_P0;})
-@
-<<SET-IP-2>>=
-define SET_IP(p)     ({ip=(p); next_cfa=*ip; NEXT_P0;})
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{78}\nwdocspar
+\nwenddocs{}\nwbegincode{79}\sublabel{NW2jw8wQ-4AD73Z-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}}\moddef{SET-IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-4AD73Z-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define SET_IP(p)     (\{ip=(p); NEXT_P0;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{80}\nwdocspar
+\nwenddocs{}\nwbegincode{81}\sublabel{NW2jw8wQ-1zfFOz-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1zfFOz-1}}}\moddef{SET-IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1zfFOz-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
+define SET_IP(p)     (\{ip=(p); next_cfa=*ip; NEXT_P0;\})
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{82}\nwdocspar
 
 \begin{description}
 \item [{vm\_A2B(a,b)}] Type casting macro that assigns \textquoteleft{}a\textquoteright{}
@@ -1408,7 +1412,7 @@ are to use a (temporary) union, or to take the address of the value,
 cast the pointer, and dereference that (not always possible, and sometimes
 expensive).
 \end{description}
-<<vm-A2B(a,b)>>=
+\nwenddocs{}\nwbegincode{83}\sublabel{NW2jw8wQ-1Sp4v8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1Sp4v8-1}}}\moddef{vm-A2B(a,b)~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Sp4v8-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2vEAWJ-1}}\nwenddeflinemarkup
 /* type change macros; these are specific to the types you use, so you
    have to change this part */
 #define vm_Cell2i(_cell,x)      ((x)=(long)(_cell))
@@ -1420,7 +1424,7 @@ expensive).
 #define vm_Cell2Cell(_x,_y)     ((_y)=(Cell)(_x))
 /* the cast in vm_Cell2Cell is needed because the base type for
    inst-stream is Cell, but *IP is an Inst */
-@
+\nwused{\\{NW2jw8wQ-2vEAWJ-1}}\nwendcode{}\nwbegindocs{84}\nwdocspar
 
 \begin{description}
 \item [{vm\_twoA2B(a1,a2,b)~vm\_B2twoA(b,a1,a2)}] Type casting between
@@ -1435,24 +1439,24 @@ the name is \textquoteleft{}\texttt{\textbf{IP}}\textquoteright{},
 and it can be a plain r-value; typically it is a macro that abstracts
 away the differences between the various implementations of \texttt{\textbf{NEXT\_P}}{*}.
 \end{description}
-<<IP>>=
+\nwenddocs{}\nwbegincode{85}\sublabel{NW2jw8wQ-E6ZFY-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-E6ZFY-1}}}\moddef{IP~{\nwtagstyle{}\subpageref{NW2jw8wQ-E6ZFY-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define IP            ip
-@
-<<IP-1>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{86}\nwdocspar
+\nwenddocs{}\nwbegincode{87}\sublabel{NW2jw8wQ-3inKY8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3inKY8-1}}}\moddef{IP-1~{\nwtagstyle{}\subpageref{NW2jw8wQ-3inKY8-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define IP            (ip-1)
-@
-<<IP-2>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{88}\nwdocspar
+\nwenddocs{}\nwbegincode{89}\sublabel{NW2jw8wQ-1G58ZQ-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1G58ZQ-1}}}\moddef{IP-2~{\nwtagstyle{}\subpageref{NW2jw8wQ-1G58ZQ-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define IP            (ip)
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{90}\nwdocspar
 
 \begin{description}
 \item [{IMM\_ARG(access,value)}] Define this to expland to \textquotedblleft{}(access)\textquotedblright{}.
 This is just a placeholder for future extensions.
 \end{description}
-<<IMM-ARG>>=
+\nwenddocs{}\nwbegincode{91}\sublabel{NW2jw8wQ-1Qw1fR-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1Qw1fR-1}}}\moddef{IMM-ARG~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Qw1fR-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2vEAWJ-1}}\nwenddeflinemarkup
 /* for future extensions */
 #define IMM_ARG(access,value) (access)
-@
+\nwused{\\{NW2jw8wQ-2vEAWJ-1}}\nwendcode{}\nwbegindocs{92}\nwdocspar
 
 \begin{description}
 \item [{stackpointerTOS}] The top-of-stack for the stack pointed to by
@@ -1463,16 +1467,16 @@ The stack pointer for the predefined \textquoteleft{}inst-stream\textquoteright{
 is called \textquoteleft{}IP\textquoteright{}, so the top-of-stack
 is called \textquoteleft{}IPTOS\textquoteright{}.
 \end{description}
-<<spTOS>>=
+\nwenddocs{}\nwbegincode{93}\sublabel{NW2jw8wQ-2qT2Zr-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2qT2Zr-1}}}\moddef{spTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-2qT2Zr-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 #ifdef USE_spTOS
   Cell   spTOS;
 #else
 #define spTOS (sp[0])
 #endif
-@
-<<IPTOS>>=
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{94}\nwdocspar
+\nwenddocs{}\nwbegincode{95}\sublabel{NW2jw8wQ-30DNwe-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-30DNwe-1}}}\moddef{IPTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-30DNwe-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define IPTOS NEXT_INST
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{96}\nwdocspar
 
 \begin{description}
 \item [{IF\_stackpointerTOS(expr)}] Macro for executing expr, if top-of-stack
@@ -1480,7 +1484,7 @@ caching is used for the stackpointer stack. I.e., this should do expr
 if there is top-of-stack caching for stackpointer; otherwise it should
 do nothing.
 \end{description}
-<<IF-spTOS>>=
+\nwenddocs{}\nwbegincode{97}\sublabel{NW2jw8wQ-2j3DUM-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2j3DUM-1}}}\moddef{IF-spTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-2j3DUM-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 #define USE_spTOS 1
 
 #ifdef USE_spTOS
@@ -1488,20 +1492,20 @@ do nothing.
 #else
 #define IF_spTOS(x)
 #endif
-@
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{98}\nwdocspar
 
 \begin{description}
 \item [{SUPER\_END}] This is used by the VM profiler (see VM profiler);
 it should not do anything in normal operation, and call \texttt{\textbf{vm\_count\_block(IP)}}
 for profiling.
 \end{description}
-<<SUPER-END>>=
+\nwenddocs{}\nwbegincode{99}\sublabel{NW2jw8wQ-2zFWf2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2zFWf2-1}}}\moddef{SUPER-END~{\nwtagstyle{}\subpageref{NW2jw8wQ-2zFWf2-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 #ifdef VM_PROFILING
 #define SUPER_END  vm_count_block(IP)
 #else
 #define SUPER_END
 #endif
-@
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{100}\nwdocspar
 
 \begin{description}
 \item [{SUPER\_CONTINUE}] This is just a hint to Vmgen and does nothing
@@ -1511,13 +1515,13 @@ for gcc-2.7 and higher. It suppresses the warnings about unused variables
 in the code for superinstructions. You need to define this only if
 you are using superinstructions.
 \end{description}
-<<MAYBE-UNUSED>>=
+\nwenddocs{}\nwbegincode{101}\sublabel{NW2jw8wQ-2OEdfg-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2OEdfg-1}}}\moddef{MAYBE-UNUSED~{\nwtagstyle{}\subpageref{NW2jw8wQ-2OEdfg-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
 #if defined(__GNUC__) && ((__GNUC__==2 && defined(__GNUC_MINOR__) && __GNUC_MINOR__>=7)||(__GNUC__>2))
 #define MAYBE_UNUSED __attribute__((unused))
 #else
 #define MAYBE_UNUSED
 #endif
-@
+\nwused{\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{102}\nwdocspar
 
 \begin{description}
 \item [{VM\_DEBUG}] If this is defined, the tracing code will be compiled
@@ -1574,12 +1578,12 @@ the address of the label defined in \textquoteleft{}\texttt{\textbf{LABEL(inst\_
 the address is taken with \textquoteleft{}\&\&\textquoteright{} (see
 Labels as Values).
 \end{description}
-<<jump-INST-ADDR>>=
+\nwenddocs{}\nwbegincode{103}\sublabel{NW2jw8wQ-dMsR7-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-dMsR7-1}}}\moddef{jump-INST-ADDR~{\nwtagstyle{}\subpageref{NW2jw8wQ-dMsR7-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define INST_ADDR(name) (Label)&&I_##name
-@
-<<switch-INST-ADDR>>=
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{104}\nwdocspar
+\nwenddocs{}\nwbegincode{105}\sublabel{NW2jw8wQ-3YsGWy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3YsGWy-1}}}\moddef{switch-INST-ADDR~{\nwtagstyle{}\subpageref{NW2jw8wQ-3YsGWy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2Kr0uS-1}}\nwenddeflinemarkup
 define INST_ADDR(name) I_##name
-@
+\nwused{\\{NW2jw8wQ-2Kr0uS-1}}\nwendcode{}\nwbegindocs{106}\nwdocspar
 
 
 \subsubsection{VM code generation}
@@ -1851,7 +1855,7 @@ You can find vmgen information at \url{http://www.complang.tuwien.ac.at/anton/vm
 
 \subsubsection{README}
 
-<<README>>=
+\nwenddocs{}\nwbegincode{107}\sublabel{NW2jw8wQ-1u9106-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1u9106-1}}}\moddef{README~{\nwtagstyle{}\subpageref{NW2jw8wQ-1u9106-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 This directory contains a working example for using vmgen.  It's a
 small Modula-2-like programming language.
 
@@ -1875,22 +1879,22 @@ To learn about the options, type
 More information can be found in the vmgen documentation.
 
 -----
-<<copyright>>
-@
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
+\nwnotused{README}\nwendcode{}\nwbegindocs{108}\nwdocspar
 
 
 \subsubsection{simple.mini - example mini program}
 
-<<simple.mini>>=
+\nwenddocs{}\nwbegincode{109}\sublabel{NW2jw8wQ-1X6hO9-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1X6hO9-1}}}\moddef{simple.mini~{\nwtagstyle{}\subpageref{NW2jw8wQ-1X6hO9-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 func main()
   return 1;
 end func;
-@
+\nwnotused{simple.mini}\nwendcode{}\nwbegindocs{110}\nwdocspar
 
 
 \subsubsection{fib.mini - example mini program}
 
-<<fib.mini>>=
+\nwenddocs{}\nwbegincode{111}\sublabel{NW2jw8wQ-2t93pk-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2t93pk-1}}}\moddef{fib.mini~{\nwtagstyle{}\subpageref{NW2jw8wQ-2t93pk-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 func fib(n)
   var r;
   if n<2 then
@@ -1905,12 +1909,12 @@ end func;
 func main()
   return fib(34);
 end func;
-@
+\nwnotused{fib.mini}\nwendcode{}\nwbegindocs{112}\nwdocspar
 
 
 \subsubsection{test.mini - example mini program (tests everything)}
 
-<<test.mini>>=
+\nwenddocs{}\nwbegincode{113}\sublabel{NW2jw8wQ-2SLoqk-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2SLoqk-1}}}\moddef{test.mini~{\nwtagstyle{}\subpageref{NW2jw8wQ-2SLoqk-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 func operators()
   print 3 = 3;
   print (3+5) = 8;
@@ -2004,12 +2008,12 @@ func main()
   testfac();
   return 0;
 end func;
-@
+\nwnotused{test.mini}\nwendcode{}\nwbegindocs{114}\nwdocspar
 
 
 \paragraph{test.out - test.mini output}
 
-<<test.out>>=
+\nwenddocs{}\nwbegincode{115}\sublabel{NW2jw8wQ-3xFKoM-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3xFKoM-1}}}\moddef{test.out~{\nwtagstyle{}\subpageref{NW2jw8wQ-3xFKoM-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 1
 1
 1
@@ -2044,7 +2048,7 @@ end func;
 1
 1
 result = 0
-@
+\nwnotused{test.out}\nwendcode{}\nwbegindocs{116}\nwdocspar
 
 
 \subsection{Mini specific files}
@@ -2054,10 +2058,10 @@ You would typically change much in or replace the following files:
 
 \subsubsection{\textit{Makefile} }
 
-<<Makefile>>=
+\nwenddocs{}\nwbegincode{117}\sublabel{NW2jw8wQ-2CgwVs-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2CgwVs-1}}}\moddef{Makefile~{\nwtagstyle{}\subpageref{NW2jw8wQ-2CgwVs-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 #Makefile for vmgen example
 
-<<make-copyright>>
+\LA{}make-copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-265spY-1}}\RA{}
 
 LEX=flex -l
 YACC=bison -y
@@ -2071,19 +2075,19 @@ M4=m4
 OBJECTS_MINI=mini.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
 
 mini: $(OBJECTS_MINI)
-	$(CC) $(OBJECTS_MINI) -o $@
+        $(CC) $(OBJECTS_MINI) -o $@
 
 lex.yy.c: mini.l
-	$(LEX) mini.l
+        $(LEX) mini.l
 
 mini.tab.c: mini.y lex.yy.c
-	$(YACC) mini.y && mv y.tab.c $@
+        $(YACC) mini.y && mv y.tab.c $@
 
 mini-vm.i mini-disasm.i mini-gen.i mini-labels.i mini-profile.i mini-peephole.i: mini.vmg
-	$(VMGEN) mini.vmg
+        $(VMGEN) mini.vmg
 
 mini.vmg: mini-inst.vmg mini-super.vmg
-	$(M4) mini-inst.vmg >$@
+        $(M4) mini-inst.vmg >$@
 
 mini.tab.o: mini.tab.c mini-gen.i lex.yy.c mini.h
 
@@ -2095,29 +2099,29 @@ profile.o: profile.c mini-profile.i mini.h
 
 disasm.o: disasm.c mini-disasm.i mini.h
 
-<<engine>>
+\LA{}engine~{\nwtagstyle{}\subpageref{NW2jw8wQ-17Efas-1}}\RA{}
 
 clean:
-	rm -f *.o mini mini-*.i lex.yy.c mini.tab.c mini.vmg
+        rm -f *.o mini mini-*.i lex.yy.c mini.tab.c mini.vmg
 
 check:  mini
-	./mini test.mini | tr -d '\015' | diff - test.out
+        ./mini test.mini | tr -d '\\015' | diff - test.out
 
 checkall:
-	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
+        for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \\time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
 
 #make profiles
 %.prof: %.mini mini
-	./mini -p $< 2>$@
-@
+        ./mini -p $< 2>$@
+\nwnotused{Makefile}\nwendcode{}\nwbegindocs{118}\nwdocspar
 
 
 \subsubsection{Support.c - main() and other support functions}
 
-<<support.c>>=
+\nwenddocs{}\nwbegincode{119}\sublabel{NW2jw8wQ-1rQXkM-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1rQXkM-1}}}\moddef{support.c~{\nwtagstyle{}\subpageref{NW2jw8wQ-1rQXkM-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* support functions and main() for vmgen example
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 #include <stdlib.h>
@@ -2129,55 +2133,55 @@ extern int optind;
 #include "mini.h"
 
 void genarg_i(Inst **vmcodepp, Cell i)
-{
+\{
   *((Cell *) *vmcodepp) = i;
   (*vmcodepp)++;
-}
+\}
 
 void genarg_target(Inst **vmcodepp, Inst *target)
-{
+\{
   *((Inst **) *vmcodepp) = target;
   (*vmcodepp)++;
-}
+\}
 
 void printarg_i(Cell i)
-{
+\{
   fprintf(vm_out, "%ld ", i);
-}
+\}
 
 void printarg_target(Inst *target)
-{
+\{
   fprintf(vm_out, "%p ", target);
-}
+\}
 
 void printarg_a(char *a)
-{
+\{
   fprintf(vm_out, "%p ", a);
-}
+\}
 
 void printarg_Cell(Cell i)
-{
+\{
   fprintf(vm_out, "0x%lx ", i);
-}
+\}
 
 /* This language has separate name spaces for functions and variables;
    this works because there are no function variables, and the syntax
    makes it possible to differentiate between function and variable
    reference */
 
-typedef struct functab {
+typedef struct functab \{
   struct functab *next;
   char *name;
   Inst *start;
   int params;
   int nonparams;
-} functab;
+\} functab;
 
 functab *ftab=NULL;
 
 /* note: does not check for double definitions */
 void insert_func(char *name, Inst *start, int locals, int nonparams)
-{
+\{
   functab *node = malloc(sizeof(functab));
 
   node->next=ftab;
@@ -2186,10 +2190,10 @@ void insert_func(char *name, Inst *start, int locals, int nonparams)
   node->params=locals-nonparams;
   node->nonparams=nonparams;
   ftab=node;
-}
+\}
 
 functab *lookup_func(char *name)
-{
+\{
   functab *p;
 
   for (p=ftab; p!=NULL; p=p->next)
@@ -2197,29 +2201,29 @@ functab *lookup_func(char *name)
       return p;
   fprintf(stderr, "undefined function %s", name);
   exit(1);
-}
+\}
 
 Inst *func_addr(char *name)
-{
+\{
   return lookup_func(name)->start;
-}
+\}
 
 Cell func_calladjust(char *name)
-{
+\{
   return adjust(lookup_func(name)->nonparams);
-}
+\}
 
-typedef struct vartab {
+typedef struct vartab \{
   struct vartab *next;
   char *name;
   int index;
-} vartab;
+\} vartab;
 
 vartab* vtab;
 
 /* no checking for double definitions */
 void insert_local(char *name)
-{
+\{
   vartab *node = malloc(sizeof(vartab));
 
   locals++;
@@ -2227,10 +2231,10 @@ void insert_local(char *name)
   node->name=name;
   node->index=locals;
   vtab = node;
-}
+\}
 
 vartab *lookup_var(char *name)
-{
+\{
   vartab *p;
 
   for (p=vtab; p!=NULL; p=p->next)
@@ -2238,12 +2242,12 @@ vartab *lookup_var(char *name)
       return p;
   fprintf(stderr, "undefined local variable %s", name);
   exit(1);
-}
+\}
 
 Cell var_offset(char *name)
-{
+\{
   return (locals - lookup_var(name)->index + 2)*sizeof(Cell);
-}
+\}
 
 #define CODE_SIZE 65536
 #define STACK_SIZE 65536
@@ -2252,7 +2256,7 @@ typedef Cell (*engine_t)(Inst *ip0, Cell* sp, char* fp);
 char *program_name;
 
 int main(int argc, char **argv)
-{
+\{
   int disassembling = 0;
   int profiling = 0;
   int c;
@@ -2261,13 +2265,13 @@ int main(int argc, char **argv)
   Cell *stack=(Cell *)calloc(STACK_SIZE,sizeof(Cell));
   engine_t runvm=engine;
 
-  while ((c = getopt(argc, argv, "hdpt")) != -1) {
-    switch (c) {
+  while ((c = getopt(argc, argv, "hdpt")) != -1) \{
+    switch (c) \{
     default:
     case 'h':
     help:
-      fprintf(stderr, "Usage: %s [options] file\nOptions:\n-h	Print this message and exit\n-d	disassemble VM program before execution\n-p	profile VM code sequences (output on stderr)\n-t	trace VM code execution (output on stderr)\n",
-	      argv[0]);
+      fprintf(stderr, "Usage: %s [options] file\\nOptions:\\n-h   Print this message and exit\\n-d disassemble VM program before execution\\n-p     profile VM code sequences (output on stderr)\\n-t        trace VM code execution (output on stderr)\\n",
+              argv[0]);
       exit(1);
     case 'd':
       disassembling=1;
@@ -2281,15 +2285,15 @@ int main(int argc, char **argv)
       vm_debug=1;
       runvm = engine_debug;
       break;
-    }
-  }
+    \}
+  \}
   if (optind+1 != argc)
     goto help;
   program_name = argv[optind];
-  if ((yyin=fopen(program_name,"r"))==NULL) {
+  if ((yyin=fopen(program_name,"r"))==NULL) \{
     perror(argv[optind]);
     exit(1);
-  }
+  \}
 
   /* initialize everything */
   vmcodep = vm_code;
@@ -2307,22 +2311,22 @@ int main(int argc, char **argv)
   if (disassembling)
     vm_disassemble(vm_code, vmcodep, vm_prim);
 
-  printf("result = %ld\n",runvm(start, stack+STACK_SIZE-1, NULL));
+  printf("result = %ld\\n",runvm(start, stack+STACK_SIZE-1, NULL));
 
   if (profiling)
     vm_print_profile(vm_out);
 
   return 0;
-}
-@
+\}
+\nwnotused{support.c}\nwendcode{}\nwbegindocs{120}\nwdocspar
 
 
 \subsubsection{mini.h - common declarations}
 
-<<mini.h>>=
+\nwenddocs{}\nwbegincode{121}\sublabel{NW2jw8wQ-2vEAWJ-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2vEAWJ-1}}}\moddef{mini.h~{\nwtagstyle{}\subpageref{NW2jw8wQ-2vEAWJ-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* support functions for vmgen example
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 #include <stdio.h>
@@ -2359,9 +2363,9 @@ void vm_count_block(Inst *ip);
 struct block_count *block_insert(Inst *ip);
 void vm_print_profile(FILE *file);
 
-<<vm-A2B(a,b)>>
+\LA{}vm-A2B(a,b)~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Sp4v8-1}}\RA{}
 
-<<IMM-ARG>>
+\LA{}IMM-ARG~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Qw1fR-1}}\RA{}
 
 #define VM_IS_INST(inst, n) ((inst) == vm_prim[n])
 
@@ -2390,58 +2394,58 @@ void gen_main_end(void);
 
 /* stack pointer change for a function with n nonparams */
 #define adjust(n)  ((n) * -sizeof(Cell))
-@
+\nwnotused{mini.h}\nwendcode{}\nwbegindocs{122}\nwdocspar
 
 
 \subsubsection{mini-inst.vmg - simple VM instructions}
 
-<<mini-inst.vmg>>=
-\ mini.inst is generated automatically from mini-inst.vmg and mini-super.vmg
-\ example .vmg file
+\nwenddocs{}\nwbegincode{123}\sublabel{NW2jw8wQ-xV04w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-xV04w-1}}}\moddef{mini-inst.vmg~{\nwtagstyle{}\subpageref{NW2jw8wQ-xV04w-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\\ mini.inst is generated automatically from mini-inst.vmg and mini-super.vmg
+\\ example .vmg file
 
-<<\copyright>>
+\LA{}\copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3VQn9E-1}}\RA{}
 
-\ WARNING: This file is processed by m4. Make sure your identifiers
-\ don't collide with m4's (e.g. by undefining them).
+\\ WARNING: This file is processed by m4. Make sure your identifiers
+\\ don't collide with m4's (e.g. by undefining them).
 
-\ comments start with "\ "
+\\ comments start with "\\ "
 
-<<stack-definitions>>
+\LA{}stack-definitions~{\nwtagstyle{}\subpageref{NW2jw8wQ-2yMZpu-1}}\RA{}
 
-<<stack-prefix>>
+\LA{}stack-prefix~{\nwtagstyle{}\subpageref{NW2jw8wQ-25BRy4-1}}\RA{}
 
-<<type-prefix>>
+\LA{}type-prefix~{\nwtagstyle{}\subpageref{NW2jw8wQ-JTT27-1}}\RA{}
 
-<<simple-instructions>>
+\LA{}simple-instructions~{\nwtagstyle{}\subpageref{NW2jw8wQ-30JyJS-1}}\RA{}
 
-<<branch>>
+\LA{}branch~{\nwtagstyle{}\subpageref{NW2jw8wQ-3kTaNH-1}}\RA{}
 
-<<zbranch>>
+\LA{}zbranch~{\nwtagstyle{}\subpageref{NW2jw8wQ-3gbMZA-1}}\RA{}
 
-<<stack-organization>>
+\LA{}stack-organization~{\nwtagstyle{}\subpageref{NW2jw8wQ-1sBtWC-1}}\RA{}
 
-<<stack-caching>>
+\LA{}stack-caching~{\nwtagstyle{}\subpageref{NW2jw8wQ-1bm9o4-1}}\RA{}
 
-<<end>>
+\LA{}end~{\nwtagstyle{}\subpageref{NW2jw8wQ-139RGe-1}}\RA{}
 
 include(mini-super.vmg)
-@
+\nwnotused{mini-inst.vmg}\nwendcode{}\nwbegindocs{124}\nwdocspar
 
 
 \subsubsection{mini-super.vmg - superinstructions (empty at first)}
 
-<<mini-super.vmg>>=
-<<ll>>
-@
+\nwenddocs{}\nwbegincode{125}\sublabel{NW2jw8wQ-T30UU-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-T30UU-1}}}\moddef{mini-super.vmg~{\nwtagstyle{}\subpageref{NW2jw8wQ-T30UU-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\LA{}ll~{\nwtagstyle{}\subpageref{NW2jw8wQ-j70pE-1}}\RA{}
+\nwnotused{mini-super.vmg}\nwendcode{}\nwbegindocs{126}\nwdocspar
 
 
 \subsubsection{mini.l - scanner}
 
-<<mini.l>>=
-%{
+\nwenddocs{}\nwbegincode{127}\sublabel{NW2jw8wQ-2yuxD9-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2yuxD9-1}}}\moddef{mini.l~{\nwtagstyle{}\subpageref{NW2jw8wQ-2yuxD9-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+%\{
 /* front-end scanner for vmgen example
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 /* % option yylineno (flex option, implied by flex -l) */
@@ -2449,14 +2453,14 @@ include(mini-super.vmg)
 #include <stdlib.h>
 #include <string.h>
 char *mystrdup(const char *s)
-{
+\{
   char *t=malloc(strlen(s)+1);
   return strcpy(t,s);
-}
-%}
+\}
+%\}
 
 %%
-[-();,+*&|<=!]	return yytext[0];
+[-();,+*&|<=!]  return yytext[0];
 :=     return BECOMES;
 func   return FUNC;
 return return RETURN;
@@ -2468,35 +2472,35 @@ else   return ELSE;
 while  return WHILE;
 do     return DO;
 print  return PRINT;
-[0-9]+ { yylval.num=strtol(yytext,NULL,10); return NUM; }
-[a-zA-Z\_][a-zA-Z0-9\_]* { yylval.string=mystrdup(yytext); return IDENT; }
-[ \t\n] ;
+[0-9]+ \{ yylval.num=strtol(yytext,NULL,10); return NUM; \}
+[a-zA-Z\\_][a-zA-Z0-9\\_]* \{ yylval.string=mystrdup(yytext); return IDENT; \}
+[ \\t\\n] ;
 [/][/].* ;
 . yyerror("illegal character"); exit(1);
 %%
-@
+\nwnotused{mini.l}\nwendcode{}\nwbegindocs{128}\nwdocspar
 
 
 \subsubsection{mini.y - front end (parser, VM code generator)}
 
-<<mini.y>>=
+\nwenddocs{}\nwbegincode{129}\sublabel{NW2jw8wQ-1raQgt-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1raQgt-1}}}\moddef{mini.y~{\nwtagstyle{}\subpageref{NW2jw8wQ-1raQgt-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* front-end compiler for vmgen example
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 /* I use yacc/bison here not because I think it's the best tool for
    the job, but because it's widely available and popular; it's also
    (barely) adequate for this job. */
 
-%{
+%\{
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "mini.h"
 
 /* BB_BOUNDARY is needed on basic blocks without a preceding VM branch */
-#define BB_BOUNDARY (last_compiled = NULL,  /* suppress peephole opt */ \
+#define BB_BOUNDARY (last_compiled = NULL,  /* suppress peephole opt */ \\
                      block_insert(vmcodep)) /* for accurate profiling */
 
 Inst *vm_prim;
@@ -2505,38 +2509,38 @@ FILE *vm_out;
 int vm_debug;
 
 void yyerror(char *s)
-{
+\{
 #if 1
   /* for pure flex call */
-  fprintf(stderr, "%s: %s\n", program_name, s);
+  fprintf(stderr, "%s: %s\\n", program_name, s);
 #else
   /* lex or flex -l supports yylineno */
-  fprintf (stderr, "%s: %d: %s\n", program_name, yylineno, s);
+  fprintf (stderr, "%s: %d: %s\\n", program_name, yylineno, s);
 #endif
-}
+\}
 
 #include "mini-gen.i"
 
 void gen_main_end(void)
-{
+\{
   gen_call(&vmcodep, func_addr("main"), func_calladjust("main"));
   gen_end(&vmcodep);
   BB_BOUNDARY; /* for profiling; see comment in mini.vmg:end */
-}
+\}
 
 int locals=0;
 int nonparams=0;
 
 int yylex();
-%}
+%\}
 
 %token FUNC RETURN END VAR IF THEN ELSE WHILE DO BECOMES PRINT NUM IDENT
 
-%union {
+%union \{
   long num;
   char *string;
   Inst *instp;
-}
+\}
 
 %type <string> IDENT;
 %type <num> NUM;
@@ -2546,54 +2550,54 @@ int yylex();
 program: program function
        | ;
 
-function: FUNC IDENT { locals=0; nonparams=0; } '(' params ')'
-          vars                  { insert_func($2,vmcodep,locals,nonparams); }
+function: FUNC IDENT \{ locals=0; nonparams=0; \} '(' params ')'
+          vars                  \{ insert_func($2,vmcodep,locals,nonparams); \}
           stats RETURN expr ';'
-          END FUNC ';'          { gen_return(&vmcodep, -adjust(locals)); }
+          END FUNC ';'          \{ gen_return(&vmcodep, -adjust(locals)); \}
         ;
 
-params: IDENT ',' { insert_local($1); } params
-      | IDENT     { insert_local($1); }
+params: IDENT ',' \{ insert_local($1); \} params
+      | IDENT     \{ insert_local($1); \}
       | ;
 
-vars: vars VAR IDENT ';' { insert_local($3); nonparams++; }
+vars: vars VAR IDENT ';' \{ insert_local($3); nonparams++; \}
     | ;
 
 stats: stats stat ';'
      | ;
 
-stat: IF expr THEN { gen_zbranch(&vmcodep, 0); $<instp>$ = vmcodep; }
-      stats { $<instp>$ = $<instp>4; }
-      elsepart END IF { BB_BOUNDARY; $<instp>7[-1] = (Inst)vmcodep; }
-    | WHILE   { BB_BOUNDARY; $<instp>$ = vmcodep; }
-      expr DO { gen_zbranch(&vmcodep, 0); $<instp>$ = vmcodep; }
-      stats END WHILE { gen_branch(&vmcodep, $<instp>2); $<instp>5[-1] = (Inst)vmcodep; }
-    | IDENT BECOMES expr        { gen_storelocal(&vmcodep,  var_offset($1)); }
-    | PRINT expr                { gen_print(&vmcodep); }
-    | expr                      { gen_drop(&vmcodep); }
+stat: IF expr THEN \{ gen_zbranch(&vmcodep, 0); $<instp>$ = vmcodep; \}
+      stats \{ $<instp>$ = $<instp>4; \}
+      elsepart END IF \{ BB_BOUNDARY; $<instp>7[-1] = (Inst)vmcodep; \}
+    | WHILE   \{ BB_BOUNDARY; $<instp>$ = vmcodep; \}
+      expr DO \{ gen_zbranch(&vmcodep, 0); $<instp>$ = vmcodep; \}
+      stats END WHILE \{ gen_branch(&vmcodep, $<instp>2); $<instp>5[-1] = (Inst)vmcodep; \}
+    | IDENT BECOMES expr        \{ gen_storelocal(&vmcodep,  var_offset($1)); \}
+    | PRINT expr                \{ gen_print(&vmcodep); \}
+    | expr                      \{ gen_drop(&vmcodep); \}
     ;
 
-elsepart: ELSE { gen_branch(&vmcodep, 0); $<instp>$ = vmcodep; $<instp>0[-1] = (Inst)vmcodep; }
-          stats { $$ = $<instp>2; }
-        | { $$ = $<instp>0; }
+elsepart: ELSE \{ gen_branch(&vmcodep, 0); $<instp>$ = vmcodep; $<instp>0[-1] = (Inst)vmcodep; \}
+          stats \{ $$ = $<instp>2; \}
+        | \{ $$ = $<instp>0; \}
         ;
 
-expr: term '+' term     { gen_add(&vmcodep); }
-    | term '-' term     { gen_sub(&vmcodep); }
-    | term '*' term     { gen_mul(&vmcodep); }
-    | term '&' term     { gen_and(&vmcodep); }
-    | term '|' term     { gen_or(&vmcodep); }
-    | term '<' term     { gen_lessthan(&vmcodep); }
-    | term '=' term     { gen_equals(&vmcodep); }
-    | '!' term          { gen_not(&vmcodep); }
-    | '-' term          { gen_negate(&vmcodep); }
+expr: term '+' term     \{ gen_add(&vmcodep); \}
+    | term '-' term     \{ gen_sub(&vmcodep); \}
+    | term '*' term     \{ gen_mul(&vmcodep); \}
+    | term '&' term     \{ gen_and(&vmcodep); \}
+    | term '|' term     \{ gen_or(&vmcodep); \}
+    | term '<' term     \{ gen_lessthan(&vmcodep); \}
+    | term '=' term     \{ gen_equals(&vmcodep); \}
+    | '!' term          \{ gen_not(&vmcodep); \}
+    | '-' term          \{ gen_negate(&vmcodep); \}
     | term
     ;
 
 term: '(' expr ')'
-    | IDENT '(' args ')' { gen_call(&vmcodep, func_addr($1), func_calladjust($1)); }
-    | IDENT              { gen_loadlocal(&vmcodep, var_offset($1)); }
-    | NUM                { gen_lit(&vmcodep, $1); }
+    | IDENT '(' args ')' \{ gen_call(&vmcodep, func_addr($1), func_calladjust($1)); \}
+    | IDENT              \{ gen_loadlocal(&vmcodep, var_offset($1)); \}
+    | NUM                \{ gen_lit(&vmcodep, $1); \}
     ;
 
 /* missing: argument counting and checking against called function */
@@ -2602,21 +2606,21 @@ args: expr ',' args
     | ;
 %%
 int yywrap(void)
-{
+\{
   return 1;
-}
+\}
 
 #include "lex.yy.c"
-@
+\nwnotused{mini.y}\nwendcode{}\nwbegindocs{130}\nwdocspar
 
 
 \subsubsection{peephole-blacklist - list of instructions not allowed in superinstructions}
 
-<<peephole-blacklist>>=
+\nwenddocs{}\nwbegincode{131}\sublabel{NW2jw8wQ-2La6Zz-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2La6Zz-1}}}\moddef{peephole-blacklist~{\nwtagstyle{}\subpageref{NW2jw8wQ-2La6Zz-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 call
 return
 unknown
-@
+\nwnotused{peephole-blacklist}\nwendcode{}\nwbegindocs{132}\nwdocspar
 
 
 \subsection{Generic support files}
@@ -2627,37 +2631,37 @@ and change little, if anything:
 
 \subsubsection{peephole.c - wrapper file}
 
-<<peephole.c>>=
+\nwenddocs{}\nwbegincode{133}\sublabel{NW2jw8wQ-31dqSD-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-31dqSD-1}}}\moddef{peephole.c~{\nwtagstyle{}\subpageref{NW2jw8wQ-31dqSD-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* Peephole optimization routines and tables
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 #include <stdlib.h>
 #include "mini.h"
 
 /* the numbers in this struct are primitive indices */
-typedef struct Combination {
+typedef struct Combination \{
   int prefix;
   int lastprim;
   int combination_prim;
-} Combination;
+\} Combination;
 
-Combination peephole_table[] = {
+Combination peephole_table[] = \{
 #include "mini-peephole.i"
 #ifndef __GNUC__
-  {-1,-1,-1} /* unnecessary; just to shut up lcc if the file is empty */
+  \{-1,-1,-1\} /* unnecessary; just to shut up lcc if the file is empty */
 #endif
-};
+\};
 
 int use_super = 1; /* turned off by option -p */
 
-typedef struct Peeptable_entry {
+typedef struct Peeptable_entry \{
   struct Peeptable_entry *next;
   Inst prefix;
   Inst lastprim;
   Inst combination_prim;
-} Peeptable_entry;
+\} Peeptable_entry;
 
 #define HASH_SIZE 1024
 #define hash(_i1,_i2) (((((Cell)(_i1))^((Cell)(_i2)))>>4)&(HASH_SIZE-1))
@@ -2665,11 +2669,11 @@ typedef struct Peeptable_entry {
 Cell peeptable;
 
 Cell prepare_peephole_table(Inst insts[])
-{
+\{
   Cell i;
   Peeptable_entry **pt = (Peeptable_entry **)calloc(HASH_SIZE,sizeof(Peeptable_entry *));
 
-  for (i=0; i<sizeof(peephole_table)/sizeof(peephole_table[0]); i++) {
+  for (i=0; i<sizeof(peephole_table)/sizeof(peephole_table[0]); i++) \{
     Combination *c = &peephole_table[i];
     Peeptable_entry *p = (Peeptable_entry *)malloc(sizeof(Peeptable_entry));
     Cell h;
@@ -2679,17 +2683,17 @@ Cell prepare_peephole_table(Inst insts[])
     h = hash(p->prefix,p->lastprim);
     p->next = pt[h];
     pt[h] = p;
-  }
+  \}
   return (Cell)pt;
-}
+\}
 
 void init_peeptable(void)
-{
+\{
   peeptable = prepare_peephole_table(vm_prim);
-}
+\}
 
 Inst peephole_opt(Inst inst1, Inst inst2, Cell peeptable)
-{
+\{
   Peeptable_entry **pt = (Peeptable_entry **)peeptable;
   Peeptable_entry *p;
 
@@ -2699,32 +2703,32 @@ Inst peephole_opt(Inst inst1, Inst inst2, Cell peeptable)
     if (inst1 == p->prefix && inst2 == p->lastprim)
       return p->combination_prim;
   return NULL;
-}
+\}
 
 Inst *last_compiled = NULL;
 
 void gen_inst(Inst **vmcodepp, Inst i)
-{
-  if (last_compiled != NULL) {
+\{
+  if (last_compiled != NULL) \{
     Inst combo = peephole_opt(*last_compiled, i, peeptable);
-    if (combo != NULL) {
+    if (combo != NULL) \{
       *last_compiled = combo;
       return;
-    }
-  }
+    \}
+  \}
   last_compiled = *vmcodepp;
   **vmcodepp = i;
   (*vmcodepp)++;
-}
-@
+\}
+\nwnotused{peephole.c}\nwendcode{}\nwbegindocs{134}\nwdocspar
 
 
 \subsubsection{profile.c - wrapper file}
 
-<<profile.c>>=
+\nwenddocs{}\nwbegincode{135}\sublabel{NW2jw8wQ-PznLh-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-PznLh-1}}}\moddef{profile.c~{\nwtagstyle{}\subpageref{NW2jw8wQ-PznLh-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* VM profiling support stuff
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 #include <stdlib.h>
@@ -2743,7 +2747,7 @@ typedef long long long_long;
 typedef long long_long;
 #endif
 
-typedef struct block_count {
+typedef struct block_count \{
   struct block_count *next; /* next in hash table */
   struct block_count *fallthrough; /* the block that this one falls
                                        through to without SUPER_END */
@@ -2751,23 +2755,23 @@ typedef struct block_count {
   long_long count;
   char **insts;
   size_t ninsts;
-} block_count;
+\} block_count;
 
 block_count *blocks[HASH_SIZE];
 Inst *vmcode_end;
 
 block_count *block_lookup(Inst *ip)
-{
+\{
   block_count *b = blocks[hash(ip)];
 
   while (b!=NULL && b->ip!=ip)
     b = b->next;
   return b;
-}
+\}
 
 /* looks up present elements, inserts absent elements */
 block_count *block_insert(Inst *ip)
-{
+\{
   block_count *b = block_lookup(ip);
   block_count *new;
 
@@ -2783,102 +2787,102 @@ block_count *block_insert(Inst *ip)
   new->ninsts = 0;
   blocks[hash(ip)] = new;
   return new;
-}
+\}
 
 void add_inst(block_count *b, char *inst)
-{
+\{
   b->insts = realloc(b->insts, (b->ninsts+1) * sizeof(char *));
   b->insts[b->ninsts++] = inst;
-}
+\}
 
 void vm_count_block(Inst *ip)
-{
+\{
   block_insert(ip)->count++;
-}
+\}
 
 void postprocess_block(block_count *b)
-{
+\{
   Inst *ip = b->ip;
   block_count *next_block=NULL;
 
-  while (next_block == NULL && ip<vmcode_end) {
+  while (next_block == NULL && ip<vmcode_end) \{
 #include "mini-profile.i"
     /* else */
-    {
+    \{
       add_inst(b,"unknown");
       ip++;
-    }
+    \}
   _endif_:
     next_block = block_lookup(ip);
-  }
+  \}
   /* we fell through, so set fallthrough and update the count */
   b->fallthrough = next_block;
   /* also update the counts of all following fallthrough blocks that
      have already been processed */
-  while (next_block != NULL) {
+  while (next_block != NULL) \{
     next_block->count += b->count;
     next_block = next_block->fallthrough;
-  }
-}
+  \}
+\}
 
 /* Deal with block entry by falling through from non-SUPER_END
    instructions.  And fill the insts and ninsts fields. */
 void postprocess(void)
-{
+\{
   size_t i;
 
-  for (i=0; i<HASH_SIZE; i++) {
+  for (i=0; i<HASH_SIZE; i++) \{
     block_count *b = blocks[i];
     for (; b!=0; b = b->next)
       postprocess_block(b);
-   }
-}
+   \}
+\}
 
 #if 0
 void print_block(FILE *file, block_count *b)
-{
+\{
   size_t i;
 
-  fprintf(file,"%14lld\t",b->count);
+  fprintf(file,"%14lld\\t",b->count);
   for (i=0; i<b->ninsts; i++)
     fprintf(file, "%s ", b->insts[i]);
-  putc('\n', file);
-}
+  putc('\\n', file);
+\}
 #endif
 
 void print_block(FILE *file, block_count *b)
-{
+\{
   size_t i,j,k;
 
   for (i=2; i<12; i++)
-    for (j=0; i+j<=b->ninsts; j++) {
-      fprintf(file,"%14lld\t",b->count);
+    for (j=0; i+j<=b->ninsts; j++) \{
+      fprintf(file,"%14lld\\t",b->count);
       for (k=j; k<i+j; k++)
         fprintf(file, "%s ", b->insts[k]);
-      putc('\n', file);
-    }
-}
+      putc('\\n', file);
+    \}
+\}
 
 void vm_print_profile(FILE *file)
-{
+\{
   size_t i;
 
   postprocess();
-  for (i=0; i<HASH_SIZE; i++) {
+  for (i=0; i<HASH_SIZE; i++) \{
     block_count *b = blocks[i];
     for (; b!=0; b = b->next)
       print_block(file, b);
-   }
-}
-@
+   \}
+\}
+\nwnotused{profile.c}\nwendcode{}\nwbegindocs{136}\nwdocspar
 
 
 \subsubsection{disasm.c - wrapper file}
 
-<<disasm.c>>=
+\nwenddocs{}\nwbegincode{137}\sublabel{NW2jw8wQ-2b6jar-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2b6jar-1}}}\moddef{disasm.c~{\nwtagstyle{}\subpageref{NW2jw8wQ-2b6jar-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* vm disassembler wrapper
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 #include "mini.h"
@@ -2887,75 +2891,75 @@ void vm_print_profile(FILE *file)
 #define IPTOS IP[0]
 
 void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
-{
-  while (ip<endp) {
+\{
+  while (ip<endp) \{
     fprintf(vm_out,"%p: ",ip);
 #include "mini-disasm.i"
-    {
+    \{
       fprintf(vm_out,"unknown instruction %p",ip[0]);
       ip++;
-    }
+    \}
   _endif_:
-    fputc('\n',vm_out);
-  }
-}
-@
+    fputc('\\n',vm_out);
+  \}
+\}
+\nwnotused{disasm.c}\nwendcode{}\nwbegindocs{138}\nwdocspar
 
 
 \subsubsection{engine.c - wrapper file}
 
-<<engine>>=
+\nwenddocs{}\nwbegincode{139}\sublabel{NW2jw8wQ-17Efas-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-17Efas-1}}}\moddef{engine~{\nwtagstyle{}\subpageref{NW2jw8wQ-17Efas-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2CgwVs-1}}\nwenddeflinemarkup
 engine.o: engine.c mini-vm.i mini-labels.i mini.h
 
 engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
-	$(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
-@
-<<engine.c>>=
+        $(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
+\nwused{\\{NW2jw8wQ-2CgwVs-1}}\nwendcode{}\nwbegindocs{140}\nwdocspar
+\nwenddocs{}\nwbegincode{141}\sublabel{NW2jw8wQ-3bgHTG-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3bgHTG-1}}}\moddef{engine.c~{\nwtagstyle{}\subpageref{NW2jw8wQ-3bgHTG-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 /* vm interpreter wrapper
 
-<<copyright>>
+\LA{}copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}\RA{}
 */
 
 #include "mini.h"
 
-<<IF-spTOS>>
+\LA{}IF-spTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-2j3DUM-1}}\RA{}
 
-<<NAME>>
+\LA{}NAME~{\nwtagstyle{}\subpageref{NW2jw8wQ-4fcHYk-1}}\RA{}
 
-<<dispatch>>
+\LA{}dispatch~{\nwtagstyle{}\subpageref{NW2jw8wQ-2Kr0uS-1}}\RA{}
 
-<<LABEL2>>
+\LA{}LABEL2~{\nwtagstyle{}\subpageref{NW2jw8wQ-GfBpN-1}}\RA{}
 
-<<SUPER-END>>
+\LA{}SUPER-END~{\nwtagstyle{}\subpageref{NW2jw8wQ-2zFWf2-1}}\RA{}
 
 #ifndef __GNUC__
-enum {
+enum \{
 #include "mini-labels.i"
-};
+\};
 #endif
 
-<<MAYBE-UNUSED>>
+\LA{}MAYBE-UNUSED~{\nwtagstyle{}\subpageref{NW2jw8wQ-2OEdfg-1}}\RA{}
 
 /* the return type can be anything you want it to */
 Cell engine(Inst *ip0, Cell *sp, char *fp)
-{
+\{
   /* VM registers (you may want to use gcc's "Explicit Reg Vars" here) */
   Inst * ip;
   Inst * cfa;
-<<spTOS>>
-  static Label labels[] = {
+\LA{}spTOS~{\nwtagstyle{}\subpageref{NW2jw8wQ-2qT2Zr-1}}\RA{}
+  static Label labels[] = \{
 #include "mini-labels.i"
-  };
+  \};
 #ifdef MORE_VARS
   MORE_VARS
 #endif
 
   if (vm_debug)
-      fprintf(vm_out,"entering engine(%p,%p,%p)\n",ip0,sp,fp);
-  if (ip0 == NULL) {
+      fprintf(vm_out,"entering engine(%p,%p,%p)\\n",ip0,sp,fp);
+  if (ip0 == NULL) \{
     vm_prim = labels;
     return 0;
-  }
+  \}
 
   /* I don't have a clue where these things come from,
      but I've put them in macros.h for the moment */
@@ -2969,75 +2973,75 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
 #include "mini-vm.i"
 #else
  next_inst:
-  switch(*ip++) {
+  switch(*ip++) \{
 #include "mini-vm.i"
   default:
-    fprintf(stderr,"unknown instruction %d at %p\n", ip[-1], ip-1);
+    fprintf(stderr,"unknown instruction %d at %p\\n", ip[-1], ip-1);
     exit(1);
-  }
+  \}
 #endif
-}
-@
+\}
+\nwnotused{engine.c}\nwendcode{}\nwbegindocs{142}\nwdocspar
 
 
 \subsubsection{stat.awk - script for aggregating profile information}
 
-<<stat.awk>>=
-BEGIN {
-  FS="\t";
-}
-{
+\nwenddocs{}\nwbegincode{143}\sublabel{NW2jw8wQ-1Hj3DJ-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1Hj3DJ-1}}}\moddef{stat.awk~{\nwtagstyle{}\subpageref{NW2jw8wQ-1Hj3DJ-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+BEGIN \{
+  FS="\\t";
+\}
+\{
   dyn[$2] += $1;
   stat[$2]++;
   files[$2] += (FILENAME!=filename[$2]);
   filename[$2] = FILENAME;
-}
-END {
+\}
+END \{
   for (i in dyn)
-    printf("%7d\t%7d\t%15d\t%s\n",files[i],stat[i],dyn[i],i);
-}
-@
+    printf("%7d\\t%7d\\t%15d\\t%s\\n",files[i],stat[i],dyn[i],i);
+\}
+\nwnotused{stat.awk}\nwendcode{}\nwbegindocs{144}\nwdocspar
 
 
 \subsubsection{seq2rule.awk - script for creating superinstructions}
 
-<<seq2rule.awk>>=
-BEGIN {
-  FS="\t";
-}
-{
+\nwenddocs{}\nwbegincode{145}\sublabel{NW2jw8wQ-41jcBp-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-41jcBp-1}}}\moddef{seq2rule.awk~{\nwtagstyle{}\subpageref{NW2jw8wQ-41jcBp-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+BEGIN \{
+  FS="\\t";
+\}
+\{
   name = $4;
   gsub(/ /,"_",name);
   print name" = "$4;
-}
-@
+\}
+\nwnotused{seq2rule.awk}\nwendcode{}\nwbegindocs{146}\nwdocspar
 
 
 \section{Printing and Extracting the code}
 
 A script for converting this document to PDF form follows:
 
-<<final>>=
+\nwenddocs{}\nwbegincode{147}\sublabel{NW2jw8wQ-2RhzzX-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-2RhzzX-1}}}\moddef{final~{\nwtagstyle{}\subpageref{NW2jw8wQ-2RhzzX-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 lyx -e pdf $1
 lyx -e latex $1
-@
+\nwnotused{final}\nwendcode{}\nwbegindocs{148}\nwdocspar
 
 Each of these scripts can be pulled out manually given the default
 {*} script defined below.
 
-<<*>>=
+\nwenddocs{}\nwbegincode{149}\sublabel{NW2jw8wQ-1p0Y9w-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-1p0Y9w-1}}}\moddef{*~{\nwtagstyle{}\subpageref{NW2jw8wQ-1p0Y9w-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 echo "Extract file $1 from afvm.lyx..."
 rm -f afvm.nw
 lyx -e literate afvm.lyx
 notangle -R$2 afvm.nw > $1
 chmod a+x $1
 rm -f afvm.nw
-@
+\nwnotused{*}\nwendcode{}\nwbegindocs{150}\nwdocspar
 
 Once that script is pulled out and named extract, the following script
 can pull out all of the other scripts:
 
-<<extract-all>>=
+\nwenddocs{}\nwbegincode{151}\sublabel{NW2jw8wQ-38QYBr-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-38QYBr-1}}}\moddef{extract-all~{\nwtagstyle{}\subpageref{NW2jw8wQ-38QYBr-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
 echo "Extract all files..."
 ./extract README
 ./extract simple.mini
@@ -3058,7 +3062,7 @@ echo "Extract all files..."
 ./extract engine.c
 ./extract stat.awk
 ./extract seq2rule.awk
-@
+\nwnotused{extract-all}\nwendcode{}\nwbegindocs{152}\nwdocspar
 
 
 \section{Copyrights}
@@ -3066,7 +3070,7 @@ echo "Extract all files..."
 Although I would have preferred to use an MIT license, GForth uses
 a GNU license, so I must comply with that.
 
-<<copyright>>=
+\nwenddocs{}\nwbegincode{153}\sublabel{NW2jw8wQ-3CaW5t-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}}\moddef{copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3CaW5t-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-1u9106-1}\\{NW2jw8wQ-1rQXkM-1}\\{NW2jw8wQ-2vEAWJ-1}\\{NW2jw8wQ-2yuxD9-1}\\{NW2jw8wQ-1raQgt-1}\\{NW2jw8wQ-31dqSD-1}\\{NW2jw8wQ-PznLh-1}\\{NW2jw8wQ-2b6jar-1}\\{NW2jw8wQ-3bgHTG-1}}\nwenddeflinemarkup
   Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
 
   This file is part of Gforth.
@@ -3083,26 +3087,26 @@ a GNU license, so I must comply with that.
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, see http://www.gnu.org/licenses/.
-@
-<<\copyright>>=
-\ Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
+\nwused{\\{NW2jw8wQ-1u9106-1}\\{NW2jw8wQ-1rQXkM-1}\\{NW2jw8wQ-2vEAWJ-1}\\{NW2jw8wQ-2yuxD9-1}\\{NW2jw8wQ-1raQgt-1}\\{NW2jw8wQ-31dqSD-1}\\{NW2jw8wQ-PznLh-1}\\{NW2jw8wQ-2b6jar-1}\\{NW2jw8wQ-3bgHTG-1}}\nwendcode{}\nwbegindocs{154}\nwdocspar
+\nwenddocs{}\nwbegincode{155}\sublabel{NW2jw8wQ-3VQn9E-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-3VQn9E-1}}}\moddef{\copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-3VQn9E-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-xV04w-1}}\nwenddeflinemarkup
+\\ Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
 
-\ This file is part of Gforth.
+\\ This file is part of Gforth.
 
-\ Gforth is free software; you can redistribute it and/or
-\ modify it under the terms of the GNU General Public License
-\ as published by the Free Software Foundation, either version 3
-\ of the License, or (at your option) any later version.
+\\ Gforth is free software; you can redistribute it and/or
+\\ modify it under the terms of the GNU General Public License
+\\ as published by the Free Software Foundation, either version 3
+\\ of the License, or (at your option) any later version.
 
-\ This program is distributed in the hope that it will be useful,
-\ but WITHOUT ANY WARRANTY; without even the implied warranty of
-\ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-\ GNU General Public License for more details.
+\\ This program is distributed in the hope that it will be useful,
+\\ but WITHOUT ANY WARRANTY; without even the implied warranty of
+\\ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+\\ GNU General Public License for more details.
 
-\ You should have received a copy of the GNU General Public License
-\ along with this program. If not, see http://www.gnu.org/licenses/.
-@
-<<make-copyright>>=
+\\ You should have received a copy of the GNU General Public License
+\\ along with this program. If not, see http://www.gnu.org/licenses/.
+\nwused{\\{NW2jw8wQ-xV04w-1}}\nwendcode{}\nwbegindocs{156}\nwdocspar
+\nwenddocs{}\nwbegincode{157}\sublabel{NW2jw8wQ-265spY-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2jw8wQ-265spY-1}}}\moddef{make-copyright~{\nwtagstyle{}\subpageref{NW2jw8wQ-265spY-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2jw8wQ-2CgwVs-1}}\nwenddeflinemarkup
 #Copyright (C) 2001,2003,2007,2008 Free Software Foundation, Inc.
 
 #This file is part of Gforth.
@@ -3119,7 +3123,88 @@ a GNU license, so I must comply with that.
 
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see http://www.gnu.org/licenses/.
-@
+\nwused{\\{NW2jw8wQ-2CgwVs-1}}\nwendcode{}
+
+\nwixlogsorted{c}{{*}{NW2jw8wQ-1p0Y9w-1}{\nwixd{NW2jw8wQ-1p0Y9w-1}}}%
+\nwixlogsorted{c}{{\copyright}{NW2jw8wQ-3VQn9E-1}{\nwixu{NW2jw8wQ-xV04w-1}\nwixd{NW2jw8wQ-3VQn9E-1}}}%
+\nwixlogsorted{c}{{branch}{NW2jw8wQ-3kTaNH-1}{\nwixd{NW2jw8wQ-3kTaNH-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{copyright}{NW2jw8wQ-3CaW5t-1}{\nwixu{NW2jw8wQ-1u9106-1}\nwixu{NW2jw8wQ-1rQXkM-1}\nwixu{NW2jw8wQ-2vEAWJ-1}\nwixu{NW2jw8wQ-2yuxD9-1}\nwixu{NW2jw8wQ-1raQgt-1}\nwixu{NW2jw8wQ-31dqSD-1}\nwixu{NW2jw8wQ-PznLh-1}\nwixu{NW2jw8wQ-2b6jar-1}\nwixu{NW2jw8wQ-3bgHTG-1}\nwixd{NW2jw8wQ-3CaW5t-1}}}%
+\nwixlogsorted{c}{{DEF-CA}{NW2jw8wQ-1b0vzS-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1b0vzS-1}}}%
+\nwixlogsorted{c}{{disasm.c}{NW2jw8wQ-2b6jar-1}{\nwixd{NW2jw8wQ-2b6jar-1}}}%
+\nwixlogsorted{c}{{dispatch}{NW2jw8wQ-2Kr0uS-1}{\nwixd{NW2jw8wQ-2Kr0uS-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{end}{NW2jw8wQ-139RGe-1}{\nwixd{NW2jw8wQ-139RGe-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{engine}{NW2jw8wQ-17Efas-1}{\nwixu{NW2jw8wQ-2CgwVs-1}\nwixd{NW2jw8wQ-17Efas-1}}}%
+\nwixlogsorted{c}{{engine.c}{NW2jw8wQ-3bgHTG-1}{\nwixd{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{extract-all}{NW2jw8wQ-38QYBr-1}{\nwixd{NW2jw8wQ-38QYBr-1}}}%
+\nwixlogsorted{c}{{fib.mini}{NW2jw8wQ-2t93pk-1}{\nwixd{NW2jw8wQ-2t93pk-1}}}%
+\nwixlogsorted{c}{{final}{NW2jw8wQ-2RhzzX-1}{\nwixd{NW2jw8wQ-2RhzzX-1}}}%
+\nwixlogsorted{c}{{IF-spTOS}{NW2jw8wQ-2j3DUM-1}{\nwixd{NW2jw8wQ-2j3DUM-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{IMM-ARG}{NW2jw8wQ-1Qw1fR-1}{\nwixd{NW2jw8wQ-1Qw1fR-1}\nwixu{NW2jw8wQ-2vEAWJ-1}}}%
+\nwixlogsorted{c}{{INC-IP}{NW2jw8wQ-1YfVQe-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1YfVQe-1}}}%
+\nwixlogsorted{c}{{INC-IP-1}{NW2jw8wQ-1Gaga3-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1Gaga3-1}}}%
+\nwixlogsorted{c}{{INC-IP-2}{NW2jw8wQ-3iAU2V-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-3iAU2V-1}}}%
+\nwixlogsorted{c}{{INC-IP-3}{NW2jw8wQ-1ALVid-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1ALVid-1}}}%
+\nwixlogsorted{c}{{IP}{NW2jw8wQ-E6ZFY-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-E6ZFY-1}}}%
+\nwixlogsorted{c}{{IP-1}{NW2jw8wQ-3inKY8-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-3inKY8-1}}}%
+\nwixlogsorted{c}{{IP-2}{NW2jw8wQ-1G58ZQ-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1G58ZQ-1}}}%
+\nwixlogsorted{c}{{IPTOS}{NW2jw8wQ-30DNwe-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-30DNwe-1}}}%
+\nwixlogsorted{c}{{jump-INST-ADDR}{NW2jw8wQ-dMsR7-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-dMsR7-1}}}%
+\nwixlogsorted{c}{{jump-LABEL}{NW2jw8wQ-2GdOBm-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-2GdOBm-1}}}%
+\nwixlogsorted{c}{{LABEL2}{NW2jw8wQ-GfBpN-1}{\nwixd{NW2jw8wQ-GfBpN-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{lit}{NW2jw8wQ-zteG4-1}{\nwixu{NW2jw8wQ-30JyJS-1}\nwixd{NW2jw8wQ-zteG4-1}}}%
+\nwixlogsorted{c}{{ll}{NW2jw8wQ-j70pE-1}{\nwixd{NW2jw8wQ-j70pE-1}\nwixu{NW2jw8wQ-T30UU-1}}}%
+\nwixlogsorted{c}{{make-copyright}{NW2jw8wQ-265spY-1}{\nwixu{NW2jw8wQ-2CgwVs-1}\nwixd{NW2jw8wQ-265spY-1}}}%
+\nwixlogsorted{c}{{Makefile}{NW2jw8wQ-2CgwVs-1}{\nwixd{NW2jw8wQ-2CgwVs-1}}}%
+\nwixlogsorted{c}{{MAYBE-UNUSED}{NW2jw8wQ-2OEdfg-1}{\nwixd{NW2jw8wQ-2OEdfg-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{mini-inst.vmg}{NW2jw8wQ-xV04w-1}{\nwixd{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{mini-super.vmg}{NW2jw8wQ-T30UU-1}{\nwixd{NW2jw8wQ-T30UU-1}}}%
+\nwixlogsorted{c}{{mini.h}{NW2jw8wQ-2vEAWJ-1}{\nwixd{NW2jw8wQ-2vEAWJ-1}}}%
+\nwixlogsorted{c}{{mini.l}{NW2jw8wQ-2yuxD9-1}{\nwixd{NW2jw8wQ-2yuxD9-1}}}%
+\nwixlogsorted{c}{{mini.y}{NW2jw8wQ-1raQgt-1}{\nwixd{NW2jw8wQ-1raQgt-1}}}%
+\nwixlogsorted{c}{{NAME}{NW2jw8wQ-4fcHYk-1}{\nwixd{NW2jw8wQ-4fcHYk-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{NEXT-INST}{NW2jw8wQ-rp6Mx-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-rp6Mx-1}}}%
+\nwixlogsorted{c}{{NEXT-INST-1}{NW2jw8wQ-2bLix5-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-2bLix5-1}}}%
+\nwixlogsorted{c}{{NEXT-INST-2}{NW2jw8wQ-1p9qp-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1p9qp-1}}}%
+\nwixlogsorted{c}{{NEXT-P0}{NW2jw8wQ-y8keh-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-y8keh-1}}}%
+\nwixlogsorted{c}{{NEXT-P0-1}{NW2jw8wQ-4HTFrz-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-4HTFrz-1}}}%
+\nwixlogsorted{c}{{NEXT-P0-2}{NW2jw8wQ-1sAFS3-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1sAFS3-1}}}%
+\nwixlogsorted{c}{{NEXT-P1}{NW2jw8wQ-3YEW15-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-3YEW15-1}}}%
+\nwixlogsorted{c}{{NEXT-P1-1}{NW2jw8wQ-4HTALH-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-4HTALH-1}}}%
+\nwixlogsorted{c}{{NEXT-P1-2}{NW2jw8wQ-1sA9vL-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1sA9vL-1}}}%
+\nwixlogsorted{c}{{NEXT-P1-3}{NW2jw8wQ-2hFxKx-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-2hFxKx-1}}}%
+\nwixlogsorted{c}{{NEXT-P2}{NW2jw8wQ-1R5pvH-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1R5pvH-1}}}%
+\nwixlogsorted{c}{{NEXT-P2-1}{NW2jw8wQ-4HTIdL-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-4HTIdL-1}}}%
+\nwixlogsorted{c}{{NEXT-P2-2}{NW2jw8wQ-1sAIDP-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1sAIDP-1}}}%
+\nwixlogsorted{c}{{NEXT-P2-3}{NW2jw8wQ-2hG5d1-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-2hG5d1-1}}}%
+\nwixlogsorted{c}{{peephole-blacklist}{NW2jw8wQ-2La6Zz-1}{\nwixd{NW2jw8wQ-2La6Zz-1}}}%
+\nwixlogsorted{c}{{peephole.c}{NW2jw8wQ-31dqSD-1}{\nwixd{NW2jw8wQ-31dqSD-1}}}%
+\nwixlogsorted{c}{{profile.c}{NW2jw8wQ-PznLh-1}{\nwixd{NW2jw8wQ-PznLh-1}}}%
+\nwixlogsorted{c}{{README}{NW2jw8wQ-1u9106-1}{\nwixd{NW2jw8wQ-1u9106-1}}}%
+\nwixlogsorted{c}{{seq2rule.awk}{NW2jw8wQ-41jcBp-1}{\nwixd{NW2jw8wQ-41jcBp-1}}}%
+\nwixlogsorted{c}{{SET-IP}{NW2jw8wQ-2wRxRx-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-2wRxRx-1}}}%
+\nwixlogsorted{c}{{SET-IP-1}{NW2jw8wQ-4AD73Z-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-4AD73Z-1}}}%
+\nwixlogsorted{c}{{SET-IP-2}{NW2jw8wQ-1zfFOz-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-1zfFOz-1}}}%
+\nwixlogsorted{c}{{simple-instructions}{NW2jw8wQ-30JyJS-1}{\nwixd{NW2jw8wQ-30JyJS-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{simple.mini}{NW2jw8wQ-1X6hO9-1}{\nwixd{NW2jw8wQ-1X6hO9-1}}}%
+\nwixlogsorted{c}{{spTOS}{NW2jw8wQ-2qT2Zr-1}{\nwixd{NW2jw8wQ-2qT2Zr-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{stack-caching}{NW2jw8wQ-1bm9o4-1}{\nwixd{NW2jw8wQ-1bm9o4-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{stack-definitions}{NW2jw8wQ-2yMZpu-1}{\nwixd{NW2jw8wQ-2yMZpu-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{stack-organization}{NW2jw8wQ-1sBtWC-1}{\nwixd{NW2jw8wQ-1sBtWC-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{stack-prefix}{NW2jw8wQ-25BRy4-1}{\nwixd{NW2jw8wQ-25BRy4-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{stat.awk}{NW2jw8wQ-1Hj3DJ-1}{\nwixd{NW2jw8wQ-1Hj3DJ-1}}}%
+\nwixlogsorted{c}{{SUPER-END}{NW2jw8wQ-2zFWf2-1}{\nwixd{NW2jw8wQ-2zFWf2-1}\nwixu{NW2jw8wQ-3bgHTG-1}}}%
+\nwixlogsorted{c}{{support.c}{NW2jw8wQ-1rQXkM-1}{\nwixd{NW2jw8wQ-1rQXkM-1}}}%
+\nwixlogsorted{c}{{switch-INST-ADDR}{NW2jw8wQ-3YsGWy-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-3YsGWy-1}}}%
+\nwixlogsorted{c}{{switch-LABEL}{NW2jw8wQ-2M831w-1}{\nwixu{NW2jw8wQ-2Kr0uS-1}\nwixd{NW2jw8wQ-2M831w-1}}}%
+\nwixlogsorted{c}{{test.mini}{NW2jw8wQ-2SLoqk-1}{\nwixd{NW2jw8wQ-2SLoqk-1}}}%
+\nwixlogsorted{c}{{test.out}{NW2jw8wQ-3xFKoM-1}{\nwixd{NW2jw8wQ-3xFKoM-1}}}%
+\nwixlogsorted{c}{{type-prefix}{NW2jw8wQ-JTT27-1}{\nwixd{NW2jw8wQ-JTT27-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwixlogsorted{c}{{unused-branch}{NW2jw8wQ-1LK2FX-1}{\nwixd{NW2jw8wQ-1LK2FX-1}}}%
+\nwixlogsorted{c}{{unused-stack-adjust}{NW2jw8wQ-4cVj4O-1}{\nwixd{NW2jw8wQ-4cVj4O-1}}}%
+\nwixlogsorted{c}{{unused-stack-transform}{NW2jw8wQ-Zmzq3-1}{\nwixd{NW2jw8wQ-Zmzq3-1}}}%
+\nwixlogsorted{c}{{vm-A2B(a,b)}{NW2jw8wQ-1Sp4v8-1}{\nwixd{NW2jw8wQ-1Sp4v8-1}\nwixu{NW2jw8wQ-2vEAWJ-1}}}%
+\nwixlogsorted{c}{{zbranch}{NW2jw8wQ-3gbMZA-1}{\nwixd{NW2jw8wQ-3gbMZA-1}\nwixu{NW2jw8wQ-xV04w-1}}}%
+\nwbegindocs{158}\nwdocspar
 
 
 \subsection{GNU GENERAL PUBLIC LICENSE}
@@ -4305,3 +4390,4 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License, to
 permit their use in free software.
 \end{document}
+\nwenddocs{}
