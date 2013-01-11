@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program; if not, see http://www.gnu.org/licenses/.
+  along with this program; if not, see http://www.gnu.org/licenses/.
 */
 
 #include <stdlib.h>
@@ -164,8 +164,8 @@ int main(int argc, char **argv)
     default:
     case 'h':
     help:
-      fprintf(stderr, "Usage: %s [options] file\nOptions:\n-h   Print this message and exit\n-d disassemble VM program before execution\n-p     profile VM code sequences (output on stderr)\n-t        trace VM code execution (output on stderr)\n",
-              argv[0]);
+      fprintf(stderr, "Usage: %s [options] file\nOptions:\n-h	Print this message and exit\n-d	disassemble VM program before execution\n-p	profile VM code sequences (output on stderr)\n-t	trace VM code execution (output on stderr)\n",
+	      argv[0]);
       exit(1);
     case 'd':
       disassembling=1;

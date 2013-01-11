@@ -134,4 +134,5 @@ block_insert(IP); /* we also do this at compile time, so this is unnecessary */
 #endif
 return i;
 
-include(mini-super.vmg)
+ll = loadlocal lit
+

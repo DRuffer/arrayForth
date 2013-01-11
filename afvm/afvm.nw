@@ -1,6 +1,6 @@
-%% LyX 2.0.2 created this file.  For more info, see http://www.lyx.org/.
+%% LyX 2.0.5 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
-\documentclass[10pt,english]{article}
+\documentclass[10pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage[dvips]{geometry}
@@ -10,7 +10,6 @@
 \setlength{\parskip}{\smallskipamount}
 \setlength{\parindent}{0pt}
 \usepackage[active]{srcltx}
-\usepackage{babel}
 \usepackage{longtable}
 \usepackage{textcomp}
 \usepackage{url}
@@ -3029,7 +3028,7 @@ Each of these scripts can be pulled out manually given the default
 echo "Extract file $1 from afvm.lyx..."
 rm -f afvm.nw
 lyx -e literate afvm.lyx
-notangle -R$2 afvm.nw > $1
+notangle -t4 -R$2 afvm.nw > $1
 chmod a+x $1
 rm -f afvm.nw
 @

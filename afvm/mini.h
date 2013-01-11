@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program; if not, see http://www.gnu.org/licenses/.
+  along with this program; if not, see http://www.gnu.org/licenses/.
 */
 
 #include <stdio.h>
@@ -62,10 +62,10 @@ void vm_print_profile(FILE *file);
 #define vm_a2Cell(x,_cell)      ((_cell)=(Cell)(x))
 #define vm_Cell2Cell(_x,_y)     ((_y)=(Cell)(_x))
 /* the cast in vm_Cell2Cell is needed because the base type for
-   inst-stream is Cell, but *IP is an Inst */
+   inst-stream is Cell, but *IP is an Inst */
 
 /* for future extensions */
-#define IMM_ARG(access,value) (access)
+#define IMM_ARG(access,value) (access)
 
 #define VM_IS_INST(inst, n) ((inst) == vm_prim[n])
 

@@ -1446,7 +1446,6 @@ We will use the following simple VM instruction descriptions as examples:
 \end_layout
 
 \begin_layout Scrap
-
 <<simple-instructions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1667,7 +1666,6 @@ How do we know the type and stack of the stack items? Vmgen uses prefixes,
 \end_layout
 
 \begin_layout Scrap
-
 <<type-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1752,7 +1750,6 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
-
 <<stack-definitions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1798,7 +1795,6 @@ We can override the default stack of a stack item by using a stack prefix.
 \end_layout
 
 \begin_layout Scrap
-
 <<lit>>=
 \begin_inset Newline newline
 \end_inset
@@ -1835,7 +1831,6 @@ i
 \end_layout
 
 \begin_layout Scrap
-
 <<stack-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1946,7 +1941,6 @@ Consider this example:
 \end_layout
 
 \begin_layout Scrap
-
 <<unused-stack-adjust>>=
 \begin_inset Newline newline
 \end_inset
@@ -2069,7 +2063,6 @@ SET_IP As far as Vmgen is concerned, a VM instruction containing this ends
 \end_layout
 
 \begin_layout Scrap
-
 <<branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2097,7 +2090,6 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
-
 <<end>>=
 \begin_inset Newline newline
 \end_inset
@@ -2174,7 +2166,6 @@ INST_TAIL;
 \end_layout
 
 \begin_layout Scrap
-
 <<zbranch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2218,7 +2209,6 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
-
 <<unused-branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2319,7 +2309,6 @@ IF_spTOS(spTOS = sp[0])
 \end_layout
 
 \begin_layout Scrap
-
 <<stack-caching>>=
 \begin_inset Newline newline
 \end_inset
@@ -2545,7 +2534,6 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
-
 <<unused-stack-transform>>=
 \begin_inset Newline newline
 \end_inset
@@ -2606,7 +2594,6 @@ n
 \end_layout
 
 \begin_layout Scrap
-
 <<stack-organization>>=
 \begin_inset Newline newline
 \end_inset
@@ -2725,7 +2712,6 @@ Here is an example of a superinstruction definition:
 \end_layout
 
 \begin_layout Scrap
-
 <<ll>>=
 \begin_inset Newline newline
 \end_inset
@@ -5562,7 +5548,6 @@ README
 \end_layout
 
 \begin_layout Scrap
-
 <<README>>=
 \begin_inset Newline newline
 \end_inset
@@ -5673,7 +5658,6 @@ simple.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
-
 <<simple.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -5698,7 +5682,6 @@ fib.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
-
 <<fib.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -5768,7 +5751,6 @@ test.mini - example mini program (tests everything)
 \end_layout
 
 \begin_layout Scrap
-
 <<test.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -6153,7 +6135,6 @@ test.out - test.mini output
 \end_layout
 
 \begin_layout Scrap
-
 <<test.out>>=
 \begin_inset Newline newline
 \end_inset
@@ -6316,7 +6297,6 @@ Makefile
 \end_layout
 
 \begin_layout Scrap
-
 <<Makefile>>=
 \begin_inset Newline newline
 \end_inset
@@ -6552,7 +6532,6 @@ Support.c - main() and other support functions
 \end_layout
 
 \begin_layout Scrap
-
 <<support.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -7375,7 +7354,6 @@ mini.h - common declarations
 \end_layout
 
 \begin_layout Scrap
-
 <<mini.h>>=
 \begin_inset Newline newline
 \end_inset
@@ -7669,7 +7647,6 @@ mini-inst.vmg - simple VM instructions
 \end_layout
 
 \begin_layout Scrap
-
 <<mini-inst.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -7814,7 +7791,6 @@ mini-super.vmg - superinstructions (empty at first)
 \end_layout
 
 \begin_layout Scrap
-
 <<mini-super.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -7831,7 +7807,6 @@ mini.l - scanner
 \end_layout
 
 \begin_layout Scrap
-
 <<mini.l>>=
 \begin_inset Newline newline
 \end_inset
@@ -7997,7 +7972,6 @@ mini.y - front end (parser, VM code generator)
 \end_layout
 
 \begin_layout Scrap
-
 <<mini.y>>=
 \begin_inset Newline newline
 \end_inset
@@ -8532,7 +8506,6 @@ peephole-blacklist - list of instructions not allowed in superinstructions
 \end_layout
 
 \begin_layout Scrap
-
 <<peephole-blacklist>>=
 \begin_inset Newline newline
 \end_inset
@@ -8566,7 +8539,6 @@ peephole.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<peephole.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -8932,7 +8904,6 @@ profile.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<profile.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9547,7 +9518,6 @@ disasm.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<disasm.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9654,7 +9624,6 @@ engine.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
-
 <<engine>>=
 \begin_inset Newline newline
 \end_inset
@@ -9679,7 +9648,6 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 \end_layout
 
 \begin_layout Scrap
-
 <<engine.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9960,7 +9928,6 @@ stat.awk - script for aggregating profile information
 \end_layout
 
 \begin_layout Scrap
-
 <<stat.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10035,7 +10002,6 @@ seq2rule.awk - script for creating superinstructions
 \end_layout
 
 \begin_layout Scrap
-
 <<seq2rule.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10086,7 +10052,6 @@ A script for converting this document to PDF form follows:
 \end_layout
 
 \begin_layout Scrap
-
 <<final>>=
 \begin_inset Newline newline
 \end_inset
@@ -10124,7 +10089,7 @@ lyx -e literate afvm.lyx
 \begin_inset Newline newline
 \end_inset
 
-notangle -R$2 afvm.nw > $1
+notangle -t4 -R$2 afvm.nw > $1
 \begin_inset Newline newline
 \end_inset
 
@@ -10145,7 +10110,6 @@ Once that script is pulled out and named extract, the following script can
 \end_layout
 
 \begin_layout Scrap
-
 <<extract-all>>=
 \begin_inset Newline newline
 \end_inset
@@ -10243,7 +10207,6 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
-
 <<copyright>>=
 \begin_inset Newline newline
 \end_inset
@@ -10317,7 +10280,6 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
-
 <<
 \backslash
 copyright>>=
@@ -10418,7 +10380,6 @@ copyright>>=
 \end_layout
 
 \begin_layout Scrap
-
 <<make-copyright>>=
 \begin_inset Newline newline
 \end_inset
