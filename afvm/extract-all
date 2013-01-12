@@ -18,3 +18,4 @@ echo "Extract all files..."
 ./extract engine.c
 ./extract stat.awk
 ./extract seq2rule.awk
+./extract profile-fib-test

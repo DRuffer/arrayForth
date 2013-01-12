@@ -1,1 +1,12 @@
-ll = loadlocal lit
+add_storelocal_ = add storelocal 
+lessthan_zbranch_ = lessthan zbranch 
+lit_lessthan_ = lit lessthan 
+lit_lessthan_zbranch_ = lit lessthan zbranch 
+lit_storelocal_ = lit storelocal 
+lit_storelocal_branch_ = lit storelocal branch 
+lit_sub_ = lit sub 
+loadlocal_lit_ = loadlocal lit 
+loadlocal_lit_lessthan_ = loadlocal lit lessthan 
+loadlocal_lit_lessthan_zbranch_ = loadlocal lit lessthan zbranch 
+loadlocal_lit_sub_ = loadlocal lit sub 
+storelocal_branch_ = storelocal branch 

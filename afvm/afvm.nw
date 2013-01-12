@@ -44,7 +44,7 @@ Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3
 or any later version published by the Free Software Foundation; with
 no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-A copy of the license is included in section \ref{sub:GNU-Free-Documentation}.
+A copy of the license is included in \nameref{sub:GNU-Free-Documentation}.
 \par\end{center}
 
 \begin{longtable}{cc}
@@ -96,7 +96,7 @@ a real machine.
 
 In this setup, Vmgen can generate most of the code dealing with virtual
 machine instructions from a simple description of the virtual machine
-instructions (see section \ref{sub:Input-File-Format}), in particular:
+instructions (see \nameref{sub:Input-File-Format}), in particular:
 \begin{description}
 \item [{VM~instruction~execution}]~
 \item [{VM~code~generation}] Useful in the front end.
@@ -105,7 +105,7 @@ instructions (see section \ref{sub:Input-File-Format}), in particular:
 VM interpreter. You will typically provide other means for debugging
 the user's programs at the source level.
 \item [{VM~code~profiling}] Useful for optimizing the VM interpreter
-with superinstructions (see \ref{sub:VM-profiler}).
+with superinstructions (see \nameref{sub:VM-profiler}).
 \end{description}
 To create parts of the interpretive system that do not deal with VM
 instructions, you have to use other tools (e.g., bison) and/or hand-code
@@ -131,8 +131,8 @@ interpreters we looked at were slower than our interpreter).
 VMs are usually designed as stack machines (passing data between VM
 instructions on a stack), and Vmgen supports such designs especially
 well; however, you can also use Vmgen for implementing a register
-VM (see Register Machines) and still benefit from most of the advantages
-offered by Vmgen.
+VM (see \nameref{sub:Register-Machines}) and still benefit from most
+of the advantages offered by Vmgen.
 
 There are many potential uses of the instruction descriptions that
 are not implemented at the moment, but we are open for feature requests,
@@ -215,7 +215,7 @@ than a stack machine architecture.
 Vmgen has special support and optimizations for stack VMs, making
 their implementation easy and efficient.
 
-You can also implement a register VM with Vmgen (see Register Machines),
+You can also implement a register VM with Vmgen (see \nameref{sub:Register-Machines}),
 and you will still profit from most Vmgen features.
 
 Stack items all have the same size, so they typically will be as wide
@@ -257,8 +257,7 @@ the VM instruction. Dispatch consists of loading this address, jumping
 to it, and incrementing the VM instruction pointer. Typically the
 threaded-code dispatch code is appended directly to the code for executing
 the VM instruction. Threaded code cannot be implemented in ANSI C,
-but it can be implemented using GNU C's labels-as-values extension
-(see Labels as Values).
+but it can be implemented using GNU C's labels-as-values extension.
 \end{description}
 Threaded code can be twice as fast as switch dispatch, depending on
 the interpreter, the benchmark, and the machine.
@@ -319,7 +318,7 @@ programs like this:
 To learn about the options, type \texttt{\textbf{./mini -h}}.
 
 
-\subsubsection{Using profiling to create superinstructions}
+\subsubsection{Using profiling to create superinstructions\label{sub:Using-profiling-to}}
 
 I have not added rules for this in the \texttt{\textbf{Makefile}}
 (there are many options for selecting superinstructions, and I did
@@ -347,19 +346,16 @@ count of 36910041.
 The numbers can be used in various ways to select superinstructions.
 E.g., if you just want to select all sequences with a dynamic execution
 count exceeding 10000, you would use the following pipeline:
-\begin{quotation}
-\texttt{\textbf{awk -f stat.awk fib.prof test.prof| }}
 
-\texttt{\textbf{awk '\$3>=10000'| \#select sequences }}
+<<profile-fib-test>>=
+make fib.prof test.prof
+awk -f stat.awk fib.prof test.prof| \
+awk '$3>=10000'| #select sequences \
+fgrep -v -f peephole-blacklist| #eliminate wrong instructions \
+awk -f seq2rule.awk| #transform sequences into superinstruction rules \
+sort -k 3 >mini-super.vmg #sort sequences
+@
 
-\texttt{\textbf{fgrep -v -f peephole-blacklist| \#eliminate wrong
-instructions }}
-
-\texttt{\textbf{awk -f seq2rule.awk| \#transform sequences into superinstruction
-rules }}
-
-\texttt{\textbf{sort -k 3 >mini-super.vmg \#sort sequences}}
-\end{quotation}
 The file \texttt{\textbf{peephole-blacklist}} contains all instructions
 that directly access a stack or stack pointer (for mini: \texttt{\textbf{call}},
 \texttt{\textbf{return}}); the sort step is necessary to ensure that
@@ -423,7 +419,7 @@ and \texttt{\textbf{c-escape}} must not contain a newline. \texttt{\textbf{Ident
 must conform to the usual conventions of C identifiers (otherwise
 the C compiler would choke on the Vmgen output), except that idents
 in \texttt{\textbf{stack-effect}} may have a stack prefix (for stack
-prefix syntax, see Eval escapes).
+prefix syntax, see \nameref{par:Eval-escapes}).
 
 The \texttt{\textbf{c-escape}} passes the text through to each output
 file (without the \textquoteleft{}\texttt{\textbf{\textbackslash{}C}}\textquoteright{}).
@@ -434,15 +430,20 @@ etc.).
 In addition to the syntax given in the grammer, Vmgen also processes
 sync lines (lines starting with \textquoteleft{}\texttt{\textbf{\#line}}\textquoteright{}),
 as produced by \textquoteleft{}\texttt{\textbf{m4 -s}}\textquoteright{}
-(see Invoking m4) and similar tools. This allows associating C compiler
-error messages with the original source of the C code.
+and similar tools. This allows associating C compiler error messages
+with the original source of the C code.
+
+<<M4>>=
+M4=m4 -s #recommended if supported
+#M4=m4
+@
 
 Vmgen understands a few extensions beyond the grammar given here,
 but these extensions are only useful for building Gforth. You can
 find a description of the format used for Gforth in \texttt{\textbf{prim}}.
 
 
-\paragraph{Eval escapes}
+\paragraph{Eval escapes\label{par:Eval-escapes}}
 
 The text in \texttt{\textbf{eval-escape}} is Forth code that is evaluated
 when Vmgen reads the line. You will normally use this feature to define
@@ -580,9 +581,9 @@ This line defines the stack data-stack, which uses the stack pointer
 \texttt{\textbf{sp}}, and each item has the basic type \texttt{\textbf{Cell}};
 other types have to fit into one or two Cells (depending on whether
 the type is single or double wide), and are cast from and to Cells
-on accessing the data-stack with type cast macros (see VM engine).
+on accessing the data-stack with type cast macros (see \nameref{sub:VM-engine}).
 By default, stacks grow towards lower addresses in Vmgen-erated interpreters
-(see Stack growth direction).
+(see \nameref{par:Stack-growth-direction}).
 
 We can override the default stack of a stack item by using a stack
 prefix. E.g., consider the following instruction:
@@ -633,7 +634,7 @@ first take the other stack items specified in the stack effect into
 C variables, then make sure that all other stack items for that stack
 are in memory, and that the stack pointer for the stack points to
 the top-of-stack (by default, unless you change the stack access transformation:
-see Stack growth direction).
+see \nameref{par:Stack-growth-direction}).
 
 The general rule is: If you mention a stack pointer in the C code
 of a VM instruction, you should put a \texttt{\textbf{...}} for that
@@ -665,7 +666,7 @@ You cannot use \texttt{\textbf{...}} for the instruction stream, but
 that is not necessary: At the start of the C code, IP points to the
 start of the next VM instruction (i.e., right beyond the end of the
 current VM instruction), and you can change the instruction pointer
-with \texttt{\textbf{SET\_IP}} (see VM engine).
+with \texttt{\textbf{SET\_IP}} (see \nameref{sub:VM-engine}).
 
 
 \paragraph{C Code Macros\label{par:C-Code-Macros}}
@@ -808,7 +809,7 @@ a stack pointer will not reflect computations of stack items in the
 same VM instruction.
 \item Superinstructions keep stack items in variables across the whole superinstruction.
 So you should not include VM instructions, that access a stack or
-stack pointer, as components of superinstructions (see VM profiler).
+stack pointer, as components of superinstructions (see \nameref{sub:VM-profiler}).
 \end{itemize}
 You should access the instruction pointer only through its special
 macros (\textquoteleft{}\texttt{\textbf{IP}}\textquoteright{}, \textquoteleft{}\texttt{\textbf{SET\_IP}}\textquoteright{},
@@ -819,7 +820,7 @@ next instruction, and \textquoteleft{}\texttt{\textbf{IPTOS}}\textquoteright{}
 is its contents.
 
 
-\paragraph{Stack growth direction}
+\paragraph{Stack growth direction\label{par:Stack-growth-direction}}
 
 By default, the stacks grow towards lower addresses. You can change
 this for a stack by setting the \texttt{\textbf{stack-access-transform}}
@@ -864,14 +865,14 @@ enough Forth to program it, let me know.
 @
 
 
-\subsubsection{Superinstructions}
+\subsubsection{Superinstructions\label{sub:Superinstructions}}
 
 Note: don't invest too much work in (static) superinstructions; a
 future version of Vmgen will support dynamic superinstructions (see
 Ian Piumarta and Fabio Riccardi, Optimizing Direct Threaded Code by
-Selective Inlining, PLDI'98), and static superinstructions have much
-less benefit in that context (preliminary results indicate only a
-factor 1.1 speedup).
+Selective Inlining, PLDI'98 \url{http://dl.acm.org/citation.cfm?id=277743}),
+and static superinstructions have much less benefit in that context
+(preliminary results indicate only a factor 1.1 speedup).
 
 Here is an example of a superinstruction definition:
 
@@ -885,7 +886,7 @@ performs the same action as the sequence \texttt{\textbf{loadlocal}}
 and \texttt{\textbf{lit}}. It is generated automatically by the VM
 code generation functions whenever that sequence occurs, so if you
 want to use this superinstruction, you just need to add this definition
-(and even that can be partially automatized, see VM profiler).
+(and even that can be partially automatized, see \nameref{sub:VM-profiler}).
 
 Vmgen requires that the component instructions are simple instructions
 defined before superinstructions using the components. Currently,
@@ -969,7 +970,7 @@ you can use
 \texttt{\textbf{\textbackslash{}E store-optimization off}}
 \end{quotation}
 
-\subsubsection{Register Machines}
+\subsubsection{Register Machines\label{sub:Register-Machines}}
 
 If you want to implement a register VM rather than a stack VM with
 Vmgen, there are two ways to do it: Directly and through superinstructions.
@@ -984,8 +985,9 @@ numbers as immediate arguments, like this:
 A disadvantage of this method is that during tracing you only see
 the register numbers, but not the register contents. Actually, with
 an appropriate definition of \texttt{\textbf{printarg\_src}} (see
-VM engine), you can print the values of the source registers on entry,
-but you cannot print the value of the destination register on exit.
+\nameref{sub:VM-engine}), you can print the values of the source
+registers on entry, but you cannot print the value of the destination
+register on exit.
 
 If you use superinstructions to define a register VM, you define simple
 instructions that use a stack, and then define superinstructions that
@@ -1016,7 +1018,7 @@ above? It is hard to see how to do it in a general way, because there
 are a number of different designs that different people mean when
 they use the term register machine in connection with VM interpreters.
 However, if you have ideas or requests in that direction, please let
-me know (see Contact).
+me know (see \nameref{sub:Contact}).
 
 
 \subsection{Error messages}
@@ -1033,7 +1035,7 @@ can only use it before (the input side).
 earlier}}
 
 You have defined a superinstruction (e.g. abc = a b c) without defining
-its direct prefix (e.g., ab = a b), See Superinstructions.
+its direct prefix (e.g., ab = a b), See \nameref{sub:Superinstructions}.
 
 \texttt{\textbf{sync line syntax}}
 
@@ -1090,7 +1092,7 @@ first reading.
 \item VM profiler: for finding worthwhile superinstructions
 \end{itemize}
 
-\subsubsection{VM engine}
+\subsubsection{VM engine\label{sub:VM-engine}}
 
 The VM engine is the VM interpreter that executes the VM code. It
 is essential for an interpretive system.
@@ -1219,7 +1221,7 @@ For both methods, the VM engine is contained in a C-level function.
 Vmgen generates most of the contents of the function for you (name-vm.i),
 but you have to define this function, and macros and variables used
 in the engine, and initialize the variables. In our example the engine
-function also includes name-labels.i (see VM instruction table).
+function also includes name-labels.i (see \nameref{sub:VM-instruction-table}).
 
 In addition to executing the code, the VM engine can optionally also
 print out a trace of the executed instructions, their arguments and
@@ -1231,7 +1233,8 @@ tests).
 It costs significant performance to check in each instruction whether
 to print tracing code, so we recommend producing two copies of the
 engine: one for fast execution, and one for tracing. See the rules
-for engine.o and engine-debug.o in vmgen-ex/Makefile for an example.
+for engine.o and engine-debug.o in vmgen-ex/Makefile for an example
+(\nameref{sub:engine.c---wrapper}).
 
 The following macros and variables are used in name-vm.i:
 \begin{description}
@@ -1490,7 +1493,7 @@ do nothing.
 @
 
 \begin{description}
-\item [{SUPER\_END}] This is used by the VM profiler (see VM profiler);
+\item [{SUPER\_END}] This is used by the VM profiler (see \nameref{sub:VM-profiler});
 it should not do anything in normal operation, and call \texttt{\textbf{vm\_count\_block(IP)}}
 for profiling.
 \end{description}
@@ -1504,7 +1507,7 @@ for profiling.
 
 \begin{description}
 \item [{SUPER\_CONTINUE}] This is just a hint to Vmgen and does nothing
-at the C level. See \ref{par:C-Code-Macros}
+at the C level. See \nameref{par:C-Code-Macros}
 \item [{MAYBE\_UNUSED}] This should be defined as \texttt{\textbf{\_\_attribute\_\_((unused))}}
 for gcc-2.7 and higher. It suppresses the warnings about unused variables
 in the code for superinstructions. You need to define this only if
@@ -1537,13 +1540,13 @@ definition (e.g., \textquoteleft{}printarg\_i\textquoteright{}); in
 superinstructions it is currently the basic type of the stack.
 \end{description}
 
-\subsubsection{VM instruction table}
+\subsubsection{VM instruction table\label{sub:VM-instruction-table}}
 
 For threaded code we also need to produce a table containing the labels
 of all VM instructions. This is needed for VM code generation (see
-VM code generation), and it has to be done in the engine function,
-because the labels are not visible outside. It then has to be passed
-outside the function (and assigned to \textquoteleft{}\texttt{\textbf{vm\_prim}}\textquoteright{}),
+\nameref{sub:VM-code-generation}), and it has to be done in the engine
+function, because the labels are not visible outside. It then has
+to be passed outside the function (and assigned to \textquoteleft{}\texttt{\textbf{vm\_prim}}\textquoteright{}),
 to be used by the VM code generation functions.
 
 This means that the engine function has to be called first to produce
@@ -1570,8 +1573,7 @@ in this file:
 name of the switch label (the same name as used in \textquoteleft{}\texttt{\textbf{LABEL(inst\_name)}}\textquoteright{}),
 for both uses of name-labels.i. For threaded-code dispatch, this is
 the address of the label defined in \textquoteleft{}\texttt{\textbf{LABEL(inst\_name)}}\textquoteright{});
-the address is taken with \textquoteleft{}\&\&\textquoteright{} (see
-Labels as Values).
+the address is taken with \textquoteleft{}\&\&\textquoteright{}.
 \end{description}
 <<jump-INST-ADDR>>=
 define INST_ADDR(name) (Label)&&I_##name
@@ -1581,7 +1583,7 @@ define INST_ADDR(name) I_##name
 @
 
 
-\subsubsection{VM code generation}
+\subsubsection{VM code generation\label{sub:VM-code-generation}}
 
 Vmgen generates VM code generation functions in \texttt{\textbf{name-gen.i}}
 that the front end can call to generate VM code. This is essential
@@ -1610,16 +1612,15 @@ The following types, variables, and functions are used in \texttt{\textbf{name-g
 this is \texttt{\textbf{void {*}}}; for switch dispatch this is an
 integer type.
 \item [{vm\_prim}] The VM instruction table (type: \texttt{\textbf{Inst
-{*}}}, see VM instruction table).
+{*}}}, see \nameref{sub:VM-instruction-table}).
 \item [{gen\_inst(Inst~{*}{*}ctp,~Inst~i)}] This function compiles the
 instruction i. Take a look at it in \texttt{\textbf{vmgen-ex/peephole.c}}.
 It is trivial when you don't want to use superinstructions (just the
 last two lines of the example function), and slightly more complicated
-in the example due to its ability to use superinstructions (see Peephole
-optimization).
+in the example due to its ability to use superinstructions (see \nameref{sub:Peephole-optimization}).
 \item [{genarg\_type\_prefix(Inst~{*}{*}ctp,~type~type\_prefix)}] This
 compiles an immediate argument of type (as defined in a \texttt{\textbf{type-prefix}}
-definition). These functions are trivial to define (see \texttt{\textbf{vmgen-ex/support.c}}).
+definition). These functions are trivial to define (see \texttt{\textbf{\nameref{sub:Support.c---main()}}}).
 You need one of these functions for every type that you use as immediate
 argument.
 \end{description}
@@ -1637,7 +1638,7 @@ reason to end the superinstruction at the branch), and because the
 branches announce themselves to the profiler.
 
 
-\subsubsection{Peephole optimization}
+\subsubsection{Peephole optimization\label{sub:Peephole-optimization}}
 
 You need peephole optimization only if you want to use superinstructions.
 But having the code for it does not hurt much if you do not use superinstructions.
@@ -1660,11 +1661,11 @@ peephole optimization. After that, compiling with the VM code generation
 functions will automatically combine VM instructions into superinstructions.
 Since you do not want to combine instructions across VM branch targets
 (otherwise there will not be a proper VM instruction to branch to),
-you have to call \texttt{\textbf{BB\_BOUNDARY}} (see VM code generation)
+you have to call \texttt{\textbf{BB\_BOUNDARY}} (see \nameref{sub:VM-code-generation})
 at branch targets.
 
 
-\subsubsection{VM disassembler}
+\subsubsection{VM disassembler\label{sub:VM-disassembler}}
 
 A VM code disassembler is optional for an interpretive system, but
 highly recommended during its development and maintenance, because
@@ -1724,22 +1725,12 @@ been executed 36910041 times. Now you can select superinstructions
 in any way you like (note that compile time and space typically limit
 the number of superinstructions to 100\textendash{}1000). After you
 have done that, \texttt{\textbf{vmgen/seq2rule.awk}} turns lines of
-the form above into rules for inclusion in a Vmgen input file. Note
-that this script does not ensure that all prefixes are defined, so
-you have to do that in other ways. So, an overall script for turning
-profiles into superinstructions can look like this:
-\begin{quotation}
-\texttt{\textbf{awk -f stat.awk fib.prof test.prof| }}
+the form above into rules for inclusion in a Vmgen input file. So,
+an overall script for turning profiles into superinstructions can
+look like \texttt{\textbf{profile-fib-test}} in \nameref{sub:Using-profiling-to}.
+Note that this script does not ensure that all prefixes are defined,
+so you have to do that in other ways.
 
-\texttt{\textbf{awk '\$3>=10000'| \#select sequences }}
-
-\texttt{\textbf{fgrep -v -f peephole-blacklist| \#eliminate wrong
-instructions }}
-
-\texttt{\textbf{awk -f seq2rule.awk| \#turn into superinstructions }}
-
-\texttt{\textbf{sort -k 3 >mini-super.vmg \#sort sequences}}
-\end{quotation}
 Here the dynamic count is used for selecting sequences (preliminary
 results indicate that the static count gives better results, though);
 the third line eliminates sequences containing instructions that must
@@ -1768,8 +1759,7 @@ when you want to output the profile on file.
 
 The \texttt{\textbf{file-profile.i}} is similar to the disassembler
 file, and it uses variables and functions defined in \texttt{\textbf{vmgen-ex/profile.c}},
-plus VM\_IS\_INST already defined for the VM disassembler (see VM
-disassembler).
+plus VM\_IS\_INST already defined for the VM disassembler (see \nameref{sub:VM-disassembler}).
 
 
 \subsection{Hints}
@@ -1831,7 +1821,7 @@ In any case, if you are doing things to the wrapper files that would
 cause problems in a generated-.c-file approach, please let us know.
 
 
-\subsection{Contact}
+\subsection{Contact\label{sub:Contact}}
 
 To report a bug, use \url{https://savannah.gnu.org/bugs/?func=addbug&group_id=2672}.
 
@@ -2065,8 +2055,7 @@ VMGEN=vmgen
 #GCC=gcc -g -Wall
 GCC=gcc -O3 -fomit-frame-pointer -Wall
 CC=$(GCC)
-#M4=m4 -s #recommended if supported
-M4=m4
+<<M4>>
 OBJECTS_MINI=mini.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
 
 mini: $(OBJECTS_MINI)
@@ -2111,7 +2100,7 @@ checkall:
 @
 
 
-\subsubsection{Support.c - main() and other support functions}
+\subsubsection{Support.c - main() and other support functions\label{sub:Support.c---main()}}
 
 <<support.c>>=
 /* support functions and main() for vmgen example
@@ -2901,7 +2890,7 @@ void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
 @
 
 
-\subsubsection{engine.c - wrapper file}
+\subsubsection{engine.c - wrapper file\label{sub:engine.c---wrapper}}
 
 <<engine>>=
 engine.o: engine.c mini-vm.i mini-labels.i mini.h
@@ -3029,6 +3018,7 @@ echo "Extract file $1 from afvm.lyx..."
 rm -f afvm.nw
 lyx -e literate afvm.lyx
 notangle -t4 -R$2 afvm.nw > $1
+dos2unix $1
 chmod a+x $1
 rm -f afvm.nw
 @
@@ -3057,6 +3047,7 @@ echo "Extract all files..."
 ./extract engine.c
 ./extract stat.awk
 ./extract seq2rule.awk
+./extract profile-fib-test
 @
 
 
@@ -3313,8 +3304,8 @@ on terms that prohibit them from making any copies of your copyrighted
 material outside their relationship with you.
 
 Conveying under any other circumstances is permitted solely under
-the conditions stated below. Sublicensing is not allowed; section
-\ref{sub:Conveying-Non-Source-Forms.} makes it unnecessary.
+the conditions stated below. Sublicensing is not allowed; \nameref{sub:Conveying-Non-Source-Forms.}
+makes it unnecessary.
 
 
 \subsubsection{Protecting Users' Legal Rights From Anti-Circumvention Law.\label{sub:Protecting-Users'-Legal}}
@@ -3339,8 +3330,8 @@ You may convey verbatim copies of the Program's source code as you
 receive it, in any medium, provided that you conspicuously and appropriately
 publish on each copy an appropriate copyright notice; keep intact
 all notices stating that this License and any non-permissive terms
-added in accord with section \ref{sub:Conveying-Modified-Source}
-apply to the code; keep intact all notices of the absence of any warranty;
+added in accord with \nameref{sub:Conveying-Modified-Source} apply
+to the code; keep intact all notices of the absence of any warranty;
 and give all recipients a copy of this License along with the Program.
 
 You may charge any price or no price for each copy that you convey,
@@ -3351,18 +3342,18 @@ and you may offer support or warranty protection for a fee.
 
 You may convey a work based on the Program, or the modifications to
 produce it from the Program, in the form of source code under the
-terms of section \ref{sub:Conveying-Verbatim-Copies.}, provided that
+terms of \nameref{sub:Conveying-Verbatim-Copies.}, provided that
 you also meet all of these conditions:
 \begin{itemize}
 \item a) The work must carry prominent notices stating that you modified
 it, and giving a relevant date.
 \item b) The work must carry prominent notices stating that it is released
-under this License and any conditions added under section \ref{sub:Acceptance-Not-Required}.
-This requirement modifies the requirement in section \ref{sub:Conveying-Verbatim-Copies.}
+under this License and any conditions added under \nameref{sub:Acceptance-Not-Required}.
+This requirement modifies the requirement in \nameref{sub:Conveying-Verbatim-Copies.}
 to \textquotedblleft{}keep intact all notices\textquotedblright{}.
 \item c) You must license the entire work, as a whole, under this License
 to anyone who comes into possession of a copy. This License will therefore
-apply, along with any applicable section \ref{sub:Acceptance-Not-Required}
+apply, along with any applicable \nameref{sub:Acceptance-Not-Required}
 additional terms, to the whole of the work, and all its parts, regardless
 of how they are packaged. This License gives no permission to license
 the work in any other way, but it does not invalidate such permission
@@ -3384,7 +3375,7 @@ does not cause this License to apply to the other parts of the aggregate.
 \subsubsection{Conveying Non-Source Forms.\label{sub:Conveying-Non-Source-Forms.}}
 
 You may convey a covered work in object code form under the terms
-of sections \ref{sub:Conveying-Verbatim-Copies.} and \ref{sub:Conveying-Modified-Source},
+of \nameref{sub:Conveying-Verbatim-Copies.} and \nameref{sub:Conveying-Modified-Source},
 provided that you also convey the machine-readable Corresponding Source
 under the terms of this License, in one of these ways:
 \begin{itemize}
@@ -3405,8 +3396,8 @@ Source from a network server at no charge.
 \item c) Convey individual copies of the object code with a copy of the
 written offer to provide the Corresponding Source. This alternative
 is allowed only occasionally and noncommercially, and only if you
-received the object code with such an offer, in accord with subsection
-\ref{sub:Conveying-Non-Source-Forms.}b.
+received the object code with such an offer, in accord with \nameref{sub:Conveying-Non-Source-Forms.}
+subsection b.
 \item d) Convey the object code by offering access from a designated place
 (gratis or for a charge), and offer equivalent access to the Corresponding
 Source in the same way through the same place at no further charge.
@@ -3421,10 +3412,10 @@ it is available for as long as needed to satisfy these requirements.
 \item e) Convey the object code using peer-to-peer transmission, provided
 you inform other peers where the object code and Corresponding Source
 of the work are being offered to the general public at no charge under
-subsection \ref{sub:Conveying-Non-Source-Forms.}d. A separable portion
-of the object code, whose source code is excluded from the Corresponding
-Source as a System Library, need not be included in conveying the
-object code work.
+\nameref{sub:Conveying-Non-Source-Forms.} subsection d. A separable
+portion of the object code, whose source code is excluded from the
+Corresponding Source as a System Library, need not be included in
+conveying the object code work.
 \end{itemize}
 A \textquotedblleft{}User Product\textquotedblright{} is either (1)
 a \textquotedblleft{}consumer product\textquotedblright{}, which means
@@ -3520,7 +3511,7 @@ that these contractual assumptions directly impose on those licensors
 and authors.
 \end{itemize}
 All other non-permissive additional terms are considered \textquotedblleft{}further
-restrictions\textquotedblright{} within the meaning of section \ref{sub:Automatic-Licensing-of}.
+restrictions\textquotedblright{} within the meaning of \nameref{sub:Automatic-Licensing-of}.
 If the Program as you received it, or any part of it, contains a notice
 stating that it is governed by this License along with a term that
 is a further restriction, you may remove that term. If a license document
@@ -3545,7 +3536,7 @@ You may not propagate or modify a covered work except as expressly
 provided under this License. Any attempt otherwise to propagate or
 modify it is void, and will automatically terminate your rights under
 this License (including any patent licenses granted under the third
-paragraph of section \ref{sub:No-Surrender-of}).
+paragraph of \nameref{sub:No-Surrender-of}).
 
 However, if you cease all violation of this License, then your license
 from a particular copyright holder is reinstated (a) provisionally,
@@ -3565,7 +3556,7 @@ Termination of your rights under this section does not terminate the
 licenses of parties who have received copies or rights from you under
 this License. If your rights have been terminated and not permanently
 reinstated, you do not qualify to receive new licenses for the same
-material under section \ref{sub:Automatic-Licensing-of}.
+material under \nameref{sub:Automatic-Licensing-of}.
 
 
 \subsubsection{Acceptance Not Required for Having Copies.\label{sub:Acceptance-Not-Required}}
@@ -3701,8 +3692,8 @@ to link or combine any covered work with a work licensed under version
 work, and to convey the resulting work. The terms of this License
 will continue to apply to the part which is the covered work, but
 the special requirements of the GNU Affero General Public License,
-section \ref{sub:No-Surrender-of}, concerning interaction through
-a network will apply to the combination as such.
+\nameref{sub:No-Surrender-of}, concerning interaction through a network
+will apply to the combination as such.
 
 
 \subsubsection{Revised Versions of this License.\label{sub:Revised-Versions-of}}
@@ -3757,8 +3748,7 @@ TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER
 PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 
-\subsubsection{Interpretation of Sections \ref{sub:Disclaimer-of-Warranty.} and
-\ref{sub:Limitation-of-Liability.}.}
+\subsubsection{Interpretation of \nameref{sub:Disclaimer-of-Warranty.} and \nameref{sub:Limitation-of-Liability.}.}
 
 If the disclaimer of warranty and limitation of liability provided
 above cannot be given local legal effect according to their terms,
@@ -3975,7 +3965,7 @@ whatsoever to those of this License. You may not use technical measures
 to obstruct or control the reading or further copying of the copies
 you make or distribute. However, you may accept compensation in exchange
 for copies. If you distribute a large enough number of copies you
-must also follow the conditions in section \ref{sub:COPYING-IN-QUANTITY}.
+must also follow the conditions in \nameref{sub:COPYING-IN-QUANTITY}.
 
 You may also lend copies, under the same conditions stated above,
 and you may publicly display copies.
@@ -4022,7 +4012,7 @@ Document.
 \subsubsection{MODIFICATIONS\label{sub:MODIFICATIONS}}
 
 You may copy and distribute a Modified Version of the Document under
-the conditions of sections \ref{sub:VERBATIM-COPYING} and \ref{sub:COPYING-IN-QUANTITY}
+the conditions of \nameref{sub:VERBATIM-COPYING} and \nameref{sub:COPYING-IN-QUANTITY}
 above, provided that you release the Modified Version under precisely
 this License, with the Modified Version filling the role of the Document,
 thus licensing distribution and modification of the Modified Version
@@ -4109,8 +4099,8 @@ or imply endorsement of any Modified Version.
 \subsubsection{COMBINING DOCUMENTS}
 
 You may combine the Document with other documents released under this
-License, under the terms defined in section \ref{sub:MODIFICATIONS}
-above for modified versions, provided that you include in the combination
+License, under the terms defined in \nameref{sub:MODIFICATIONS} above
+for modified versions, provided that you include in the combination
 all of the Invariant Sections of all of the original documents, unmodified,
 and list them all as Invariant Sections of your combined work in its
 license notice, and that you preserve all their Warranty Disclaimers.
@@ -4156,7 +4146,7 @@ works permit. When the Document is included in an aggregate, this
 License does not apply to the other works in the aggregate which are
 not themselves derivative works of the Document.
 
-If the Cover Text requirement of section \ref{sub:COPYING-IN-QUANTITY}
+If the Cover Text requirement of \nameref{sub:COPYING-IN-QUANTITY}
 is applicable to these copies of the Document, then if the Document
 is less than one half of the entire aggregate, the Document's Cover
 Texts may be placed on covers that bracket the Document within the
@@ -4168,7 +4158,7 @@ that bracket the whole aggregate.
 \subsubsection{TRANSLATION}
 
 Translation is considered a kind of modification, so you may distribute
-translations of the Document under the terms of section \ref{sub:MODIFICATIONS}.
+translations of the Document under the terms of \nameref{sub:MODIFICATIONS}.
 Replacing Invariant Sections with translations requires special permission
 from their copyright holders, but you may include translations of
 some or all Invariant Sections in addition to the original versions
@@ -4182,9 +4172,9 @@ will prevail.
 
 If a section in the Document is Entitled \textquotedbl{}Acknowledgements\textquotedbl{},
 \textquotedbl{}Dedications\textquotedbl{}, or \textquotedbl{}History\textquotedbl{},
-the requirement (section \ref{sub:MODIFICATIONS}) to Preserve its
-Title (section \ref{sub:APPLICABILITY-AND-DEFINITIONS}) will typically
-require changing the actual title.
+the requirement (\nameref{sub:MODIFICATIONS}) to Preserve its Title
+(\nameref{sub:APPLICABILITY-AND-DEFINITIONS}) will typically require
+changing the actual title.
 
 
 \subsubsection{TERMINATION}

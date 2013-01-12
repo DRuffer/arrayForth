@@ -94,9 +94,9 @@ Permission is granted to copy, distribute and/or modify this document under
  the terms of the GNU Free Documentation License, Version 1.3 or any later
  version published by the Free Software Foundation; with no Invariant Sections,
  no Front-Cover Texts, and no Back-Cover Texts.
- A copy of the license is included in section 
+ A copy of the license is included in 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:GNU-Free-Documentation"
 
 \end_inset
@@ -264,9 +264,9 @@ A virtual machine (VM) represents the program as a sequence of VM instructions,
 \begin_layout Standard
 In this setup, Vmgen can generate most of the code dealing with virtual
  machine instructions from a simple description of the virtual machine instructi
-ons (see section 
+ons (see 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Input-File-Format"
 
 \end_inset
@@ -336,7 +336,7 @@ code
 profiling Useful for optimizing the VM interpreter with superinstructions
  (see 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:VM-profiler"
 
 \end_inset
@@ -384,8 +384,14 @@ As a result, Vmgen-based interpreters are only about an order of magnitude
 \begin_layout Standard
 VMs are usually designed as stack machines (passing data between VM instructions
  on a stack), and Vmgen supports such designs especially well; however,
- you can also use Vmgen for implementing a register VM (see Register Machines)
- and still benefit from most of the advantages offered by Vmgen.
+ you can also use Vmgen for implementing a register VM (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Register-Machines"
+
+\end_inset
+
+) and still benefit from most of the advantages offered by Vmgen.
 \end_layout
 
 \begin_layout Standard
@@ -516,8 +522,14 @@ Vmgen has special support and optimizations for stack VMs, making their
 \end_layout
 
 \begin_layout Standard
-You can also implement a register VM with Vmgen (see Register Machines),
- and you will still profit from most Vmgen features.
+You can also implement a register VM with Vmgen (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Register-Machines"
+
+\end_inset
+
+), and you will still profit from most Vmgen features.
 \end_layout
 
 \begin_layout Standard
@@ -602,7 +614,7 @@ code This method represents a VM instruction opcode by the address of the
  Typically the threaded-code dispatch code is appended directly to the code
  for executing the VM instruction.
  Threaded code cannot be implemented in ANSI C, but it can be implemented
- using GNU C's labels-as-values extension (see Labels as Values).
+ using GNU C's labels-as-values extension.
 \end_layout
 
 \begin_layout Standard
@@ -866,6 +878,13 @@ To learn about the options, type
 
 \begin_layout Subsubsection
 Using profiling to create superinstructions
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Using-profiling-to"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -953,39 +972,45 @@ The numbers can be used in various ways to select superinstructions.
  exceeding 10000, you would use the following pipeline:
 \end_layout
 
-\begin_layout Quotation
+\begin_layout Scrap
 
-\family typewriter
-\series bold
+<<profile-fib-test>>=
+\begin_inset Newline newline
+\end_inset
+
+make fib.prof test.prof
+\begin_inset Newline newline
+\end_inset
+
 awk -f stat.awk fib.prof test.prof| 
-\end_layout
+\backslash
 
-\begin_layout Quotation
+\begin_inset Newline newline
+\end_inset
 
-\family typewriter
-\series bold
 awk '$3>=10000'| #select sequences 
-\end_layout
+\backslash
 
-\begin_layout Quotation
+\begin_inset Newline newline
+\end_inset
 
-\family typewriter
-\series bold
 fgrep -v -f peephole-blacklist| #eliminate wrong instructions 
-\end_layout
+\backslash
 
-\begin_layout Quotation
+\begin_inset Newline newline
+\end_inset
 
-\family typewriter
-\series bold
 awk -f seq2rule.awk| #transform sequences into superinstruction rules 
-\end_layout
+\backslash
 
-\begin_layout Quotation
+\begin_inset Newline newline
+\end_inset
 
-\family typewriter
-\series bold
 sort -k 3 >mini-super.vmg #sort sequences
+\begin_inset Newline newline
+\end_inset
+
+@
 \end_layout
 
 \begin_layout Standard
@@ -1220,7 +1245,14 @@ Ident
 stack-effect
 \family default
 \series default
- may have a stack prefix (for stack prefix syntax, see Eval escapes).
+ may have a stack prefix (for stack prefix syntax, see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "par:Eval-escapes"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -1264,9 +1296,26 @@ In addition to the syntax given in the grammer, Vmgen also processes sync
 m4 -s
 \family default
 \series default
-’ (see Invoking m4) and similar tools.
+’ and similar tools.
  This allows associating C compiler error messages with the original source
  of the C code.
+\end_layout
+
+\begin_layout Scrap
+
+<<M4>>=
+\begin_inset Newline newline
+\end_inset
+
+M4=m4 -s #recommended if supported
+\begin_inset Newline newline
+\end_inset
+
+#M4=m4
+\begin_inset Newline newline
+\end_inset
+
+@
 \end_layout
 
 \begin_layout Standard
@@ -1283,6 +1332,13 @@ prim
 
 \begin_layout Paragraph
 Eval escapes
+\begin_inset CommandInset label
+LatexCommand label
+name "par:Eval-escapes"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1446,6 +1502,7 @@ We will use the following simple VM instruction descriptions as examples:
 \end_layout
 
 \begin_layout Scrap
+
 <<simple-instructions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1666,6 +1723,7 @@ How do we know the type and stack of the stack items? Vmgen uses prefixes,
 \end_layout
 
 \begin_layout Scrap
+
 <<type-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1750,6 +1808,7 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-definitions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1784,9 +1843,23 @@ Cell
 \series default
 ; other types have to fit into one or two Cells (depending on whether the
  type is single or double wide), and are cast from and to Cells on accessing
- the data-stack with type cast macros (see VM engine).
+ the data-stack with type cast macros (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-engine"
+
+\end_inset
+
+).
  By default, stacks grow towards lower addresses in Vmgen-erated interpreters
- (see Stack growth direction).
+ (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "par:Stack-growth-direction"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -1795,6 +1868,7 @@ We can override the default stack of a stack item by using a stack prefix.
 \end_layout
 
 \begin_layout Scrap
+
 <<lit>>=
 \begin_inset Newline newline
 \end_inset
@@ -1831,6 +1905,7 @@ i
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1921,7 +1996,14 @@ You notify Vmgen by putting
  in the stack effect into C variables, then make sure that all other stack
  items for that stack are in memory, and that the stack pointer for the
  stack points to the top-of-stack (by default, unless you change the stack
- access transformation: see Stack growth direction).
+ access transformation: see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "par:Stack-growth-direction"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -1941,6 +2023,7 @@ Consider this example:
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-stack-adjust>>=
 \begin_inset Newline newline
 \end_inset
@@ -2037,7 +2120,14 @@ on pointer with
 SET_IP
 \family default
 \series default
- (see VM engine).
+ (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-engine"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Paragraph
@@ -2063,6 +2153,7 @@ SET_IP As far as Vmgen is concerned, a VM instruction containing this ends
 \end_layout
 
 \begin_layout Scrap
+
 <<branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2090,6 +2181,7 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
+
 <<end>>=
 \begin_inset Newline newline
 \end_inset
@@ -2166,6 +2258,7 @@ INST_TAIL;
 \end_layout
 
 \begin_layout Scrap
+
 <<zbranch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2209,6 +2302,7 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2309,6 +2403,7 @@ IF_spTOS(spTOS = sp[0])
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-caching>>=
 \begin_inset Newline newline
 \end_inset
@@ -2455,7 +2550,14 @@ ons of stack items in the same VM instruction.
 Superinstructions keep stack items in variables across the whole superinstructio
 n.
  So you should not include VM instructions, that access a stack or stack
- pointer, as components of superinstructions (see VM profiler).
+ pointer, as components of superinstructions (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-profiler"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -2497,6 +2599,13 @@ IPTOS
 
 \begin_layout Paragraph
 Stack growth direction
+\begin_inset CommandInset label
+LatexCommand label
+name "par:Stack-growth-direction"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2534,6 +2643,7 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-stack-transform>>=
 \begin_inset Newline newline
 \end_inset
@@ -2594,6 +2704,7 @@ n
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-organization>>=
 \begin_inset Newline newline
 \end_inset
@@ -2697,14 +2808,32 @@ n
 
 \begin_layout Subsubsection
 Superinstructions
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Superinstructions"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 Note: don't invest too much work in (static) superinstructions; a future
  version of Vmgen will support dynamic superinstructions (see Ian Piumarta
  and Fabio Riccardi, Optimizing Direct Threaded Code by Selective Inlining,
- PLDI'98), and static superinstructions have much less benefit in that context
- (preliminary results indicate only a factor 1.1 speedup).
+ PLDI'98 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://dl.acm.org/citation.cfm?id=277743
+\end_layout
+
+\end_inset
+
+), and static superinstructions have much less benefit in that context (prelimin
+ary results indicate only a factor 1.1 speedup).
 \end_layout
 
 \begin_layout Standard
@@ -2712,6 +2841,7 @@ Here is an example of a superinstruction definition:
 \end_layout
 
 \begin_layout Scrap
+
 <<ll>>=
 \begin_inset Newline newline
 \end_inset
@@ -2759,7 +2889,14 @@ lit
  It is generated automatically by the VM code generation functions whenever
  that sequence occurs, so if you want to use this superinstruction, you
  just need to add this definition (and even that can be partially automatized,
- see VM profiler).
+ see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-profiler"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -2981,6 +3118,13 @@ E store-optimization off
 
 \begin_layout Subsubsection
 Register Machines
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Register-Machines"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3016,8 +3160,15 @@ A disadvantage of this method is that during tracing you only see the register
 printarg_src
 \family default
 \series default
- (see VM engine), you can print the values of the source registers on entry,
- but you cannot print the value of the destination register on exit.
+ (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-engine"
+
+\end_inset
+
+), you can print the values of the source registers on entry, but you cannot
+ print the value of the destination register on exit.
 \end_layout
 
 \begin_layout Standard
@@ -3089,7 +3240,14 @@ Could the register VM support be improved, apart from the issues mentioned
  a number of different designs that different people mean when they use
  the term register machine in connection with VM interpreters.
  However, if you have ideas or requests in that direction, please let me
- know (see Contact).
+ know (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Contact"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -3121,8 +3279,14 @@ the prefix for this superinstruction must be defined earlier
 
 \begin_layout Standard
 You have defined a superinstruction (e.g.
- abc = a b c) without defining its direct prefix (e.g., ab = a b), See Superinstru
-ctions.
+ abc = a b c) without defining its direct prefix (e.g., ab = a b), See 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Superinstructions"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -3244,6 +3408,13 @@ VM profiler: for finding worthwhile superinstructions
 
 \begin_layout Subsubsection
 VM engine
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:VM-engine"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3264,6 +3435,7 @@ defined(__GNUC__)
 \end_layout
 
 \begin_layout Scrap
+
 <<dispatch>>=
 \begin_inset Newline newline
 \end_inset
@@ -3727,8 +3899,14 @@ For both methods, the VM engine is contained in a C-level function.
  Vmgen generates most of the contents of the function for you (name-vm.i),
  but you have to define this function, and macros and variables used in
  the engine, and initialize the variables.
- In our example the engine function also includes name-labels.i (see VM instructi
-on table).
+ In our example the engine function also includes name-labels.i (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-instruction-table"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -3744,7 +3922,14 @@ It costs significant performance to check in each instruction whether to
  print tracing code, so we recommend producing two copies of the engine:
  one for fast execution, and one for tracing.
  See the rules for engine.o and engine-debug.o in vmgen-ex/Makefile for an
- example.
+ example (
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:engine.c---wrapper"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -3783,6 +3968,7 @@ inst_name
 \end_layout
 
 \begin_layout Scrap
+
 <<jump-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -3795,6 +3981,7 @@ define LABEL(name) I_##name:
 \end_layout
 
 \begin_layout Scrap
+
 <<switch-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -3812,6 +3999,7 @@ LABEL2(inst_name) This will be used for dynamic superinstructions; at the
 \end_layout
 
 \begin_layout Scrap
+
 <<LABEL2>>=
 \begin_inset Newline newline
 \end_inset
@@ -3832,6 +4020,7 @@ NAME(inst_name_string) Called on entering a VM instruction with a string
 \end_layout
 
 \begin_layout Scrap
+
 <<NAME>>=
 \begin_inset Newline newline
 \end_inset
@@ -3882,6 +4071,7 @@ DEF_CA Usually empty.
 \end_layout
 
 \begin_layout Scrap
+
 <<DEF-CA>>=
 \begin_inset Newline newline
 \end_inset
@@ -4011,6 +4201,7 @@ NEXT_P1
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P0>>=
 \begin_inset Newline newline
 \end_inset
@@ -4023,6 +4214,7 @@ define NEXT_P0
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P0-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4035,6 +4227,7 @@ define NEXT_P0       ({cfa=*ip++;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P0-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4047,6 +4240,7 @@ define NEXT_P0       ({cfa=*ip;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4059,6 +4253,7 @@ define NEXT_P1
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4071,6 +4266,7 @@ define NEXT_P1       ({cfa=*ip++;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4083,6 +4279,7 @@ define NEXT_P1       (ip++)
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1-3>>=
 \begin_inset Newline newline
 \end_inset
@@ -4095,6 +4292,7 @@ define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4107,6 +4305,7 @@ define NEXT_P2 goto next_inst;
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4119,6 +4318,7 @@ define NEXT_P2       ({goto *cfa;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4131,6 +4331,7 @@ define NEXT_P2       ({goto **(ip-1);})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2-3>>=
 \begin_inset Newline newline
 \end_inset
@@ -4143,6 +4344,7 @@ define NEXT_P2       ({cfa=*ip++; goto *cfa;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-INST>>=
 \begin_inset Newline newline
 \end_inset
@@ -4155,6 +4357,7 @@ define NEXT_INST     (*ip)
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-INST-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4167,6 +4370,7 @@ define NEXT_INST     (cfa)
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-INST-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4183,6 +4387,7 @@ INC_IP(n) This increments IP by n.
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -4195,6 +4400,7 @@ define INC_IP(const_inc) (ip+=(const_inc))
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4207,6 +4413,7 @@ define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4219,6 +4426,7 @@ define INC_IP(const_inc) ({ip+=(const_inc);})
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP-3>>=
 \begin_inset Newline newline
 \end_inset
@@ -4235,6 +4443,7 @@ SET_IP(target) This sets IP to target.
 \end_layout
 
 \begin_layout Scrap
+
 <<SET-IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -4247,6 +4456,7 @@ define SET_IP(p)     (ip=(p))
 \end_layout
 
 \begin_layout Scrap
+
 <<SET-IP-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4259,6 +4469,7 @@ define SET_IP(p)     ({ip=(p); NEXT_P0;})
 \end_layout
 
 \begin_layout Scrap
+
 <<SET-IP-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4294,6 +4505,7 @@ vm_A2B(a,b) Type casting macro that assigns ‘a’ (of type A) to ‘b’ (of t
 \end_layout
 
 \begin_layout Scrap
+
 <<vm-A2B(a,b)>>=
 \begin_inset Newline newline
 \end_inset
@@ -4378,6 +4590,7 @@ NEXT_P
 \end_layout
 
 \begin_layout Scrap
+
 <<IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -4390,6 +4603,7 @@ define IP            ip
 \end_layout
 
 \begin_layout Scrap
+
 <<IP-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4402,6 +4616,7 @@ define IP            (ip-1)
 \end_layout
 
 \begin_layout Scrap
+
 <<IP-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4419,6 +4634,7 @@ IMM_ARG(access,value) Define this to expland to “(access)”.
 \end_layout
 
 \begin_layout Scrap
+
 <<IMM-ARG>>=
 \begin_inset Newline newline
 \end_inset
@@ -4444,6 +4660,7 @@ stackpointerTOS The top-of-stack for the stack pointed to by stackpointer.
 \end_layout
 
 \begin_layout Scrap
+
 <<spTOS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4472,6 +4689,7 @@ stackpointerTOS The top-of-stack for the stack pointed to by stackpointer.
 \end_layout
 
 \begin_layout Scrap
+
 <<IPTOS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4491,6 +4709,7 @@ IF_stackpointerTOS(expr) Macro for executing expr, if top-of-stack caching
 \end_layout
 
 \begin_layout Scrap
+
 <<IF-spTOS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4527,8 +4746,14 @@ IF_stackpointerTOS(expr) Macro for executing expr, if top-of-stack caching
 \end_layout
 
 \begin_layout Description
-SUPER_END This is used by the VM profiler (see VM profiler); it should not
- do anything in normal operation, and call 
+SUPER_END This is used by the VM profiler (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-profiler"
+
+\end_inset
+
+); it should not do anything in normal operation, and call 
 \family typewriter
 \series bold
 vm_count_block(IP)
@@ -4538,6 +4763,7 @@ vm_count_block(IP)
 \end_layout
 
 \begin_layout Scrap
+
 <<SUPER-END>>=
 \begin_inset Newline newline
 \end_inset
@@ -4569,7 +4795,7 @@ vm_count_block(IP)
 SUPER_CONTINUE This is just a hint to Vmgen and does nothing at the C level.
  See 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "par:C-Code-Macros"
 
 \end_inset
@@ -4591,6 +4817,7 @@ ions.
 \end_layout
 
 \begin_layout Scrap
+
 <<MAYBE-UNUSED>>=
 \begin_inset Newline newline
 \end_inset
@@ -4648,14 +4875,27 @@ printarg_type(value) Needed only if ‘VM_DEBUG’ is defined.
 
 \begin_layout Subsubsection
 VM instruction table
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:VM-instruction-table"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 For threaded code we also need to produce a table containing the labels
  of all VM instructions.
- This is needed for VM code generation (see VM code generation), and it
- has to be done in the engine function, because the labels are not visible
- outside.
+ This is needed for VM code generation (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-code-generation"
+
+\end_inset
+
+), and it has to be done in the engine function, because the labels are
+ not visible outside.
  It then has to be passed outside the function (and assigned to ‘
 \family typewriter
 \series bold
@@ -4735,10 +4975,11 @@ LABEL(inst_name)
 LABEL(inst_name)
 \family default
 \series default
-’); the address is taken with ‘&&’ (see Labels as Values).
+’); the address is taken with ‘&&’.
 \end_layout
 
 \begin_layout Scrap
+
 <<jump-INST-ADDR>>=
 \begin_inset Newline newline
 \end_inset
@@ -4751,6 +4992,7 @@ define INST_ADDR(name) (Label)&&I_##name
 \end_layout
 
 \begin_layout Scrap
+
 <<switch-INST-ADDR>>=
 \begin_inset Newline newline
 \end_inset
@@ -4764,6 +5006,13 @@ define INST_ADDR(name) I_##name
 
 \begin_layout Subsubsection
 VM code generation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:VM-code-generation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4859,7 +5108,14 @@ vm_prim The VM instruction table (type:
 Inst *
 \family default
 \series default
-, see VM instruction table).
+, see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-instruction-table"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Description
@@ -4885,7 +5141,14 @@ vmgen-ex/peephole.c
 .
  It is trivial when you don't want to use superinstructions (just the last
  two lines of the example function), and slightly more complicated in the
- example due to its ability to use superinstructions (see Peephole optimization).
+ example due to its ability to use superinstructions (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Peephole-optimization"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Description
@@ -4912,7 +5175,14 @@ type-prefix
  These functions are trivial to define (see 
 \family typewriter
 \series bold
-vmgen-ex/support.c
+
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Support.c---main()"
+
+\end_inset
+
+
 \family default
 \series default
 ).
@@ -4960,6 +5230,13 @@ BB_BOUNDARY
 
 \begin_layout Subsubsection
 Peephole optimization
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Peephole-optimization"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5031,11 +5308,25 @@ vm_prim
 BB_BOUNDARY
 \family default
 \series default
- (see VM code generation) at branch targets.
+ (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-code-generation"
+
+\end_inset
+
+) at branch targets.
 \end_layout
 
 \begin_layout Subsubsection
 VM disassembler
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:VM-disassembler"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5238,45 +5529,23 @@ vmgen/seq2rule.awk
 \series default
  turns lines of the form above into rules for inclusion in a Vmgen input
  file.
+ So, an overall script for turning profiles into superinstructions can look
+ like 
+\family typewriter
+\series bold
+profile-fib-test
+\family default
+\series default
+ in 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:Using-profiling-to"
+
+\end_inset
+
+.
  Note that this script does not ensure that all prefixes are defined, so
  you have to do that in other ways.
- So, an overall script for turning profiles into superinstructions can look
- like this:
-\end_layout
-
-\begin_layout Quotation
-
-\family typewriter
-\series bold
-awk -f stat.awk fib.prof test.prof| 
-\end_layout
-
-\begin_layout Quotation
-
-\family typewriter
-\series bold
-awk '$3>=10000'| #select sequences 
-\end_layout
-
-\begin_layout Quotation
-
-\family typewriter
-\series bold
-fgrep -v -f peephole-blacklist| #eliminate wrong instructions 
-\end_layout
-
-\begin_layout Quotation
-
-\family typewriter
-\series bold
-awk -f seq2rule.awk| #turn into superinstructions 
-\end_layout
-
-\begin_layout Quotation
-
-\family typewriter
-\series bold
-sort -k 3 >mini-super.vmg #sort sequences
 \end_layout
 
 \begin_layout Standard
@@ -5367,7 +5636,14 @@ file-profile.i
 vmgen-ex/profile.c
 \family default
 \series default
-, plus VM_IS_INST already defined for the VM disassembler (see VM disassembler).
+, plus VM_IS_INST already defined for the VM disassembler (see 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sub:VM-disassembler"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -5487,6 +5763,13 @@ One idea we are thinking about is to generate just one .c file instead of
 
 \begin_layout Subsection
 Contact
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Contact"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5548,6 +5831,7 @@ README
 \end_layout
 
 \begin_layout Scrap
+
 <<README>>=
 \begin_inset Newline newline
 \end_inset
@@ -5658,6 +5942,7 @@ simple.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
+
 <<simple.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -5682,6 +5967,7 @@ fib.mini - example mini program
 \end_layout
 
 \begin_layout Scrap
+
 <<fib.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -5751,6 +6037,7 @@ test.mini - example mini program (tests everything)
 \end_layout
 
 \begin_layout Scrap
+
 <<test.mini>>=
 \begin_inset Newline newline
 \end_inset
@@ -6135,6 +6422,7 @@ test.out - test.mini output
 \end_layout
 
 \begin_layout Scrap
+
 <<test.out>>=
 \begin_inset Newline newline
 \end_inset
@@ -6297,6 +6585,7 @@ Makefile
 \end_layout
 
 \begin_layout Scrap
+
 <<Makefile>>=
 \begin_inset Newline newline
 \end_inset
@@ -6345,11 +6634,7 @@ CC=$(GCC)
 \begin_inset Newline newline
 \end_inset
 
-#M4=m4 -s #recommended if supported
-\begin_inset Newline newline
-\end_inset
-
-M4=m4
+<<M4>>
 \begin_inset Newline newline
 \end_inset
 
@@ -6529,9 +6814,17 @@ time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
 
 \begin_layout Subsubsection
 Support.c - main() and other support functions
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Support.c---main()"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Scrap
+
 <<support.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -7354,6 +7647,7 @@ mini.h - common declarations
 \end_layout
 
 \begin_layout Scrap
+
 <<mini.h>>=
 \begin_inset Newline newline
 \end_inset
@@ -7647,6 +7941,7 @@ mini-inst.vmg - simple VM instructions
 \end_layout
 
 \begin_layout Scrap
+
 <<mini-inst.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -7791,6 +8086,7 @@ mini-super.vmg - superinstructions (empty at first)
 \end_layout
 
 \begin_layout Scrap
+
 <<mini-super.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -7807,6 +8103,7 @@ mini.l - scanner
 \end_layout
 
 \begin_layout Scrap
+
 <<mini.l>>=
 \begin_inset Newline newline
 \end_inset
@@ -7972,6 +8269,7 @@ mini.y - front end (parser, VM code generator)
 \end_layout
 
 \begin_layout Scrap
+
 <<mini.y>>=
 \begin_inset Newline newline
 \end_inset
@@ -8506,6 +8804,7 @@ peephole-blacklist - list of instructions not allowed in superinstructions
 \end_layout
 
 \begin_layout Scrap
+
 <<peephole-blacklist>>=
 \begin_inset Newline newline
 \end_inset
@@ -8539,6 +8838,7 @@ peephole.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<peephole.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -8904,6 +9204,7 @@ profile.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<profile.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9518,6 +9819,7 @@ disasm.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<disasm.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9621,9 +9923,17 @@ n',vm_out);
 
 \begin_layout Subsubsection
 engine.c - wrapper file
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:engine.c---wrapper"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Scrap
+
 <<engine>>=
 \begin_inset Newline newline
 \end_inset
@@ -9648,6 +9958,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 \end_layout
 
 \begin_layout Scrap
+
 <<engine.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9928,6 +10239,7 @@ stat.awk - script for aggregating profile information
 \end_layout
 
 \begin_layout Scrap
+
 <<stat.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10002,6 +10314,7 @@ seq2rule.awk - script for creating superinstructions
 \end_layout
 
 \begin_layout Scrap
+
 <<seq2rule.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10052,6 +10365,7 @@ A script for converting this document to PDF form follows:
 \end_layout
 
 \begin_layout Scrap
+
 <<final>>=
 \begin_inset Newline newline
 \end_inset
@@ -10073,6 +10387,7 @@ Each of these scripts can be pulled out manually given the default * script
 \end_layout
 
 \begin_layout Scrap
+
 <<*>>=
 \begin_inset Newline newline
 \end_inset
@@ -10093,6 +10408,10 @@ notangle -t4 -R$2 afvm.nw > $1
 \begin_inset Newline newline
 \end_inset
 
+dos2unix $1
+\begin_inset Newline newline
+\end_inset
+
 chmod a+x $1
 \begin_inset Newline newline
 \end_inset
@@ -10110,6 +10429,7 @@ Once that script is pulled out and named extract, the following script can
 \end_layout
 
 \begin_layout Scrap
+
 <<extract-all>>=
 \begin_inset Newline newline
 \end_inset
@@ -10194,6 +10514,10 @@ echo "Extract all files..."
 \begin_inset Newline newline
 \end_inset
 
+./extract profile-fib-test
+\begin_inset Newline newline
+\end_inset
+
 @
 \end_layout
 
@@ -10207,6 +10531,7 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
+
 <<copyright>>=
 \begin_inset Newline newline
 \end_inset
@@ -10280,6 +10605,7 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
+
 <<
 \backslash
 copyright>>=
@@ -10380,6 +10706,7 @@ copyright>>=
 \end_layout
 
 \begin_layout Scrap
+
 <<make-copyright>>=
 \begin_inset Newline newline
 \end_inset
@@ -10727,9 +11054,9 @@ You may make, run and propagate covered works that you do not convey, without
 \begin_layout Standard
 Conveying under any other circumstances is permitted solely under the conditions
  stated below.
- Sublicensing is not allowed; section 
+ Sublicensing is not allowed; 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Non-Source-Forms."
 
 \end_inset
@@ -10779,10 +11106,9 @@ name "sub:Conveying-Verbatim-Copies."
 You may convey verbatim copies of the Program's source code as you receive
  it, in any medium, provided that you conspicuously and appropriately publish
  on each copy an appropriate copyright notice; keep intact all notices stating
- that this License and any non-permissive terms added in accord with section
- 
+ that this License and any non-permissive terms added in accord with 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Modified-Source"
 
 \end_inset
@@ -10809,10 +11135,9 @@ name "sub:Conveying-Modified-Source"
 
 \begin_layout Standard
 You may convey a work based on the Program, or the modifications to produce
- it from the Program, in the form of source code under the terms of section
- 
+ it from the Program, in the form of source code under the terms of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Verbatim-Copies."
 
 \end_inset
@@ -10827,17 +11152,17 @@ a) The work must carry prominent notices stating that you modified it, and
 
 \begin_layout Itemize
 b) The work must carry prominent notices stating that it is released under
- this License and any conditions added under section 
+ this License and any conditions added under 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Acceptance-Not-Required"
 
 \end_inset
 
 .
- This requirement modifies the requirement in section 
+ This requirement modifies the requirement in 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Verbatim-Copies."
 
 \end_inset
@@ -10848,9 +11173,9 @@ reference "sub:Conveying-Verbatim-Copies."
 \begin_layout Itemize
 c) You must license the entire work, as a whole, under this License to anyone
  who comes into possession of a copy.
- This License will therefore apply, along with any applicable section 
+ This License will therefore apply, along with any applicable 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Acceptance-Not-Required"
 
 \end_inset
@@ -10889,17 +11214,16 @@ name "sub:Conveying-Non-Source-Forms."
 \end_layout
 
 \begin_layout Standard
-You may convey a covered work in object code form under the terms of sections
- 
+You may convey a covered work in object code form under the terms of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Verbatim-Copies."
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Modified-Source"
 
 \end_inset
@@ -10932,14 +11256,14 @@ c) Convey individual copies of the object code with a copy of the written
  offer to provide the Corresponding Source.
  This alternative is allowed only occasionally and noncommercially, and
  only if you received the object code with such an offer, in accord with
- subsection 
+ 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Non-Source-Forms."
 
 \end_inset
 
-b.
+ subsection b.
 \end_layout
 
 \begin_layout Itemize
@@ -10961,15 +11285,14 @@ nts.
 \begin_layout Itemize
 e) Convey the object code using peer-to-peer transmission, provided you
  inform other peers where the object code and Corresponding Source of the
- work are being offered to the general public at no charge under subsection
- 
+ work are being offered to the general public at no charge under 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Conveying-Non-Source-Forms."
 
 \end_inset
 
-d.
+ subsection d.
  A separable portion of the object code, whose source code is excluded from
  the Corresponding Source as a System Library, need not be included in conveying
  the object code work.
@@ -11109,9 +11432,9 @@ f) Requiring indemnification of licensors and authors of that material by
 
 \begin_layout Standard
 All other non-permissive additional terms are considered “further restrictions”
- within the meaning of section 
+ within the meaning of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Automatic-Licensing-of"
 
 \end_inset
@@ -11148,9 +11471,9 @@ You may not propagate or modify a covered work except as expressly provided
  under this License.
  Any attempt otherwise to propagate or modify it is void, and will automatically
  terminate your rights under this License (including any patent licenses
- granted under the third paragraph of section 
+ granted under the third paragraph of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:No-Surrender-of"
 
 \end_inset
@@ -11178,10 +11501,9 @@ Moreover, your license from a particular copyright holder is reinstated
 Termination of your rights under this section does not terminate the licenses
  of parties who have received copies or rights from you under this License.
  If your rights have been terminated and not permanently reinstated, you
- do not qualify to receive new licenses for the same material under section
- 
+ do not qualify to receive new licenses for the same material under 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Automatic-Licensing-of"
 
 \end_inset
@@ -11374,9 +11696,9 @@ Notwithstanding any other provision of this License, you have permission
  and to convey the resulting work.
  The terms of this License will continue to apply to the part which is the
  covered work, but the special requirements of the GNU Affero General Public
- License, section 
+ License, 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:No-Surrender-of"
 
 \end_inset
@@ -11475,16 +11797,16 @@ IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL
 \end_layout
 
 \begin_layout Subsubsection
-Interpretation of Sections 
+Interpretation of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Disclaimer-of-Warranty."
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:Limitation-of-Liability."
 
 \end_inset
@@ -11865,9 +12187,9 @@ You may copy and distribute the Document in any medium, either commercially
  further copying of the copies you make or distribute.
  However, you may accept compensation in exchange for copies.
  If you distribute a large enough number of copies you must also follow
- the conditions in section 
+ the conditions in 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:COPYING-IN-QUANTITY"
 
 \end_inset
@@ -11946,16 +12268,16 @@ name "sub:MODIFICATIONS"
 
 \begin_layout Standard
 You may copy and distribute a Modified Version of the Document under the
- conditions of sections 
+ conditions of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:VERBATIM-COPYING"
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:COPYING-IN-QUANTITY"
 
 \end_inset
@@ -12116,9 +12438,9 @@ COMBINING DOCUMENTS
 
 \begin_layout Standard
 You may combine the Document with other documents released under this License,
- under the terms defined in section 
+ under the terms defined in 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:MODIFICATIONS"
 
 \end_inset
@@ -12183,9 +12505,9 @@ n is not used to limit the legal rights of the compilation's users beyond
 \end_layout
 
 \begin_layout Standard
-If the Cover Text requirement of section 
+If the Cover Text requirement of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:COPYING-IN-QUANTITY"
 
 \end_inset
@@ -12204,9 +12526,9 @@ TRANSLATION
 
 \begin_layout Standard
 Translation is considered a kind of modification, so you may distribute
- translations of the Document under the terms of section 
+ translations of the Document under the terms of 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:MODIFICATIONS"
 
 \end_inset
@@ -12226,16 +12548,16 @@ reference "sub:MODIFICATIONS"
 
 \begin_layout Standard
 If a section in the Document is Entitled "Acknowledgements", "Dedications",
- or "History", the requirement (section 
+ or "History", the requirement (
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:MODIFICATIONS"
 
 \end_inset
 
-) to Preserve its Title (section 
+) to Preserve its Title (
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sub:APPLICABILITY-AND-DEFINITIONS"
 
 \end_inset

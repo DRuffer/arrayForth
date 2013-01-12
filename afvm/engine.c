@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program; if not, see http://www.gnu.org/licenses/.
+  along with this program; if not, see http://www.gnu.org/licenses/.
 */
 
 #include "mini.h"
@@ -26,14 +26,14 @@
 #define IF_spTOS(x) x
 #else
 #define IF_spTOS(x)
-#endif
+#endif
 
 #ifdef VM_DEBUG
 #define NAME(_x) if (vm_debug) {fprintf(vm_out, "%p: %-20s, ", ip-1, _x); \
                                 fprintf(vm_out,"fp=%p, sp=%p", fp, sp);}
 #else
 #define NAME(_x)
-#endif
+#endif
 
 /* different threading schemes for different architectures; the sparse
    numbering is there for historical reasons */
@@ -52,51 +52,51 @@
 #ifdef __GNUC__
 #if THREADING_SCHEME==1
 /* direct threading scheme 1: autoinc, long latency (HPPA, Sharc) */
-#  define NEXT_P0       ({cfa=*ip++;})
-#  define IP            (ip-1)
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-#  define NEXT_INST     (cfa)
-#  define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
-#  define DEF_CA
-#  define NEXT_P1
-#  define NEXT_P2       ({goto *cfa;})
+#  define NEXT_P0       ({cfa=*ip++;})
+#  define IP            (ip-1)
+#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
+#  define NEXT_INST     (cfa)
+#  define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
+#  define DEF_CA
+#  define NEXT_P1
+#  define NEXT_P2       ({goto *cfa;})
 #endif
 
 #if THREADING_SCHEME==3
 /* direct threading scheme 3: autoinc, low latency (68K) */
-#  define NEXT_P0
-#  define IP            (ip)
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-#  define NEXT_INST     (*ip)
-#  define INC_IP(const_inc) ({ip+=(const_inc);})
-#  define DEF_CA
-#  define NEXT_P1       ({cfa=*ip++;})
-#  define NEXT_P2       ({goto *cfa;})
+#  define NEXT_P0
+#  define IP            (ip)
+#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
+#  define NEXT_INST     (*ip)
+#  define INC_IP(const_inc) ({ip+=(const_inc);})
+#  define DEF_CA
+#  define NEXT_P1       ({cfa=*ip++;})
+#  define NEXT_P2       ({goto *cfa;})
 #endif
 
 #if THREADING_SCHEME==5
 /* direct threading scheme 5: early fetching (Alpha, MIPS) */
 #  define CFA_NEXT
-#  define NEXT_P0       ({cfa=*ip;})
-#  define IP            (ip)
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-#  define NEXT_INST     (cfa)
-#  define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
-#  define DEF_CA
-#  define NEXT_P1       (ip++)
-#  define NEXT_P2       ({goto *cfa;})
+#  define NEXT_P0       ({cfa=*ip;})
+#  define IP            (ip)
+#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
+#  define NEXT_INST     (cfa)
+#  define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
+#  define DEF_CA
+#  define NEXT_P1       (ip++)
+#  define NEXT_P2       ({goto *cfa;})
 #endif
 
 #if THREADING_SCHEME==8
 /* direct threading scheme 8: i386 hack */
-#  define NEXT_P0
-#  define IP            (ip)
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-#  define NEXT_INST     (*ip)
-#  define INC_IP(const_inc) ({ip+=(const_inc);})
-#  define DEF_CA
-#  define NEXT_P1       (ip++)
-#  define NEXT_P2       ({goto **(ip-1);})
+#  define NEXT_P0
+#  define IP            (ip)
+#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
+#  define NEXT_INST     (*ip)
+#  define INC_IP(const_inc) ({ip+=(const_inc);})
+#  define DEF_CA
+#  define NEXT_P1       (ip++)
+#  define NEXT_P2       ({goto **(ip-1);})
 #endif
 
 #if THREADING_SCHEME==9
@@ -104,57 +104,57 @@
 /* note that the "cfa=next_cfa;" occurs only in NEXT_P1, because this
    works out better with the capabilities of gcc to introduce and
    schedule the mtctr instruction. */
-#  define NEXT_P0
-#  define IP            ip
-#  define SET_IP(p)     ({ip=(p); next_cfa=*ip; NEXT_P0;})
-#  define NEXT_INST     (next_cfa)
-#  define INC_IP(const_inc) ({next_cfa=IP[const_inc]; ip+=(const_inc);})
-#  define DEF_CA
-#  define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
-#  define NEXT_P2       ({goto *cfa;})
+#  define NEXT_P0
+#  define IP            ip
+#  define SET_IP(p)     ({ip=(p); next_cfa=*ip; NEXT_P0;})
+#  define NEXT_INST     (next_cfa)
+#  define INC_IP(const_inc) ({next_cfa=IP[const_inc]; ip+=(const_inc);})
+#  define DEF_CA
+#  define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
+#  define NEXT_P2       ({goto *cfa;})
 #  define MORE_VARS     Inst next_cfa;
 #endif
 
 #if THREADING_SCHEME==10
 /* direct threading scheme 10: plain (no attempt at scheduling) */
-#  define NEXT_P0
-#  define IP            (ip)
-#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
-#  define NEXT_INST     (*ip)
-#  define INC_IP(const_inc) ({ip+=(const_inc);})
-#  define DEF_CA
-#  define NEXT_P1
-#  define NEXT_P2       ({cfa=*ip++; goto *cfa;})
+#  define NEXT_P0
+#  define IP            (ip)
+#  define SET_IP(p)     ({ip=(p); NEXT_P0;})
+#  define NEXT_INST     (*ip)
+#  define INC_IP(const_inc) ({ip+=(const_inc);})
+#  define DEF_CA
+#  define NEXT_P1
+#  define NEXT_P2       ({cfa=*ip++; goto *cfa;})
 #endif
 
 #define NEXT ({DEF_CA NEXT_P1; NEXT_P2;})
-#define IPTOS NEXT_INST
+#define IPTOS NEXT_INST
 
-#define INST_ADDR(name) (Label)&&I_##name
-#define LABEL(name) I_##name:
+#define INST_ADDR(name) (Label)&&I_##name
+#define LABEL(name) I_##name:
 #else /* !defined(__GNUC__) */
 /* use switch dispatch */
-#define DEF_CA
-#define NEXT_P0
-#define NEXT_P1
-#define NEXT_P2 goto next_inst;
-#define SET_IP(p)     (ip=(p))
-#define IP            ip
-#define NEXT_INST     (*ip)
-#define INC_IP(const_inc) (ip+=(const_inc))
-#define IPTOS NEXT_INST
-#define INST_ADDR(name) I_##name
-#define LABEL(name) case I_##name:
+#define DEF_CA
+#define NEXT_P0
+#define NEXT_P1
+#define NEXT_P2 goto next_inst;
+#define SET_IP(p)     (ip=(p))
+#define IP            ip
+#define NEXT_INST     (*ip)
+#define INC_IP(const_inc) (ip+=(const_inc))
+#define IPTOS NEXT_INST
+#define INST_ADDR(name) I_##name
+#define LABEL(name) case I_##name:
 
-#endif /* !defined(__GNUC__) */
+#endif /* !defined(__GNUC__) */
 
-#define LABEL2(x)
+#define LABEL2(x)
 
 #ifdef VM_PROFILING
 #define SUPER_END  vm_count_block(IP)
 #else
 #define SUPER_END
-#endif
+#endif
 
 #ifndef __GNUC__
 enum {
@@ -166,7 +166,7 @@ enum {
 #define MAYBE_UNUSED __attribute__((unused))
 #else
 #define MAYBE_UNUSED
-#endif
+#endif
 
 /* the return type can be anything you want it to */
 Cell engine(Inst *ip0, Cell *sp, char *fp)
@@ -178,7 +178,7 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
   Cell   spTOS;
 #else
 #define spTOS (sp[0])
-#endif
+#endif
   static Label labels[] = {
 #include "mini-labels.i"
   };
