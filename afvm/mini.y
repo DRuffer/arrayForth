@@ -1,4 +1,4 @@
-/* front-end compiler for vmgen example
+/* front-end compiler for afvm example
 
   Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
 

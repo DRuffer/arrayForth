@@ -1,4 +1,4 @@
-/* support functions for vmgen example
+/* support functions for afvm example
 
   Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
 
@@ -44,7 +44,7 @@ extern Inst *last_compiled;
 extern Inst *vmcode_end;
 extern int use_super;
 
-/* generic vmgen support functions (e.g., wrappers) */
+/* generic afvm support functions (e.g., wrappers) */
 void gen_inst(Inst **vmcodepp, Inst i);
 void init_peeptable(void);
 void vm_disassemble(Inst *ip, Inst *endp, Inst prim[]);

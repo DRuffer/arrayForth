@@ -1,4 +1,4 @@
-#Makefile for vmgen example
+#Makefile for afvm example
 
 #Copyright (C) 2001,2003,2007,2008 Free Software Foundation, Inc.
 

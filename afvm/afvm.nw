@@ -35,7 +35,7 @@
 
 \begin{document}
 
-\title{\textbf{Virtual Machine Generator}}
+\title{\textbf{ArrayForth Virtual Machine Generator}}
 
 \maketitle
 \noindent \begin{center}
@@ -308,9 +308,9 @@ casts and uses unions instead. In the rest of this manual we usually
 mention just files in \texttt{\textbf{vmgen-ex}}; if you want to use
 unions, use the equivalent file in \texttt{\textbf{vmgen-ex2}}.
 
-You can build the example by cding into the example's directory, and
-then typing \texttt{\textbf{make}}; you can check that it works with
-\texttt{\textbf{make check}}. You can run run \texttt{\textbf{mini}}
+You can build the example by \texttt{\textbf{cd}}ing into the example's
+directory, and then typing \texttt{\textbf{make}}; you can check that
+it works with \texttt{\textbf{make check}}. You can run run \texttt{\textbf{mini}}
 programs like this:
 \begin{quotation}
 \texttt{\textbf{./mini fib.mini}}
@@ -619,14 +619,14 @@ the first one (just as the intuition suggests).
 \paragraph{Explicit stack access}
 
 This feature is not needed and not supported in the 0.7.9 version
-of vmgen that is documented here (and that is invoked by default).
+of Vmgen that is documented here (and that is invoked by default).
 
 Not all stack effects can be specified using the stack effect specifications
 above. For VM instructions that have other stack effects, you can
 specify them explicitly by accessing the stack pointer in the C code;
 however, you have to notify Vmgen of such explicit stack accesses,
-otherwise Vmgens optimizations could conflict with your explicit stack
-accesses.
+otherwise Vmgen's optimizations could conflict with your explicit
+stack accesses.
 
 You notify Vmgen by putting \texttt{\textbf{...}} with the appropriate
 stack prefix into the stack comment. Then the VM instruction will
@@ -2044,7 +2044,7 @@ You would typically change much in or replace the following files:
 \subsubsection{\textit{Makefile} }
 
 <<Makefile>>=
-#Makefile for vmgen example
+#Makefile for afvm example
 
 <<make-copyright>>
 
@@ -2103,7 +2103,7 @@ checkall:
 \subsubsection{Support.c - main() and other support functions\label{sub:Support.c---main()}}
 
 <<support.c>>=
-/* support functions and main() for vmgen example
+/* support functions and main() for afvm example
 
 <<copyright>>
 */
@@ -2308,7 +2308,7 @@ int main(int argc, char **argv)
 \subsubsection{mini.h - common declarations}
 
 <<mini.h>>=
-/* support functions for vmgen example
+/* support functions for afvm example
 
 <<copyright>>
 */
@@ -2339,7 +2339,7 @@ extern Inst *last_compiled;
 extern Inst *vmcode_end;
 extern int use_super;
 
-/* generic vmgen support functions (e.g., wrappers) */
+/* generic afvm support functions (e.g., wrappers) */
 void gen_inst(Inst **vmcodepp, Inst i);
 void init_peeptable(void);
 void vm_disassemble(Inst *ip, Inst *endp, Inst prim[]);
@@ -2427,7 +2427,7 @@ include(mini-super.vmg)
 
 <<mini.l>>=
 %{
-/* front-end scanner for vmgen example
+/* front-end scanner for afvm example
 
 <<copyright>>
 */
@@ -2468,7 +2468,7 @@ print  return PRINT;
 \subsubsection{mini.y - front end (parser, VM code generator)}
 
 <<mini.y>>=
-/* front-end compiler for vmgen example
+/* front-end compiler for afvm example
 
 <<copyright>>
 */
