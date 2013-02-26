@@ -3,4 +3,4 @@ awk -f stat.awk fib.prof test.prof| \
 awk '$3>=10000'| #select sequences \
 fgrep -v -f peephole-blacklist| #eliminate wrong instructions \
 awk -f seq2rule.awk| #transform sequences into superinstruction rules \
-sort -k 3 >mini-super.vmg #sort sequences
+sort -k 3 >afvm-super.vmg #sort sequences

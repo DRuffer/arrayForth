@@ -1,4 +1,4 @@
-\ mini.inst is generated automatically from mini-inst.vmg and mini-super.vmg
+\ afvm.inst is generated automatically from afvm-inst.vmg and afvm-super.vmg
 \ example .vmg file
 
 \ Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
@@ -134,4 +134,4 @@ block_insert(IP); /* we also do this at compile time, so this is unnecessary */
 #endif
 return i;
 
-include(mini-super.vmg)
+include(afvm-super.vmg)

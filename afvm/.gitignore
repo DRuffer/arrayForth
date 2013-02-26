@@ -1,10 +1,10 @@
 *.o
-mini
-mini.exe
-mini-*.i
+afvm
+afvm.exe
+afvm-*.i
 lex.yy.c
-mini.tab.c
-mini.vmg
+afvm.tab.c
+afvm.vmg
 afvm.aux
 afvm.log
 afvm.out

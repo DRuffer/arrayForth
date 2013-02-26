@@ -19,7 +19,7 @@
 */
 
 #include <stdlib.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* the numbers in this struct are primitive indices */
 typedef struct Combination {
@@ -29,7 +29,7 @@ typedef struct Combination {
 } Combination;
 
 Combination peephole_table[] = {
-#include "mini-peephole.i"
+#include "afvm-peephole.i"
 #ifndef __GNUC__
   {-1,-1,-1} /* unnecessary; just to shut up lcc if the file is empty */
 #endif

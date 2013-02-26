@@ -10,13 +10,13 @@ Ignore the warnings.  You can check that it works with
 
 make check
 
-You can run mini programs like this:
+You can run afvm programs like this:
 
-./mini fib.mini
+./afvm fib.afvm
 
 To learn about the options, type
 
-./mini -h
+./afvm -h
 
 More information can be found in the vmgen documentation.
 

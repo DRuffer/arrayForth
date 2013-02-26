@@ -69,7 +69,7 @@ void vm_print_profile(FILE *file);
 
 #define VM_IS_INST(inst, n) ((inst) == vm_prim[n])
 
-/* mini type-specific support functions */
+/* afvm type-specific support functions */
 void genarg_i(Inst **vmcodepp, Cell i);
 void printarg_i(Cell i);
 void genarg_target(Inst **vmcodepp, Inst *target);
@@ -84,7 +84,7 @@ Cell engine_debug(Inst *ip0, Cell *sp, char *fp);
 /* other generic functions */
 int yyparse(void);
 
-/* mini-specific functions */
+/* afvm-specific functions */
 void insert_func(char *name, Inst *start, int locals, int nonparams);
 Inst *func_addr(char *name);
 Cell func_calladjust(char *name);

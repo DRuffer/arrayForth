@@ -26,48 +26,48 @@ GCC=gcc -O3 -fomit-frame-pointer -Wall
 CC=$(GCC)
 M4=m4 -s #recommended if supported
 #M4=m4
-OBJECTS_MINI=mini.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
+OBJECTS_AFVM=afvm.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
 
-mini: $(OBJECTS_MINI)
-	$(CC) $(OBJECTS_MINI) -o $@
+afvm: $(OBJECTS_AFVM)
+	$(CC) $(OBJECTS_AFVM) -o $@
 
-lex.yy.c: mini.l
-	$(LEX) mini.l
+lex.yy.c: afvm.l
+	$(LEX) afvm.l
 
-mini.tab.c: mini.y lex.yy.c
-	$(YACC) mini.y && mv y.tab.c $@
+afvm.tab.c: afvm.y lex.yy.c
+	$(YACC) afvm.y && mv y.tab.c $@
 
-mini-vm.i mini-disasm.i mini-gen.i mini-labels.i mini-profile.i mini-peephole.i: mini.vmg
-	$(VMGEN) mini.vmg
+afvm-vm.i afvm-disasm.i afvm-gen.i afvm-labels.i afvm-profile.i afvm-peephole.i: afvm.vmg
+	$(VMGEN) afvm.vmg
 
-mini.vmg: mini-inst.vmg mini-super.vmg
-	$(M4) mini-inst.vmg >$@
+afvm.vmg: afvm-inst.vmg afvm-super.vmg
+	$(M4) afvm-inst.vmg >$@
 
-mini.tab.o: mini.tab.c mini-gen.i lex.yy.c mini.h
+afvm.tab.o: afvm.tab.c afvm-gen.i lex.yy.c afvm.h
 
-support.o: support.c mini.h
+support.o: support.c afvm.h
 
-peephole.o: peephole.c mini-peephole.i mini.h
+peephole.o: peephole.c afvm-peephole.i afvm.h
 
-profile.o: profile.c mini-profile.i mini.h
+profile.o: profile.c afvm-profile.i afvm.h
 
-disasm.o: disasm.c mini-disasm.i mini.h
+disasm.o: disasm.c afvm-disasm.i afvm.h
 
-engine.o: engine.c mini-vm.i mini-labels.i mini.h
+engine.o: engine.c afvm-vm.i afvm-labels.i afvm.h
 
-engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
+engine-debug.o: engine.c afvm-vm.i afvm-labels.i afvm.h
 	$(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
 
 clean:
-	rm -f *.*~ *.o mini mini.exe mini-*.i lex.yy.c mini.tab.c mini.vmg
+	rm -f *.*~ *.o afvm afvm.exe afvm-*.i lex.yy.c afvm.tab.c afvm.vmg
 	rm -f afvm.aux afvm.log afvm.out afvm.toc comment.cut texput.log
 
-check:  mini
-	./mini test.mini | tr -d '\015' | diff - test.out
+check:  afvm
+	./afvm test.afvm | tr -d '\015' | diff - test.out
 
 checkall:
-	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
+	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \time afvm fib.afvm 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
 
 #make profiles
-%.prof: %.mini mini
-	./mini -p $< 2>$@
+%.prof: %.afvm afvm
+	./afvm -p $< 2>$@

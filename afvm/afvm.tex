@@ -299,7 +299,7 @@ The command-line options supported by Vmgen are
 There are two versions of the same example for using Vmgen: \texttt{\textbf{vmgen-ex}}
 and \texttt{\textbf{vmgen-ex2}} (you can also see Gforth as example,
 but it uses additional (undocumented) features, and also differs in
-some other respects). The example implements \texttt{\textbf{mini}},
+some other respects). The example implements \texttt{\textbf{afvm}},
 a tiny Modula-2-like language with a small JavaVM-like virtual machine.
 
 The difference between the examples is that \texttt{\textbf{vmgen-ex}}
@@ -310,12 +310,12 @@ unions, use the equivalent file in \texttt{\textbf{vmgen-ex2}}.
 
 You can build the example by \texttt{\textbf{cd}}ing into the example's
 directory, and then typing \texttt{\textbf{make}}; you can check that
-it works with \texttt{\textbf{make check}}. You can run run \texttt{\textbf{mini}}
+it works with \texttt{\textbf{make check}}. You can run run \texttt{\textbf{afvm}}
 programs like this:
 \begin{quotation}
-\texttt{\textbf{./mini fib.mini}}
+\texttt{\textbf{./afvm fib.afvm}}
 \end{quotation}
-To learn about the options, type \texttt{\textbf{./mini -h}}.
+To learn about the options, type \texttt{\textbf{./afvm -h}}.
 
 
 \subsubsection{Using profiling to create superinstructions\label{sub:Using-profiling-to}}
@@ -325,7 +325,7 @@ I have not added rules for this in the \texttt{\textbf{Makefile}}
 not want to hardcode one into the \texttt{\textbf{Makefile}}), but
 there are some supporting scripts, and here's an example:
 
-Suppose you want to use \texttt{\textbf{fib.mini}} and \texttt{\textbf{test.mini}}
+Suppose you want to use \texttt{\textbf{fib.afvm}} and \texttt{\textbf{test.afvm}}
 as training programs, you get the profiles like this:
 \begin{quotation}
 \texttt{\textbf{make fib.prof test.prof}}
@@ -353,15 +353,15 @@ awk -f stat.awk fib.prof test.prof| \\
 awk '$3>=10000'| #select sequences \\
 fgrep -v -f peephole-blacklist| #eliminate wrong instructions \\
 awk -f seq2rule.awk| #transform sequences into superinstruction rules \\
-sort -k 3 >mini-super.vmg #sort sequences
+sort -k 3 >afvm-super.vmg #sort sequences
 \nwnotused{profile-fib-test}\nwendcode{}\nwbegindocs{2}\nwdocspar
 
 The file \texttt{\textbf{peephole-blacklist}} contains all instructions
-that directly access a stack or stack pointer (for mini: \texttt{\textbf{call}},
+that directly access a stack or stack pointer (for afvm: \texttt{\textbf{call}},
 \texttt{\textbf{return}}); the sort step is necessary to ensure that
 prefixes precede larger superinstructions.
 
-Now you can create a version of mini with superinstructions by just
+Now you can create a version of afvm with superinstructions by just
 saying \textquoteleft{}\texttt{\textbf{make}}\textquoteright{}
 
 
@@ -538,7 +538,7 @@ drop ( i -- )
 
 print ( i -- )
 printf("%ld\\n", i);
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
 
 The first line specifies the name of the VM instruction (e.g. \texttt{\textbf{sub}})
 and its stack effect (e.g. \texttt{\textbf{i1 i2 -{}- i}}). The rest
@@ -561,10 +561,10 @@ prefix first:
 \\E s" Cell"   single data-stack type-prefix i
 \\E s" char *" single data-stack type-prefix a
 \\E s" Inst *" single data-stack type-prefix target
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{8}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{8}\nwdocspar
 
 This defines the prefix \texttt{\textbf{i}} to refer to the type \texttt{\textbf{Cell}}
-(defined as \texttt{\textbf{long}} in \texttt{\textbf{mini.h}}) and,
+(defined as \texttt{\textbf{long}} in \texttt{\textbf{afvm.h}}) and,
 by default, to the \texttt{\textbf{data-stack}}. It also specifies
 that this type takes one stack item (\texttt{\textbf{single}}). The
 type prefix is part of the variable name.
@@ -575,7 +575,7 @@ to define it:
 \nwenddocs{}\nwbegincode{9}\sublabel{NWafv7-staH-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-staH-1}}}\moddef{stack-definitions~{\nwtagstyle{}\subpageref{NWafv7-staH-1}}}\endmoddef
 \\ stack definitions:
 \\E stack data-stack sp Cell
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{10}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{10}\nwdocspar
 
 This line defines the stack data-stack, which uses the stack pointer
 \texttt{\textbf{sp}}, and each item has the basic type \texttt{\textbf{Cell}};
@@ -601,7 +601,7 @@ part of the variable name. Stack prefixes are defined like this:
 \\ stack prefix definitions
 \\E inst-stream stack-prefix #
 \\E data-stack  stack-prefix S:
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{14}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{14}\nwdocspar
 
 This definition defines that the stack prefix \texttt{\textbf{\#}}
 specifies the \textquotedblleft{}stack\textquotedblright{} \texttt{\textbf{inst-stream}}.
@@ -681,7 +681,7 @@ sequences). On the C level, this also sets the instruction pointer.
 \nwenddocs{}\nwbegincode{17}\sublabel{NWafv7-bra6-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-bra6-1}}}\moddef{branch~{\nwtagstyle{}\subpageref{NWafv7-bra6-1}}}\endmoddef
 branch ( #target -- )
 SET_IP(target);
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{18}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{18}\nwdocspar
 
 \begin{description}
 \item [{SUPER\_END}] This ends a basic block (for profiling), even if the
@@ -696,7 +696,7 @@ end ( i -- )
 block_insert(IP); /* we also do this at compile time, so this is unnecessary */
 #endif
 return i;
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{20}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{20}\nwdocspar
 
 \begin{description}
 \item [{INST\_TAIL;}] Vmgen replaces \textquoteleft{}\texttt{\textbf{INST\_TAIL;}}\textquoteright{}
@@ -716,7 +716,7 @@ if (i==0) \{
   SET_IP(target);
   INST_TAIL;
 \}
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{22}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{22}\nwdocspar
 
 \begin{description}
 \item [{SUPER\_CONTINUE}] This indicates that the implicit tail at the
@@ -796,7 +796,7 @@ i = *(Cell *)(fp+ioffset);
 
 storelocal ( #ioffset i -- )
 *(Cell *)(fp+ioffset) = i;
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{26}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{26}\nwdocspar
 
 \begin{itemize}
 \item The Vmgen-erated code loads the stack items from stack-pointer-indexed
@@ -862,7 +862,7 @@ enough Forth to program it, let me know.
 \\     intermediate results <-- sp
 \\  ---------------------- top of stack
 \\  lower addresses
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{30}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{30}\nwdocspar
 
 
 \subsubsection{Superinstructions\label{sub:Superinstructions}}
@@ -878,7 +878,7 @@ Here is an example of a superinstruction definition:
 
 \nwenddocs{}\nwbegincode{31}\sublabel{NWafv7-ll-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-ll-1}}}\moddef{ll~{\nwtagstyle{}\subpageref{NWafv7-ll-1}}}\endmoddef
 ll = loadlocal lit
-\nwused{\\{NWafv7-minE-1}}\nwendcode{}\nwbegindocs{32}\nwdocspar
+\nwused{\\{NWafv7-afvE-1}}\nwendcode{}\nwbegindocs{32}\nwdocspar
 
 \texttt{\textbf{ll}} is the name of the superinstruction, and \texttt{\textbf{loadlocal}}
 and \texttt{\textbf{lit}} are its components. This superinstruction
@@ -1112,7 +1112,7 @@ to choose between these methods, and our example does so.
    best to build them all and select the fastest instead of hardwiring
    a specific scheme for an architecture.  E.g., scheme 8 is fastest
    for Gforth "make bench" on a 486, whereas scheme 5 is fastest for
-   "mini fib.mini" on an Athlon */
+   "afvm fib.afvm" on an Athlon */
 #ifndef THREADING_SCHEME
 #define THREADING_SCHEME 5
 #endif /* defined(THREADING_SCHEME) */
@@ -1422,7 +1422,7 @@ expensive).
 #define vm_Cell2Cell(_x,_y)     ((_y)=(Cell)(_x))
 /* the cast in vm_Cell2Cell is needed because the base type for
    inst-stream is Cell, but *IP is an Inst */
-\nwused{\\{NWafv7-min6-1}}\nwendcode{}\nwbegindocs{88}\nwdocspar
+\nwused{\\{NWafv7-afv6-1}}\nwendcode{}\nwbegindocs{88}\nwdocspar
 
 \begin{description}
 \item [{vm\_twoA2B(a1,a2,b)~vm\_B2twoA(b,a1,a2)}] Type casting between
@@ -1454,7 +1454,7 @@ This is just a placeholder for future extensions.
 \nwenddocs{}\nwbegincode{95}\sublabel{NWafv7-IMM7-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-IMM7-1}}}\moddef{IMM-ARG~{\nwtagstyle{}\subpageref{NWafv7-IMM7-1}}}\endmoddef
 /* for future extensions */
 #define IMM_ARG(access,value) (access)
-\nwused{\\{NWafv7-min6-1}}\nwendcode{}\nwbegindocs{96}\nwdocspar
+\nwused{\\{NWafv7-afv6-1}}\nwendcode{}\nwbegindocs{96}\nwdocspar
 
 \begin{description}
 \item [{stackpointerTOS}] The top-of-stack for the stack pointed to by
@@ -1629,7 +1629,7 @@ call \texttt{\textbf{BB\_BOUNDARY}} at every basic block entry point
 if you ever want to use superinstructions (or if you want to use the
 profiling supported by Vmgen; but this support is also useful mainly
 for selecting superinstructions). If you use \texttt{\textbf{BB\_BOUNDARY}},
-you should also define it (take a look at its definition in \texttt{\textbf{vmgen-ex/mini.y}}).
+you should also define it (take a look at its definition in \texttt{\textbf{vmgen-ex/afvm.y}}).
 
 You do not need to call \texttt{\textbf{BB\_BOUNDARY}} after branches,
 because you will not define superinstructions that contain branches
@@ -1853,13 +1853,13 @@ Ignore the warnings.  You can check that it works with
 
 make check
 
-You can run mini programs like this:
+You can run afvm programs like this:
 
-./mini fib.mini
+./afvm fib.afvm
 
 To learn about the options, type
 
-./mini -h
+./afvm -h
 
 More information can be found in the vmgen documentation.
 
@@ -1868,18 +1868,18 @@ More information can be found in the vmgen documentation.
 \nwnotused{README}\nwendcode{}\nwbegindocs{112}\nwdocspar
 
 
-\subsubsection{simple.mini - example mini program}
+\subsubsection{simple.afvm - example afvm program}
 
-\nwenddocs{}\nwbegincode{113}\sublabel{NWafv7-simB-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-simB-1}}}\moddef{simple.mini~{\nwtagstyle{}\subpageref{NWafv7-simB-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{113}\sublabel{NWafv7-simB-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-simB-1}}}\moddef{simple.afvm~{\nwtagstyle{}\subpageref{NWafv7-simB-1}}}\endmoddef
 func main()
   return 1;
 end func;
-\nwnotused{simple.mini}\nwendcode{}\nwbegindocs{114}\nwdocspar
+\nwnotused{simple.afvm}\nwendcode{}\nwbegindocs{114}\nwdocspar
 
 
-\subsubsection{fib.mini - example mini program}
+\subsubsection{fib.afvm - example afvm program}
 
-\nwenddocs{}\nwbegincode{115}\sublabel{NWafv7-fib8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-fib8-1}}}\moddef{fib.mini~{\nwtagstyle{}\subpageref{NWafv7-fib8-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{115}\sublabel{NWafv7-fib8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-fib8-1}}}\moddef{fib.afvm~{\nwtagstyle{}\subpageref{NWafv7-fib8-1}}}\endmoddef
 func fib(n)
   var r;
   if n<2 then
@@ -1894,12 +1894,12 @@ end func;
 func main()
   return fib(34);
 end func;
-\nwnotused{fib.mini}\nwendcode{}\nwbegindocs{116}\nwdocspar
+\nwnotused{fib.afvm}\nwendcode{}\nwbegindocs{116}\nwdocspar
 
 
-\subsubsection{test.mini - example mini program (tests everything)}
+\subsubsection{test.afvm - example afvm program (tests everything)}
 
-\nwenddocs{}\nwbegincode{117}\sublabel{NWafv7-tes9-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-tes9-1}}}\moddef{test.mini~{\nwtagstyle{}\subpageref{NWafv7-tes9-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{117}\sublabel{NWafv7-tes9-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-tes9-1}}}\moddef{test.afvm~{\nwtagstyle{}\subpageref{NWafv7-tes9-1}}}\endmoddef
 func operators()
   print 3 = 3;
   print (3+5) = 8;
@@ -1993,10 +1993,10 @@ func main()
   testfac();
   return 0;
 end func;
-\nwnotused{test.mini}\nwendcode{}\nwbegindocs{118}\nwdocspar
+\nwnotused{test.afvm}\nwendcode{}\nwbegindocs{118}\nwdocspar
 
 
-\paragraph{test.out - test.mini output}
+\paragraph{test.out - test.afvm output}
 
 \nwenddocs{}\nwbegincode{119}\sublabel{NWafv7-tes8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-tes8-1}}}\moddef{test.out~{\nwtagstyle{}\subpageref{NWafv7-tes8-1}}}\endmoddef
 1
@@ -2036,7 +2036,7 @@ result = 0
 \nwnotused{test.out}\nwendcode{}\nwbegindocs{120}\nwdocspar
 
 
-\subsection{Mini specific files}
+\subsection{afvm specific files}
 
 You would typically change much in or replace the following files:
 
@@ -2056,60 +2056,60 @@ VMGEN=vmgen
 GCC=gcc -O3 -fomit-frame-pointer -Wall
 CC=$(GCC)
 \LA{}M4~{\nwtagstyle{}\subpageref{NWafv7-M4-1}}\RA{}
-OBJECTS_MINI=mini.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
+OBJECTS_AFVM=afvm.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
 
-mini: $(OBJECTS_MINI)
-        $(CC) $(OBJECTS_MINI) -o $@
+afvm: $(OBJECTS_AFVM)
+        $(CC) $(OBJECTS_AFVM) -o $@
 
-lex.yy.c: mini.l
-        $(LEX) mini.l
+lex.yy.c: afvm.l
+        $(LEX) afvm.l
 
-mini.tab.c: mini.y lex.yy.c
-        $(YACC) mini.y && mv y.tab.c $@
+afvm.tab.c: afvm.y lex.yy.c
+        $(YACC) afvm.y && mv y.tab.c $@
 
-mini-vm.i mini-disasm.i mini-gen.i mini-labels.i mini-profile.i mini-peephole.i: mini.vmg
-        $(VMGEN) mini.vmg
+afvm-vm.i afvm-disasm.i afvm-gen.i afvm-labels.i afvm-profile.i afvm-peephole.i: afvm.vmg
+        $(VMGEN) afvm.vmg
 
-mini.vmg: mini-inst.vmg mini-super.vmg
-        $(M4) mini-inst.vmg >$@
+afvm.vmg: afvm-inst.vmg afvm-super.vmg
+        $(M4) afvm-inst.vmg >$@
 
-mini.tab.o: mini.tab.c mini-gen.i lex.yy.c mini.h
+afvm.tab.o: afvm.tab.c afvm-gen.i lex.yy.c afvm.h
 
-support.o: support.c mini.h
+support.o: support.c afvm.h
 
-peephole.o: peephole.c mini-peephole.i mini.h
+peephole.o: peephole.c afvm-peephole.i afvm.h
 
-profile.o: profile.c mini-profile.i mini.h
+profile.o: profile.c afvm-profile.i afvm.h
 
-disasm.o: disasm.c mini-disasm.i mini.h
+disasm.o: disasm.c afvm-disasm.i afvm.h
 
 \LA{}engine~{\nwtagstyle{}\subpageref{NWafv7-eng6-1}}\RA{}
 
 clean:
-        rm -f *.*~ *.o mini mini.exe mini-*.i lex.yy.c mini.tab.c mini.vmg
+        rm -f *.*~ *.o afvm afvm.exe afvm-*.i lex.yy.c afvm.tab.c afvm.vmg
         rm -f afvm.aux afvm.log afvm.out afvm.toc comment.cut texput.log
 
-check:  mini
-        ./mini test.mini | tr -d '\\015' | diff - test.out
+check:  afvm
+        ./afvm test.afvm | tr -d '\\015' | diff - test.out
 
 checkall:
-        for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \\time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
+        for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \\time afvm fib.afvm 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
 
 #make profiles
-%.prof: %.mini mini
-        ./mini -p $< 2>$@
+%.prof: %.afvm afvm
+        ./afvm -p $< 2>$@
 \nwnotused{Makefile}\nwendcode{}\nwbegindocs{122}\nwdocspar
 
 We can also tell git to ignore the build artifacts.
 
 \nwenddocs{}\nwbegincode{123}\sublabel{NWafv7-.giA-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-.giA-1}}}\moddef{.gitignore~{\nwtagstyle{}\subpageref{NWafv7-.giA-1}}}\endmoddef
 *.o
-mini
-mini.exe
-mini-*.i
+afvm
+afvm.exe
+afvm-*.i
 lex.yy.c
-mini.tab.c
-mini.vmg
+afvm.tab.c
+afvm.vmg
 \nwalsodefined{\\{NWafv7-.giA-2}}\nwnotused{.gitignore}\nwendcode{}\nwbegindocs{124}\nwdocspar
 
 
@@ -2127,7 +2127,7 @@ mini.vmg
 extern int optind;
 
 #include <assert.h>
-#include "mini.h"
+#include "afvm.h"
 
 void genarg_i(Inst **vmcodepp, Cell i)
 \{
@@ -2318,9 +2318,9 @@ int main(int argc, char **argv)
 \nwnotused{support.c}\nwendcode{}\nwbegindocs{126}\nwdocspar
 
 
-\subsubsection{mini.h - common declarations}
+\subsubsection{afvm.h - common declarations}
 
-\nwenddocs{}\nwbegincode{127}\sublabel{NWafv7-min6-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-min6-1}}}\moddef{mini.h~{\nwtagstyle{}\subpageref{NWafv7-min6-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{127}\sublabel{NWafv7-afv6-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-afv6-1}}}\moddef{afvm.h~{\nwtagstyle{}\subpageref{NWafv7-afv6-1}}}\endmoddef
 /* support functions for afvm example
 
 \LA{}copyright~{\nwtagstyle{}\subpageref{NWafv7-cop9-1}}\RA{}
@@ -2366,7 +2366,7 @@ void vm_print_profile(FILE *file);
 
 #define VM_IS_INST(inst, n) ((inst) == vm_prim[n])
 
-/* mini type-specific support functions */
+/* afvm type-specific support functions */
 void genarg_i(Inst **vmcodepp, Cell i);
 void printarg_i(Cell i);
 void genarg_target(Inst **vmcodepp, Inst *target);
@@ -2381,7 +2381,7 @@ Cell engine_debug(Inst *ip0, Cell *sp, char *fp);
 /* other generic functions */
 int yyparse(void);
 
-/* mini-specific functions */
+/* afvm-specific functions */
 void insert_func(char *name, Inst *start, int locals, int nonparams);
 Inst *func_addr(char *name);
 Cell func_calladjust(char *name);
@@ -2391,13 +2391,13 @@ void gen_main_end(void);
 
 /* stack pointer change for a function with n nonparams */
 #define adjust(n)  ((n) * -sizeof(Cell))
-\nwnotused{mini.h}\nwendcode{}\nwbegindocs{128}\nwdocspar
+\nwnotused{afvm.h}\nwendcode{}\nwbegindocs{128}\nwdocspar
 
 
-\subsubsection{mini-inst.vmg - simple VM instructions}
+\subsubsection{afvm-inst.vmg - simple VM instructions}
 
-\nwenddocs{}\nwbegincode{129}\sublabel{NWafv7-minD-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-minD-1}}}\moddef{mini-inst.vmg~{\nwtagstyle{}\subpageref{NWafv7-minD-1}}}\endmoddef
-\\ mini.inst is generated automatically from mini-inst.vmg and mini-super.vmg
+\nwenddocs{}\nwbegincode{129}\sublabel{NWafv7-afvD-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-afvD-1}}}\moddef{afvm-inst.vmg~{\nwtagstyle{}\subpageref{NWafv7-afvD-1}}}\endmoddef
+\\ afvm.inst is generated automatically from afvm-inst.vmg and afvm-super.vmg
 \\ example .vmg file
 
 \LA{}\copyright~{\nwtagstyle{}\subpageref{NWafv7-*coA-1}}\RA{}
@@ -2425,20 +2425,20 @@ void gen_main_end(void);
 
 \LA{}end~{\nwtagstyle{}\subpageref{NWafv7-end3-1}}\RA{}
 
-include(mini-super.vmg)
-\nwnotused{mini-inst.vmg}\nwendcode{}\nwbegindocs{130}\nwdocspar
+include(afvm-super.vmg)
+\nwnotused{afvm-inst.vmg}\nwendcode{}\nwbegindocs{130}\nwdocspar
 
 
-\subsubsection{mini-super.vmg - superinstructions (empty at first)}
+\subsubsection{afvm-super.vmg - superinstructions (empty at first)}
 
-\nwenddocs{}\nwbegincode{131}\sublabel{NWafv7-minE-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-minE-1}}}\moddef{mini-super.vmg~{\nwtagstyle{}\subpageref{NWafv7-minE-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{131}\sublabel{NWafv7-afvE-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-afvE-1}}}\moddef{afvm-super.vmg~{\nwtagstyle{}\subpageref{NWafv7-afvE-1}}}\endmoddef
 \LA{}ll~{\nwtagstyle{}\subpageref{NWafv7-ll-1}}\RA{}
-\nwnotused{mini-super.vmg}\nwendcode{}\nwbegindocs{132}\nwdocspar
+\nwnotused{afvm-super.vmg}\nwendcode{}\nwbegindocs{132}\nwdocspar
 
 
-\subsubsection{mini.l - scanner}
+\subsubsection{afvm.l - scanner}
 
-\nwenddocs{}\nwbegincode{133}\sublabel{NWafv7-min6.2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-min6.2-1}}}\moddef{mini.l~{\nwtagstyle{}\subpageref{NWafv7-min6.2-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{133}\sublabel{NWafv7-afv6.2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-afv6.2-1}}}\moddef{afvm.l~{\nwtagstyle{}\subpageref{NWafv7-afv6.2-1}}}\endmoddef
 %\{
 /* front-end scanner for afvm example
 
@@ -2475,12 +2475,12 @@ print  return PRINT;
 [/][/].* ;
 . yyerror("illegal character"); exit(1);
 %%
-\nwnotused{mini.l}\nwendcode{}\nwbegindocs{134}\nwdocspar
+\nwnotused{afvm.l}\nwendcode{}\nwbegindocs{134}\nwdocspar
 
 
-\subsubsection{mini.y - front end (parser, VM code generator)}
+\subsubsection{afvm.y - front end (parser, VM code generator)}
 
-\nwenddocs{}\nwbegincode{135}\sublabel{NWafv7-min6.3-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-min6.3-1}}}\moddef{mini.y~{\nwtagstyle{}\subpageref{NWafv7-min6.3-1}}}\endmoddef
+\nwenddocs{}\nwbegincode{135}\sublabel{NWafv7-afv6.3-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-afv6.3-1}}}\moddef{afvm.y~{\nwtagstyle{}\subpageref{NWafv7-afv6.3-1}}}\endmoddef
 /* front-end compiler for afvm example
 
 \LA{}copyright~{\nwtagstyle{}\subpageref{NWafv7-cop9-1}}\RA{}
@@ -2494,7 +2494,7 @@ print  return PRINT;
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* BB_BOUNDARY is needed on basic blocks without a preceding VM branch */
 #define BB_BOUNDARY (last_compiled = NULL,  /* suppress peephole opt */ \\
@@ -2516,13 +2516,13 @@ void yyerror(char *s)
 #endif
 \}
 
-#include "mini-gen.i"
+#include "afvm-gen.i"
 
 void gen_main_end(void)
 \{
   gen_call(&vmcodep, func_addr("main"), func_calladjust("main"));
   gen_end(&vmcodep);
-  BB_BOUNDARY; /* for profiling; see comment in mini.vmg:end */
+  BB_BOUNDARY; /* for profiling; see comment in afvm.vmg:end */
 \}
 
 int locals=0;
@@ -2608,7 +2608,7 @@ int yywrap(void)
 \}
 
 #include "lex.yy.c"
-\nwnotused{mini.y}\nwendcode{}\nwbegindocs{136}\nwdocspar
+\nwnotused{afvm.y}\nwendcode{}\nwbegindocs{136}\nwdocspar
 
 
 \subsubsection{peephole-blacklist - list of instructions not allowed in superinstructions}
@@ -2635,7 +2635,7 @@ and change little, if anything:
 */
 
 #include <stdlib.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* the numbers in this struct are primitive indices */
 typedef struct Combination \{
@@ -2645,7 +2645,7 @@ typedef struct Combination \{
 \} Combination;
 
 Combination peephole_table[] = \{
-#include "mini-peephole.i"
+#include "afvm-peephole.i"
 #ifndef __GNUC__
   \{-1,-1,-1\} /* unnecessary; just to shut up lcc if the file is empty */
 #endif
@@ -2731,7 +2731,7 @@ void gen_inst(Inst **vmcodepp, Inst i)
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* data structure: simple hash table with external chaining */
 
@@ -2803,7 +2803,7 @@ void postprocess_block(block_count *b)
   block_count *next_block=NULL;
 
   while (next_block == NULL && ip<vmcode_end) \{
-#include "mini-profile.i"
+#include "afvm-profile.i"
     /* else */
     \{
       add_inst(b,"unknown");
@@ -2882,7 +2882,7 @@ void vm_print_profile(FILE *file)
 \LA{}copyright~{\nwtagstyle{}\subpageref{NWafv7-cop9-1}}\RA{}
 */
 
-#include "mini.h"
+#include "afvm.h"
 
 #define IP (ip+1)
 #define IPTOS IP[0]
@@ -2891,7 +2891,7 @@ void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
 \{
   while (ip<endp) \{
     fprintf(vm_out,"%p: ",ip);
-#include "mini-disasm.i"
+#include "afvm-disasm.i"
     \{
       fprintf(vm_out,"unknown instruction %p",ip[0]);
       ip++;
@@ -2906,9 +2906,9 @@ void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
 \subsubsection{engine.c - wrapper file\label{sub:engine.c---wrapper}}
 
 \nwenddocs{}\nwbegincode{145}\sublabel{NWafv7-eng6-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-eng6-1}}}\moddef{engine~{\nwtagstyle{}\subpageref{NWafv7-eng6-1}}}\endmoddef
-engine.o: engine.c mini-vm.i mini-labels.i mini.h
+engine.o: engine.c afvm-vm.i afvm-labels.i afvm.h
 
-engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
+engine-debug.o: engine.c afvm-vm.i afvm-labels.i afvm.h
         $(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
 \nwused{\\{NWafv7-Mak8-1}}\nwendcode{}\nwbegindocs{146}\nwdocspar
 \nwenddocs{}\nwbegincode{147}\sublabel{NWafv7-eng8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-eng8-1}}}\moddef{engine.c~{\nwtagstyle{}\subpageref{NWafv7-eng8-1}}}\endmoddef
@@ -2917,7 +2917,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 \LA{}copyright~{\nwtagstyle{}\subpageref{NWafv7-cop9-1}}\RA{}
 */
 
-#include "mini.h"
+#include "afvm.h"
 
 \LA{}IF-spTOS~{\nwtagstyle{}\subpageref{NWafv7-IF*8-1}}\RA{}
 
@@ -2931,7 +2931,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 
 #ifndef __GNUC__
 enum \{
-#include "mini-labels.i"
+#include "afvm-labels.i"
 \};
 #endif
 
@@ -2945,7 +2945,7 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
   Inst * cfa;
 \LA{}spTOS~{\nwtagstyle{}\subpageref{NWafv7-spT5-1}}\RA{}
   static Label labels[] = \{
-#include "mini-labels.i"
+#include "afvm-labels.i"
   \};
 #ifdef MORE_VARS
   MORE_VARS
@@ -2967,11 +2967,11 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
 
 #ifdef __GNUC__
   NEXT;
-#include "mini-vm.i"
+#include "afvm-vm.i"
 #else
  next_inst:
   switch(*ip++) \{
-#include "mini-vm.i"
+#include "afvm-vm.i"
   default:
     fprintf(stderr,"unknown instruction %d at %p\\n", ip[-1], ip-1);
     exit(1);
@@ -3062,17 +3062,17 @@ echo "Extract all files..."
 ./extract .gitignore
 ./extract final
 ./extract README
-./extract simple.mini
-./extract fib.mini
-./extract test.mini
+./extract simple.afvm
+./extract fib.afvm
+./extract test.afvm
 ./extract test.out
 ./extract Makefile
 ./extract support.c
-./extract mini.h
-./extract mini-inst.vmg
-./extract mini-super.vmg
-./extract mini.l
-./extract mini.y
+./extract afvm.h
+./extract afvm-inst.vmg
+./extract afvm-super.vmg
+./extract afvm.l
+./extract afvm.y
 ./extract peephole-blacklist
 ./extract peephole.c
 ./extract profile.c
@@ -3106,7 +3106,7 @@ a GNU license, so I must comply with that.
 
   You should have received a copy of the GNU General Public License
   along with this program; if not, see http://www.gnu.org/licenses/.
-\nwused{\\{NWafv7-REA6-1}\\{NWafv7-sup9-1}\\{NWafv7-min6-1}\\{NWafv7-min6.2-1}\\{NWafv7-min6.3-1}\\{NWafv7-peeA-1}\\{NWafv7-pro9-1}\\{NWafv7-dis8.2-1}\\{NWafv7-eng8-1}}\nwendcode{}\nwbegindocs{162}\nwdocspar
+\nwused{\\{NWafv7-REA6-1}\\{NWafv7-sup9-1}\\{NWafv7-afv6-1}\\{NWafv7-afv6.2-1}\\{NWafv7-afv6.3-1}\\{NWafv7-peeA-1}\\{NWafv7-pro9-1}\\{NWafv7-dis8.2-1}\\{NWafv7-eng8-1}}\nwendcode{}\nwbegindocs{162}\nwdocspar
 \nwenddocs{}\nwbegincode{163}\sublabel{NWafv7-*coA-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-*coA-1}}}\moddef{\copyright~{\nwtagstyle{}\subpageref{NWafv7-*coA-1}}}\endmoddef
 \\ Copyright (C) 2001,2002,2003,2007 Free Software Foundation, Inc.
 
@@ -3124,7 +3124,7 @@ a GNU license, so I must comply with that.
 
 \\ You should have received a copy of the GNU General Public License
 \\ along with this program. If not, see http://www.gnu.org/licenses/.
-\nwused{\\{NWafv7-minD-1}}\nwendcode{}\nwbegindocs{164}\nwdocspar
+\nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{164}\nwdocspar
 \nwenddocs{}\nwbegincode{165}\sublabel{NWafv7-makE-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-makE-1}}}\moddef{make-copyright~{\nwtagstyle{}\subpageref{NWafv7-makE-1}}}\endmoddef
 #Copyright (C) 2001,2003,2007,2008 Free Software Foundation, Inc.
 
@@ -3147,7 +3147,7 @@ a GNU license, so I must comply with that.
 \nwixlogsorted{c}{{*}{NWafv7-*-1}{\nwixd{NWafv7-*-1}}}%
 \nwixlogsorted{c}{{DEF-CA}{NWafv7-DEF6-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-DEF6-1}}}%
 \nwixlogsorted{c}{{IF-spTOS}{NWafv7-IF*8-1}{\nwixd{NWafv7-IF*8-1}\nwixu{NWafv7-eng8-1}}}%
-\nwixlogsorted{c}{{IMM-ARG}{NWafv7-IMM7-1}{\nwixd{NWafv7-IMM7-1}\nwixu{NWafv7-min6-1}}}%
+\nwixlogsorted{c}{{IMM-ARG}{NWafv7-IMM7-1}{\nwixd{NWafv7-IMM7-1}\nwixu{NWafv7-afv6-1}}}%
 \nwixlogsorted{c}{{INC-IP}{NWafv7-INC6-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-INC6-1}}}%
 \nwixlogsorted{c}{{INC-IP-1}{NWafv7-INC8-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-INC8-1}}}%
 \nwixlogsorted{c}{{INC-IP-2}{NWafv7-INC8.2-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-INC8.2-1}}}%
@@ -3180,52 +3180,52 @@ a GNU license, so I must comply with that.
 \nwixlogsorted{c}{{SET-IP-1}{NWafv7-SET8-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-SET8-1}}}%
 \nwixlogsorted{c}{{SET-IP-2}{NWafv7-SET8.2-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-SET8.2-1}}}%
 \nwixlogsorted{c}{{SUPER-END}{NWafv7-SUP9-1}{\nwixd{NWafv7-SUP9-1}\nwixu{NWafv7-eng8-1}}}%
-\nwixlogsorted{c}{{branch}{NWafv7-bra6-1}{\nwixd{NWafv7-bra6-1}\nwixu{NWafv7-minD-1}}}%
-\nwixlogsorted{c}{{\copyright}{NWafv7-*coA-1}{\nwixu{NWafv7-minD-1}\nwixd{NWafv7-*coA-1}}}%
-\nwixlogsorted{c}{{copyright}{NWafv7-cop9-1}{\nwixu{NWafv7-REA6-1}\nwixu{NWafv7-sup9-1}\nwixu{NWafv7-min6-1}\nwixu{NWafv7-min6.2-1}\nwixu{NWafv7-min6.3-1}\nwixu{NWafv7-peeA-1}\nwixu{NWafv7-pro9-1}\nwixu{NWafv7-dis8.2-1}\nwixu{NWafv7-eng8-1}\nwixd{NWafv7-cop9-1}}}%
+\nwixlogsorted{c}{{afvm.h}{NWafv7-afv6-1}{\nwixd{NWafv7-afv6-1}}}%
+\nwixlogsorted{c}{{afvm-inst.vmg}{NWafv7-afvD-1}{\nwixd{NWafv7-afvD-1}}}%
+\nwixlogsorted{c}{{afvm.l}{NWafv7-afv6.2-1}{\nwixd{NWafv7-afv6.2-1}}}%
+\nwixlogsorted{c}{{afvm-super.vmg}{NWafv7-afvE-1}{\nwixd{NWafv7-afvE-1}}}%
+\nwixlogsorted{c}{{afvm.y}{NWafv7-afv6.3-1}{\nwixd{NWafv7-afv6.3-1}}}%
+\nwixlogsorted{c}{{branch}{NWafv7-bra6-1}{\nwixd{NWafv7-bra6-1}\nwixu{NWafv7-afvD-1}}}%
+\nwixlogsorted{c}{{\copyright}{NWafv7-*coA-1}{\nwixu{NWafv7-afvD-1}\nwixd{NWafv7-*coA-1}}}%
+\nwixlogsorted{c}{{copyright}{NWafv7-cop9-1}{\nwixu{NWafv7-REA6-1}\nwixu{NWafv7-sup9-1}\nwixu{NWafv7-afv6-1}\nwixu{NWafv7-afv6.2-1}\nwixu{NWafv7-afv6.3-1}\nwixu{NWafv7-peeA-1}\nwixu{NWafv7-pro9-1}\nwixu{NWafv7-dis8.2-1}\nwixu{NWafv7-eng8-1}\nwixd{NWafv7-cop9-1}}}%
 \nwixlogsorted{c}{{disasm.c}{NWafv7-dis8.2-1}{\nwixd{NWafv7-dis8.2-1}}}%
 \nwixlogsorted{c}{{dispatch}{NWafv7-dis8-1}{\nwixd{NWafv7-dis8-1}\nwixu{NWafv7-eng8-1}}}%
-\nwixlogsorted{c}{{end}{NWafv7-end3-1}{\nwixd{NWafv7-end3-1}\nwixu{NWafv7-minD-1}}}%
+\nwixlogsorted{c}{{end}{NWafv7-end3-1}{\nwixd{NWafv7-end3-1}\nwixu{NWafv7-afvD-1}}}%
 \nwixlogsorted{c}{{engine}{NWafv7-eng6-1}{\nwixu{NWafv7-Mak8-1}\nwixd{NWafv7-eng6-1}}}%
 \nwixlogsorted{c}{{engine.c}{NWafv7-eng8-1}{\nwixd{NWafv7-eng8-1}}}%
 \nwixlogsorted{c}{{extract-all}{NWafv7-extB-1}{\nwixd{NWafv7-extB-1}}}%
-\nwixlogsorted{c}{{fib.mini}{NWafv7-fib8-1}{\nwixd{NWafv7-fib8-1}}}%
+\nwixlogsorted{c}{{fib.afvm}{NWafv7-fib8-1}{\nwixd{NWafv7-fib8-1}}}%
 \nwixlogsorted{c}{{final}{NWafv7-fin5-1}{\nwixd{NWafv7-fin5-1}}}%
 \nwixlogsorted{c}{{.gitignore}{NWafv7-.giA-1}{\nwixd{NWafv7-.giA-1}\nwixd{NWafv7-.giA-2}}}%
 \nwixlogsorted{c}{{jump-INST-ADDR}{NWafv7-jumE-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-jumE-1}}}%
 \nwixlogsorted{c}{{jump-LABEL}{NWafv7-jumA-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-jumA-1}}}%
 \nwixlogsorted{c}{{lit}{NWafv7-lit3-1}{\nwixu{NWafv7-simJ-1}\nwixd{NWafv7-lit3-1}}}%
-\nwixlogsorted{c}{{ll}{NWafv7-ll-1}{\nwixd{NWafv7-ll-1}\nwixu{NWafv7-minE-1}}}%
+\nwixlogsorted{c}{{ll}{NWafv7-ll-1}{\nwixd{NWafv7-ll-1}\nwixu{NWafv7-afvE-1}}}%
 \nwixlogsorted{c}{{make-copyright}{NWafv7-makE-1}{\nwixu{NWafv7-Mak8-1}\nwixd{NWafv7-makE-1}}}%
-\nwixlogsorted{c}{{mini.h}{NWafv7-min6-1}{\nwixd{NWafv7-min6-1}}}%
-\nwixlogsorted{c}{{mini-inst.vmg}{NWafv7-minD-1}{\nwixd{NWafv7-minD-1}}}%
-\nwixlogsorted{c}{{mini.l}{NWafv7-min6.2-1}{\nwixd{NWafv7-min6.2-1}}}%
-\nwixlogsorted{c}{{mini-super.vmg}{NWafv7-minE-1}{\nwixd{NWafv7-minE-1}}}%
-\nwixlogsorted{c}{{mini.y}{NWafv7-min6.3-1}{\nwixd{NWafv7-min6.3-1}}}%
 \nwixlogsorted{c}{{peephole-blacklist}{NWafv7-peeI-1}{\nwixd{NWafv7-peeI-1}}}%
 \nwixlogsorted{c}{{peephole.c}{NWafv7-peeA-1}{\nwixd{NWafv7-peeA-1}}}%
 \nwixlogsorted{c}{{profile.c}{NWafv7-pro9-1}{\nwixd{NWafv7-pro9-1}}}%
 \nwixlogsorted{c}{{profile-fib-test}{NWafv7-proG-1}{\nwixd{NWafv7-proG-1}}}%
 \nwixlogsorted{c}{{seq2rule.awk}{NWafv7-seqC-1}{\nwixd{NWafv7-seqC-1}}}%
-\nwixlogsorted{c}{{simple-instructions}{NWafv7-simJ-1}{\nwixd{NWafv7-simJ-1}\nwixu{NWafv7-minD-1}}}%
-\nwixlogsorted{c}{{simple.mini}{NWafv7-simB-1}{\nwixd{NWafv7-simB-1}}}%
+\nwixlogsorted{c}{{simple.afvm}{NWafv7-simB-1}{\nwixd{NWafv7-simB-1}}}%
+\nwixlogsorted{c}{{simple-instructions}{NWafv7-simJ-1}{\nwixd{NWafv7-simJ-1}\nwixu{NWafv7-afvD-1}}}%
 \nwixlogsorted{c}{{spTOS}{NWafv7-spT5-1}{\nwixd{NWafv7-spT5-1}\nwixu{NWafv7-eng8-1}}}%
-\nwixlogsorted{c}{{stack-caching}{NWafv7-staD-1}{\nwixd{NWafv7-staD-1}\nwixu{NWafv7-minD-1}}}%
-\nwixlogsorted{c}{{stack-definitions}{NWafv7-staH-1}{\nwixd{NWafv7-staH-1}\nwixu{NWafv7-minD-1}}}%
-\nwixlogsorted{c}{{stack-organization}{NWafv7-staI-1}{\nwixd{NWafv7-staI-1}\nwixu{NWafv7-minD-1}}}%
-\nwixlogsorted{c}{{stack-prefix}{NWafv7-staC-1}{\nwixd{NWafv7-staC-1}\nwixu{NWafv7-minD-1}}}%
+\nwixlogsorted{c}{{stack-caching}{NWafv7-staD-1}{\nwixd{NWafv7-staD-1}\nwixu{NWafv7-afvD-1}}}%
+\nwixlogsorted{c}{{stack-definitions}{NWafv7-staH-1}{\nwixd{NWafv7-staH-1}\nwixu{NWafv7-afvD-1}}}%
+\nwixlogsorted{c}{{stack-organization}{NWafv7-staI-1}{\nwixd{NWafv7-staI-1}\nwixu{NWafv7-afvD-1}}}%
+\nwixlogsorted{c}{{stack-prefix}{NWafv7-staC-1}{\nwixd{NWafv7-staC-1}\nwixu{NWafv7-afvD-1}}}%
 \nwixlogsorted{c}{{stat.awk}{NWafv7-sta8-1}{\nwixd{NWafv7-sta8-1}}}%
 \nwixlogsorted{c}{{support.c}{NWafv7-sup9-1}{\nwixd{NWafv7-sup9-1}}}%
 \nwixlogsorted{c}{{switch-INST-ADDR}{NWafv7-swiG-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-swiG-1}}}%
 \nwixlogsorted{c}{{switch-LABEL}{NWafv7-swiC-1}{\nwixu{NWafv7-dis8-1}\nwixd{NWafv7-swiC-1}}}%
-\nwixlogsorted{c}{{test.mini}{NWafv7-tes9-1}{\nwixd{NWafv7-tes9-1}}}%
+\nwixlogsorted{c}{{test.afvm}{NWafv7-tes9-1}{\nwixd{NWafv7-tes9-1}}}%
 \nwixlogsorted{c}{{test.out}{NWafv7-tes8-1}{\nwixd{NWafv7-tes8-1}}}%
-\nwixlogsorted{c}{{type-prefix}{NWafv7-typB-1}{\nwixd{NWafv7-typB-1}\nwixu{NWafv7-minD-1}}}%
+\nwixlogsorted{c}{{type-prefix}{NWafv7-typB-1}{\nwixd{NWafv7-typB-1}\nwixu{NWafv7-afvD-1}}}%
 \nwixlogsorted{c}{{unused-branch}{NWafv7-unuD-1}{\nwixd{NWafv7-unuD-1}}}%
 \nwixlogsorted{c}{{unused-stack-adjust}{NWafv7-unuJ-1}{\nwixd{NWafv7-unuJ-1}}}%
 \nwixlogsorted{c}{{unused-stack-transform}{NWafv7-unuM-1}{\nwixd{NWafv7-unuM-1}}}%
-\nwixlogsorted{c}{{vm-A2B(a,b)}{NWafv7-vm*B-1}{\nwixd{NWafv7-vm*B-1}\nwixu{NWafv7-min6-1}}}%
-\nwixlogsorted{c}{{zbranch}{NWafv7-zbr7-1}{\nwixd{NWafv7-zbr7-1}\nwixu{NWafv7-minD-1}}}%
+\nwixlogsorted{c}{{vm-A2B(a,b)}{NWafv7-vm*B-1}{\nwixd{NWafv7-vm*B-1}\nwixu{NWafv7-afv6-1}}}%
+\nwixlogsorted{c}{{zbranch}{NWafv7-zbr7-1}{\nwixd{NWafv7-zbr7-1}\nwixu{NWafv7-afvD-1}}}%
 \nwbegindocs{166}\nwdocspar
 
 

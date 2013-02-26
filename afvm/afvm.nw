@@ -299,7 +299,7 @@ The command-line options supported by Vmgen are
 There are two versions of the same example for using Vmgen: \texttt{\textbf{vmgen-ex}}
 and \texttt{\textbf{vmgen-ex2}} (you can also see Gforth as example,
 but it uses additional (undocumented) features, and also differs in
-some other respects). The example implements \texttt{\textbf{mini}},
+some other respects). The example implements \texttt{\textbf{afvm}},
 a tiny Modula-2-like language with a small JavaVM-like virtual machine.
 
 The difference between the examples is that \texttt{\textbf{vmgen-ex}}
@@ -310,12 +310,12 @@ unions, use the equivalent file in \texttt{\textbf{vmgen-ex2}}.
 
 You can build the example by \texttt{\textbf{cd}}ing into the example's
 directory, and then typing \texttt{\textbf{make}}; you can check that
-it works with \texttt{\textbf{make check}}. You can run run \texttt{\textbf{mini}}
+it works with \texttt{\textbf{make check}}. You can run run \texttt{\textbf{afvm}}
 programs like this:
 \begin{quotation}
-\texttt{\textbf{./mini fib.mini}}
+\texttt{\textbf{./afvm fib.afvm}}
 \end{quotation}
-To learn about the options, type \texttt{\textbf{./mini -h}}.
+To learn about the options, type \texttt{\textbf{./afvm -h}}.
 
 
 \subsubsection{Using profiling to create superinstructions\label{sub:Using-profiling-to}}
@@ -325,7 +325,7 @@ I have not added rules for this in the \texttt{\textbf{Makefile}}
 not want to hardcode one into the \texttt{\textbf{Makefile}}), but
 there are some supporting scripts, and here's an example:
 
-Suppose you want to use \texttt{\textbf{fib.mini}} and \texttt{\textbf{test.mini}}
+Suppose you want to use \texttt{\textbf{fib.afvm}} and \texttt{\textbf{test.afvm}}
 as training programs, you get the profiles like this:
 \begin{quotation}
 \texttt{\textbf{make fib.prof test.prof}}
@@ -353,15 +353,15 @@ awk -f stat.awk fib.prof test.prof| \
 awk '$3>=10000'| #select sequences \
 fgrep -v -f peephole-blacklist| #eliminate wrong instructions \
 awk -f seq2rule.awk| #transform sequences into superinstruction rules \
-sort -k 3 >mini-super.vmg #sort sequences
+sort -k 3 >afvm-super.vmg #sort sequences
 @
 
 The file \texttt{\textbf{peephole-blacklist}} contains all instructions
-that directly access a stack or stack pointer (for mini: \texttt{\textbf{call}},
+that directly access a stack or stack pointer (for afvm: \texttt{\textbf{call}},
 \texttt{\textbf{return}}); the sort step is necessary to ensure that
 prefixes precede larger superinstructions.
 
-Now you can create a version of mini with superinstructions by just
+Now you can create a version of afvm with superinstructions by just
 saying \textquoteleft{}\texttt{\textbf{make}}\textquoteright{}
 
 
@@ -564,7 +564,7 @@ prefix first:
 @
 
 This defines the prefix \texttt{\textbf{i}} to refer to the type \texttt{\textbf{Cell}}
-(defined as \texttt{\textbf{long}} in \texttt{\textbf{mini.h}}) and,
+(defined as \texttt{\textbf{long}} in \texttt{\textbf{afvm.h}}) and,
 by default, to the \texttt{\textbf{data-stack}}. It also specifies
 that this type takes one stack item (\texttt{\textbf{single}}). The
 type prefix is part of the variable name.
@@ -1112,7 +1112,7 @@ to choose between these methods, and our example does so.
    best to build them all and select the fastest instead of hardwiring
    a specific scheme for an architecture.  E.g., scheme 8 is fastest
    for Gforth "make bench" on a 486, whereas scheme 5 is fastest for
-   "mini fib.mini" on an Athlon */
+   "afvm fib.afvm" on an Athlon */
 #ifndef THREADING_SCHEME
 #define THREADING_SCHEME 5
 #endif /* defined(THREADING_SCHEME) */
@@ -1629,7 +1629,7 @@ call \texttt{\textbf{BB\_BOUNDARY}} at every basic block entry point
 if you ever want to use superinstructions (or if you want to use the
 profiling supported by Vmgen; but this support is also useful mainly
 for selecting superinstructions). If you use \texttt{\textbf{BB\_BOUNDARY}},
-you should also define it (take a look at its definition in \texttt{\textbf{vmgen-ex/mini.y}}).
+you should also define it (take a look at its definition in \texttt{\textbf{vmgen-ex/afvm.y}}).
 
 You do not need to call \texttt{\textbf{BB\_BOUNDARY}} after branches,
 because you will not define superinstructions that contain branches
@@ -1853,13 +1853,13 @@ Ignore the warnings.  You can check that it works with
 
 make check
 
-You can run mini programs like this:
+You can run afvm programs like this:
 
-./mini fib.mini
+./afvm fib.afvm
 
 To learn about the options, type
 
-./mini -h
+./afvm -h
 
 More information can be found in the vmgen documentation.
 
@@ -1868,18 +1868,18 @@ More information can be found in the vmgen documentation.
 @
 
 
-\subsubsection{simple.mini - example mini program}
+\subsubsection{simple.afvm - example afvm program}
 
-<<simple.mini>>=
+<<simple.afvm>>=
 func main()
   return 1;
 end func;
 @
 
 
-\subsubsection{fib.mini - example mini program}
+\subsubsection{fib.afvm - example afvm program}
 
-<<fib.mini>>=
+<<fib.afvm>>=
 func fib(n)
   var r;
   if n<2 then
@@ -1897,9 +1897,9 @@ end func;
 @
 
 
-\subsubsection{test.mini - example mini program (tests everything)}
+\subsubsection{test.afvm - example afvm program (tests everything)}
 
-<<test.mini>>=
+<<test.afvm>>=
 func operators()
   print 3 = 3;
   print (3+5) = 8;
@@ -1996,7 +1996,7 @@ end func;
 @
 
 
-\paragraph{test.out - test.mini output}
+\paragraph{test.out - test.afvm output}
 
 <<test.out>>=
 1
@@ -2036,7 +2036,7 @@ result = 0
 @
 
 
-\subsection{Mini specific files}
+\subsection{afvm specific files}
 
 You would typically change much in or replace the following files:
 
@@ -2056,60 +2056,60 @@ VMGEN=vmgen
 GCC=gcc -O3 -fomit-frame-pointer -Wall
 CC=$(GCC)
 <<M4>>
-OBJECTS_MINI=mini.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
+OBJECTS_AFVM=afvm.tab.o support.o peephole.o profile.o disasm.o engine.o engine-debug.o
 
-mini: $(OBJECTS_MINI)
-	$(CC) $(OBJECTS_MINI) -o $@
+afvm: $(OBJECTS_AFVM)
+	$(CC) $(OBJECTS_AFVM) -o $@
 
-lex.yy.c: mini.l
-	$(LEX) mini.l
+lex.yy.c: afvm.l
+	$(LEX) afvm.l
 
-mini.tab.c: mini.y lex.yy.c
-	$(YACC) mini.y && mv y.tab.c $@
+afvm.tab.c: afvm.y lex.yy.c
+	$(YACC) afvm.y && mv y.tab.c $@
 
-mini-vm.i mini-disasm.i mini-gen.i mini-labels.i mini-profile.i mini-peephole.i: mini.vmg
-	$(VMGEN) mini.vmg
+afvm-vm.i afvm-disasm.i afvm-gen.i afvm-labels.i afvm-profile.i afvm-peephole.i: afvm.vmg
+	$(VMGEN) afvm.vmg
 
-mini.vmg: mini-inst.vmg mini-super.vmg
-	$(M4) mini-inst.vmg >$@
+afvm.vmg: afvm-inst.vmg afvm-super.vmg
+	$(M4) afvm-inst.vmg >$@
 
-mini.tab.o: mini.tab.c mini-gen.i lex.yy.c mini.h
+afvm.tab.o: afvm.tab.c afvm-gen.i lex.yy.c afvm.h
 
-support.o: support.c mini.h
+support.o: support.c afvm.h
 
-peephole.o: peephole.c mini-peephole.i mini.h
+peephole.o: peephole.c afvm-peephole.i afvm.h
 
-profile.o: profile.c mini-profile.i mini.h
+profile.o: profile.c afvm-profile.i afvm.h
 
-disasm.o: disasm.c mini-disasm.i mini.h
+disasm.o: disasm.c afvm-disasm.i afvm.h
 
 <<engine>>
 
 clean:
-	rm -f *.*~ *.o mini mini.exe mini-*.i lex.yy.c mini.tab.c mini.vmg
+	rm -f *.*~ *.o afvm afvm.exe afvm-*.i lex.yy.c afvm.tab.c afvm.vmg
 	rm -f afvm.aux afvm.log afvm.out afvm.toc comment.cut texput.log
 
-check:  mini
-	./mini test.mini | tr -d '\015' | diff - test.out
+check:  afvm
+	./afvm test.afvm | tr -d '\015' | diff - test.out
 
 checkall:
-	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \time mini fib.mini 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
+	for i in 1 3 5 8 9 10; do make clean; echo $$i; make check VMGEN=vmgen CC="gcc -O3 -fomit-frame-pointer -Wall -DTHREADING_SCHEME=$$i"; echo $$i >>xxx-bench; \time afvm fib.afvm 2>>xxx-bench; done; cat xxx-bench; rm xxx-bench
 
 #make profiles
-%.prof: %.mini mini
-	./mini -p $< 2>$@
+%.prof: %.afvm afvm
+	./afvm -p $< 2>$@
 @
 
 We can also tell git to ignore the build artifacts.
 
 <<.gitignore>>=
 *.o
-mini
-mini.exe
-mini-*.i
+afvm
+afvm.exe
+afvm-*.i
 lex.yy.c
-mini.tab.c
-mini.vmg
+afvm.tab.c
+afvm.vmg
 @
 
 
@@ -2127,7 +2127,7 @@ mini.vmg
 extern int optind;
 
 #include <assert.h>
-#include "mini.h"
+#include "afvm.h"
 
 void genarg_i(Inst **vmcodepp, Cell i)
 {
@@ -2318,9 +2318,9 @@ int main(int argc, char **argv)
 @
 
 
-\subsubsection{mini.h - common declarations}
+\subsubsection{afvm.h - common declarations}
 
-<<mini.h>>=
+<<afvm.h>>=
 /* support functions for afvm example
 
 <<copyright>>
@@ -2366,7 +2366,7 @@ void vm_print_profile(FILE *file);
 
 #define VM_IS_INST(inst, n) ((inst) == vm_prim[n])
 
-/* mini type-specific support functions */
+/* afvm type-specific support functions */
 void genarg_i(Inst **vmcodepp, Cell i);
 void printarg_i(Cell i);
 void genarg_target(Inst **vmcodepp, Inst *target);
@@ -2381,7 +2381,7 @@ Cell engine_debug(Inst *ip0, Cell *sp, char *fp);
 /* other generic functions */
 int yyparse(void);
 
-/* mini-specific functions */
+/* afvm-specific functions */
 void insert_func(char *name, Inst *start, int locals, int nonparams);
 Inst *func_addr(char *name);
 Cell func_calladjust(char *name);
@@ -2394,10 +2394,10 @@ void gen_main_end(void);
 @
 
 
-\subsubsection{mini-inst.vmg - simple VM instructions}
+\subsubsection{afvm-inst.vmg - simple VM instructions}
 
-<<mini-inst.vmg>>=
-\ mini.inst is generated automatically from mini-inst.vmg and mini-super.vmg
+<<afvm-inst.vmg>>=
+\ afvm.inst is generated automatically from afvm-inst.vmg and afvm-super.vmg
 \ example .vmg file
 
 <<\copyright>>
@@ -2425,20 +2425,20 @@ void gen_main_end(void);
 
 <<end>>
 
-include(mini-super.vmg)
+include(afvm-super.vmg)
 @
 
 
-\subsubsection{mini-super.vmg - superinstructions (empty at first)}
+\subsubsection{afvm-super.vmg - superinstructions (empty at first)}
 
-<<mini-super.vmg>>=
+<<afvm-super.vmg>>=
 <<ll>>
 @
 
 
-\subsubsection{mini.l - scanner}
+\subsubsection{afvm.l - scanner}
 
-<<mini.l>>=
+<<afvm.l>>=
 %{
 /* front-end scanner for afvm example
 
@@ -2478,9 +2478,9 @@ print  return PRINT;
 @
 
 
-\subsubsection{mini.y - front end (parser, VM code generator)}
+\subsubsection{afvm.y - front end (parser, VM code generator)}
 
-<<mini.y>>=
+<<afvm.y>>=
 /* front-end compiler for afvm example
 
 <<copyright>>
@@ -2494,7 +2494,7 @@ print  return PRINT;
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* BB_BOUNDARY is needed on basic blocks without a preceding VM branch */
 #define BB_BOUNDARY (last_compiled = NULL,  /* suppress peephole opt */ \
@@ -2516,13 +2516,13 @@ void yyerror(char *s)
 #endif
 }
 
-#include "mini-gen.i"
+#include "afvm-gen.i"
 
 void gen_main_end(void)
 {
   gen_call(&vmcodep, func_addr("main"), func_calladjust("main"));
   gen_end(&vmcodep);
-  BB_BOUNDARY; /* for profiling; see comment in mini.vmg:end */
+  BB_BOUNDARY; /* for profiling; see comment in afvm.vmg:end */
 }
 
 int locals=0;
@@ -2635,7 +2635,7 @@ and change little, if anything:
 */
 
 #include <stdlib.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* the numbers in this struct are primitive indices */
 typedef struct Combination {
@@ -2645,7 +2645,7 @@ typedef struct Combination {
 } Combination;
 
 Combination peephole_table[] = {
-#include "mini-peephole.i"
+#include "afvm-peephole.i"
 #ifndef __GNUC__
   {-1,-1,-1} /* unnecessary; just to shut up lcc if the file is empty */
 #endif
@@ -2731,7 +2731,7 @@ void gen_inst(Inst **vmcodepp, Inst i)
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* data structure: simple hash table with external chaining */
 
@@ -2803,7 +2803,7 @@ void postprocess_block(block_count *b)
   block_count *next_block=NULL;
 
   while (next_block == NULL && ip<vmcode_end) {
-#include "mini-profile.i"
+#include "afvm-profile.i"
     /* else */
     {
       add_inst(b,"unknown");
@@ -2882,7 +2882,7 @@ void vm_print_profile(FILE *file)
 <<copyright>>
 */
 
-#include "mini.h"
+#include "afvm.h"
 
 #define IP (ip+1)
 #define IPTOS IP[0]
@@ -2891,7 +2891,7 @@ void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
 {
   while (ip<endp) {
     fprintf(vm_out,"%p: ",ip);
-#include "mini-disasm.i"
+#include "afvm-disasm.i"
     {
       fprintf(vm_out,"unknown instruction %p",ip[0]);
       ip++;
@@ -2906,9 +2906,9 @@ void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
 \subsubsection{engine.c - wrapper file\label{sub:engine.c---wrapper}}
 
 <<engine>>=
-engine.o: engine.c mini-vm.i mini-labels.i mini.h
+engine.o: engine.c afvm-vm.i afvm-labels.i afvm.h
 
-engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
+engine-debug.o: engine.c afvm-vm.i afvm-labels.i afvm.h
 	$(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
 @
 <<engine.c>>=
@@ -2917,7 +2917,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 <<copyright>>
 */
 
-#include "mini.h"
+#include "afvm.h"
 
 <<IF-spTOS>>
 
@@ -2931,7 +2931,7 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 
 #ifndef __GNUC__
 enum {
-#include "mini-labels.i"
+#include "afvm-labels.i"
 };
 #endif
 
@@ -2945,7 +2945,7 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
   Inst * cfa;
 <<spTOS>>
   static Label labels[] = {
-#include "mini-labels.i"
+#include "afvm-labels.i"
   };
 #ifdef MORE_VARS
   MORE_VARS
@@ -2967,11 +2967,11 @@ Cell engine(Inst *ip0, Cell *sp, char *fp)
 
 #ifdef __GNUC__
   NEXT;
-#include "mini-vm.i"
+#include "afvm-vm.i"
 #else
  next_inst:
   switch(*ip++) {
-#include "mini-vm.i"
+#include "afvm-vm.i"
   default:
     fprintf(stderr,"unknown instruction %d at %p\n", ip[-1], ip-1);
     exit(1);
@@ -3062,17 +3062,17 @@ echo "Extract all files..."
 ./extract .gitignore
 ./extract final
 ./extract README
-./extract simple.mini
-./extract fib.mini
-./extract test.mini
+./extract simple.afvm
+./extract fib.afvm
+./extract test.afvm
 ./extract test.out
 ./extract Makefile
 ./extract support.c
-./extract mini.h
-./extract mini-inst.vmg
-./extract mini-super.vmg
-./extract mini.l
-./extract mini.y
+./extract afvm.h
+./extract afvm-inst.vmg
+./extract afvm-super.vmg
+./extract afvm.l
+./extract afvm.y
 ./extract peephole-blacklist
 ./extract peephole.c
 ./extract profile.c

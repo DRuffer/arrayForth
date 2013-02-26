@@ -18,7 +18,7 @@
   along with this program; if not, see http://www.gnu.org/licenses/.
 */
 
-#include "mini.h"
+#include "afvm.h"
 
 #define IP (ip+1)
 #define IPTOS IP[0]
@@ -27,7 +27,7 @@ void vm_disassemble(Inst *ip, Inst *endp, Inst vm_prim[])
 {
   while (ip<endp) {
     fprintf(vm_out,"%p: ",ip);
-#include "mini-disasm.i"
+#include "afvm-disasm.i"
     {
       fprintf(vm_out,"unknown instruction %p",ip[0]);
       ip++;

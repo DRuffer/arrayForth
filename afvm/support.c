@@ -24,7 +24,7 @@
 extern int optind;
 
 #include <assert.h>
-#include "mini.h"
+#include "afvm.h"
 
 void genarg_i(Inst **vmcodepp, Cell i)
 {

@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* BB_BOUNDARY is needed on basic blocks without a preceding VM branch */
 #define BB_BOUNDARY (last_compiled = NULL,  /* suppress peephole opt */ \
@@ -48,13 +48,13 @@ void yyerror(char *s)
 #endif
 }
 
-#include "mini-gen.i"
+#include "afvm-gen.i"
 
 void gen_main_end(void)
 {
   gen_call(&vmcodep, func_addr("main"), func_calladjust("main"));
   gen_end(&vmcodep);
-  BB_BOUNDARY; /* for profiling; see comment in mini.vmg:end */
+  BB_BOUNDARY; /* for profiling; see comment in afvm.vmg:end */
 }
 
 int locals=0;

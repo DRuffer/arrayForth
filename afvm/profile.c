@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "mini.h"
+#include "afvm.h"
 
 /* data structure: simple hash table with external chaining */
 
@@ -93,7 +93,7 @@ void postprocess_block(block_count *b)
   block_count *next_block=NULL;
 
   while (next_block == NULL && ip<vmcode_end) {
-#include "mini-profile.i"
+#include "afvm-profile.i"
     /* else */
     {
       add_inst(b,"unknown");
