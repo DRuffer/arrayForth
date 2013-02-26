@@ -1,4 +1,6 @@
 echo "Extract all files..."
+./extract .gitignore
+./extract final
 ./extract README
 ./extract simple.mini
 ./extract fib.mini

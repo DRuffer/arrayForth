@@ -1,2 +1,8 @@
-lyx -e pdf $1
-lyx -e latex $1
+lyx -e latex afvm.lyx
+if [ $? == 0 ]; then
+   lyx -e pdf afvm.lyx
+else # noweb conversion can't be called in cygwin
+   lyx -e literate afvm.lyx
+   noweave -delay -index "afvm.nw" > "afvm.tex"
+   pdflatex afvm latex=pdflatex
+fi

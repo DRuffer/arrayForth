@@ -1,0 +1,13 @@
+*.o
+mini
+mini.exe
+mini-*.i
+lex.yy.c
+mini.tab.c
+mini.vmg
+afvm.aux
+afvm.log
+afvm.out
+afvm.toc
+comment.cut
+texput.log

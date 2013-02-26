@@ -2086,7 +2086,8 @@ disasm.o: disasm.c mini-disasm.i mini.h
 <<engine>>
 
 clean:
-	rm -f *.o mini mini-*.i lex.yy.c mini.tab.c mini.vmg
+	rm -f *.*~ *.o mini mini.exe mini-*.i lex.yy.c mini.tab.c mini.vmg
+	rm -f afvm.aux afvm.log afvm.out afvm.toc comment.cut texput.log
 
 check:  mini
 	./mini test.mini | tr -d '\015' | diff - test.out
@@ -2097,6 +2098,18 @@ checkall:
 #make profiles
 %.prof: %.mini mini
 	./mini -p $< 2>$@
+@
+
+We can also tell git to ignore the build artifacts.
+
+<<.gitignore>>=
+*.o
+mini
+mini.exe
+mini-*.i
+lex.yy.c
+mini.tab.c
+mini.vmg
 @
 
 
@@ -3006,8 +3019,26 @@ BEGIN {
 A script for converting this document to PDF form follows:
 
 <<final>>=
-lyx -e pdf $1
-lyx -e latex $1
+lyx -e latex afvm.lyx
+if [ $? == 0 ]; then
+   lyx -e pdf afvm.lyx
+else # noweb conversion can't be called in cygwin
+   lyx -e literate afvm.lyx
+   noweave -delay -index "afvm.nw" > "afvm.tex"
+   pdflatex afvm latex=pdflatex
+fi
+@
+
+This creates a lot of extra files, so we can add tell \texttt{\textbf{git}}
+to ignore them.
+
+<<.gitignore>>=
+afvm.aux
+afvm.log
+afvm.out
+afvm.toc
+comment.cut
+texput.log
 @
 
 Each of these scripts can be pulled out manually given the default
@@ -3028,6 +3059,8 @@ can pull out all of the other scripts:
 
 <<extract-all>>=
 echo "Extract all files..."
+./extract .gitignore
+./extract final
 ./extract README
 ./extract simple.mini
 ./extract fib.mini

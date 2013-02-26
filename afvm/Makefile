@@ -59,7 +59,8 @@ engine-debug.o: engine.c mini-vm.i mini-labels.i mini.h
 	$(CC) -DVM_DEBUG -DVM_PROFILING -Dengine=engine_debug -c -o $@ engine.c
 
 clean:
-	rm -f *.o mini mini-*.i lex.yy.c mini.tab.c mini.vmg
+	rm -f *.*~ *.o mini mini.exe mini-*.i lex.yy.c mini.tab.c mini.vmg
+	rm -f afvm.aux afvm.log afvm.out afvm.toc comment.cut texput.log
 
 check:  mini
 	./mini test.mini | tr -d '\015' | diff - test.out
