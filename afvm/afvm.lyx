@@ -978,6 +978,7 @@ The numbers can be used in various ways to select superinstructions.
 \end_layout
 
 \begin_layout Scrap
+
 <<profile-fib-test>>=
 \begin_inset Newline newline
 \end_inset
@@ -1306,6 +1307,7 @@ m4 -s
 \end_layout
 
 \begin_layout Scrap
+
 <<M4>>=
 \begin_inset Newline newline
 \end_inset
@@ -1505,6 +1507,7 @@ We will use the following simple VM instruction descriptions as examples:
 \end_layout
 
 \begin_layout Scrap
+
 <<simple-instructions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1725,6 +1728,7 @@ How do we know the type and stack of the stack items? Vmgen uses prefixes,
 \end_layout
 
 \begin_layout Scrap
+
 <<type-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1737,19 +1741,79 @@ How do we know the type and stack of the stack items? Vmgen uses prefixes,
 
 
 \backslash
-E s" Cell"   single data-stack type-prefix i
+E s" Bool"              single data-stack type-prefix f
 \begin_inset Newline newline
 \end_inset
 
 
 \backslash
-E s" char *" single data-stack type-prefix a
+E s" char"              single data-stack type-prefix c
 \begin_inset Newline newline
 \end_inset
 
 
 \backslash
-E s" Inst *" single data-stack type-prefix target
+E s" Cell"              single data-stack type-prefix i
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Cell"              single data-stack type-prefix n
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Cell"              single data-stack type-prefix w
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" UCell"             single data-stack type-prefix u
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" DCell"             double data-stack type-prefix d
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Cell *"            single data-stack type-prefix a_
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" char *"            single data-stack type-prefix a
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Xt"                single data-stack type-prefix xt
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" Inst *"            single data-stack type-prefix target
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" struct F83Name *"  single data-stack type-prefix f83name
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E s" struct Longname *" single data-stack type-prefix longname 
 \begin_inset Newline newline
 \end_inset
 
@@ -1809,6 +1873,7 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-definitions>>=
 \begin_inset Newline newline
 \end_inset
@@ -1822,6 +1887,12 @@ data-stack
 
 \backslash
 E stack data-stack sp Cell
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E stack return-stack rp Cell
 \begin_inset Newline newline
 \end_inset
 
@@ -1868,6 +1939,7 @@ We can override the default stack of a stack item by using a stack prefix.
 \end_layout
 
 \begin_layout Scrap
+
 <<lit>>=
 \begin_inset Newline newline
 \end_inset
@@ -1904,6 +1976,7 @@ i
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-prefix>>=
 \begin_inset Newline newline
 \end_inset
@@ -1916,13 +1989,19 @@ i
 
 
 \backslash
-E inst-stream stack-prefix #
+E inst-stream  stack-prefix #
 \begin_inset Newline newline
 \end_inset
 
 
 \backslash
-E data-stack  stack-prefix S:
+E data-stack   stack-prefix S:
+\begin_inset Newline newline
+\end_inset
+
+
+\backslash
+E return-stack stack-prefix R:
 \begin_inset Newline newline
 \end_inset
 
@@ -2021,6 +2100,7 @@ Consider this example:
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-stack-adjust>>=
 \begin_inset Newline newline
 \end_inset
@@ -2150,6 +2230,7 @@ SET_IP As far as Vmgen is concerned, a VM instruction containing this ends
 \end_layout
 
 \begin_layout Scrap
+
 <<branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2177,6 +2258,7 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
+
 <<end>>=
 \begin_inset Newline newline
 \end_inset
@@ -2253,6 +2335,7 @@ INST_TAIL;
 \end_layout
 
 \begin_layout Scrap
+
 <<zbranch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2296,6 +2379,7 @@ SET_IP
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-branch>>=
 \begin_inset Newline newline
 \end_inset
@@ -2396,6 +2480,7 @@ IF_spTOS(spTOS = sp[0])
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-caching>>=
 \begin_inset Newline newline
 \end_inset
@@ -2635,6 +2720,7 @@ data-stack
 \end_layout
 
 \begin_layout Scrap
+
 <<unused-stack-transform>>=
 \begin_inset Newline newline
 \end_inset
@@ -2695,6 +2781,7 @@ n
 \end_layout
 
 \begin_layout Scrap
+
 <<stack-organization>>=
 \begin_inset Newline newline
 \end_inset
@@ -2831,6 +2918,7 @@ Here is an example of a superinstruction definition:
 \end_layout
 
 \begin_layout Scrap
+
 <<ll>>=
 \begin_inset Newline newline
 \end_inset
@@ -3424,6 +3512,7 @@ defined(__GNUC__)
 \end_layout
 
 \begin_layout Scrap
+
 <<dispatch>>=
 \begin_inset Newline newline
 \end_inset
@@ -3956,6 +4045,7 @@ inst_name
 \end_layout
 
 \begin_layout Scrap
+
 <<jump-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -3968,6 +4058,7 @@ define LABEL(name) I_##name:
 \end_layout
 
 \begin_layout Scrap
+
 <<switch-LABEL>>=
 \begin_inset Newline newline
 \end_inset
@@ -3985,6 +4076,7 @@ LABEL2(inst_name) This will be used for dynamic superinstructions; at the
 \end_layout
 
 \begin_layout Scrap
+
 <<LABEL2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4005,6 +4097,7 @@ NAME(inst_name_string) Called on entering a VM instruction with a string
 \end_layout
 
 \begin_layout Scrap
+
 <<NAME>>=
 \begin_inset Newline newline
 \end_inset
@@ -4055,6 +4148,7 @@ DEF_CA Usually empty.
 \end_layout
 
 \begin_layout Scrap
+
 <<DEF-CA>>=
 \begin_inset Newline newline
 \end_inset
@@ -4184,6 +4278,7 @@ NEXT_P1
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P0>>=
 \begin_inset Newline newline
 \end_inset
@@ -4196,6 +4291,7 @@ define NEXT_P0
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P0-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4208,6 +4304,7 @@ define NEXT_P0       ({cfa=*ip++;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P0-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4220,6 +4317,7 @@ define NEXT_P0       ({cfa=*ip;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4232,6 +4330,7 @@ define NEXT_P1
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4244,6 +4343,7 @@ define NEXT_P1       ({cfa=*ip++;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4256,6 +4356,7 @@ define NEXT_P1       (ip++)
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P1-3>>=
 \begin_inset Newline newline
 \end_inset
@@ -4268,6 +4369,7 @@ define NEXT_P1       ({cfa=next_cfa; ip++; next_cfa=*ip;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4280,6 +4382,7 @@ define NEXT_P2 goto next_inst;
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4292,6 +4395,7 @@ define NEXT_P2       ({goto *cfa;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4304,6 +4408,7 @@ define NEXT_P2       ({goto **(ip-1);})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-P2-3>>=
 \begin_inset Newline newline
 \end_inset
@@ -4316,6 +4421,7 @@ define NEXT_P2       ({cfa=*ip++; goto *cfa;})
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-INST>>=
 \begin_inset Newline newline
 \end_inset
@@ -4328,6 +4434,7 @@ define NEXT_INST     (*ip)
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-INST-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4340,6 +4447,7 @@ define NEXT_INST     (cfa)
 \end_layout
 
 \begin_layout Scrap
+
 <<NEXT-INST-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4356,6 +4464,7 @@ INC_IP(n) This increments IP by n.
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -4368,6 +4477,7 @@ define INC_IP(const_inc) (ip+=(const_inc))
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4380,6 +4490,7 @@ define INC_IP(const_inc) ({cfa=IP[const_inc]; ip+=(const_inc);})
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4392,6 +4503,7 @@ define INC_IP(const_inc) ({ip+=(const_inc);})
 \end_layout
 
 \begin_layout Scrap
+
 <<INC-IP-3>>=
 \begin_inset Newline newline
 \end_inset
@@ -4408,6 +4520,7 @@ SET_IP(target) This sets IP to target.
 \end_layout
 
 \begin_layout Scrap
+
 <<SET-IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -4420,6 +4533,7 @@ define SET_IP(p)     (ip=(p))
 \end_layout
 
 \begin_layout Scrap
+
 <<SET-IP-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4432,6 +4546,7 @@ define SET_IP(p)     ({ip=(p); NEXT_P0;})
 \end_layout
 
 \begin_layout Scrap
+
 <<SET-IP-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4467,6 +4582,7 @@ vm_A2B(a,b) Type casting macro that assigns ‘a’ (of type A) to ‘b’ (of t
 \end_layout
 
 \begin_layout Scrap
+
 <<vm-A2B(a,b)>>=
 \begin_inset Newline newline
 \end_inset
@@ -4551,6 +4667,7 @@ NEXT_P
 \end_layout
 
 \begin_layout Scrap
+
 <<IP>>=
 \begin_inset Newline newline
 \end_inset
@@ -4563,6 +4680,7 @@ define IP            ip
 \end_layout
 
 \begin_layout Scrap
+
 <<IP-1>>=
 \begin_inset Newline newline
 \end_inset
@@ -4575,6 +4693,7 @@ define IP            (ip-1)
 \end_layout
 
 \begin_layout Scrap
+
 <<IP-2>>=
 \begin_inset Newline newline
 \end_inset
@@ -4592,6 +4711,7 @@ IMM_ARG(access,value) Define this to expland to “(access)”.
 \end_layout
 
 \begin_layout Scrap
+
 <<IMM-ARG>>=
 \begin_inset Newline newline
 \end_inset
@@ -4617,6 +4737,7 @@ stackpointerTOS The top-of-stack for the stack pointed to by stackpointer.
 \end_layout
 
 \begin_layout Scrap
+
 <<spTOS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4645,6 +4766,7 @@ stackpointerTOS The top-of-stack for the stack pointed to by stackpointer.
 \end_layout
 
 \begin_layout Scrap
+
 <<IPTOS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4664,6 +4786,7 @@ IF_stackpointerTOS(expr) Macro for executing expr, if top-of-stack caching
 \end_layout
 
 \begin_layout Scrap
+
 <<IF-spTOS>>=
 \begin_inset Newline newline
 \end_inset
@@ -4717,6 +4840,7 @@ vm_count_block(IP)
 \end_layout
 
 \begin_layout Scrap
+
 <<SUPER-END>>=
 \begin_inset Newline newline
 \end_inset
@@ -4770,6 +4894,7 @@ ions.
 \end_layout
 
 \begin_layout Scrap
+
 <<MAYBE-UNUSED>>=
 \begin_inset Newline newline
 \end_inset
@@ -4931,6 +5056,7 @@ LABEL(inst_name)
 \end_layout
 
 \begin_layout Scrap
+
 <<jump-INST-ADDR>>=
 \begin_inset Newline newline
 \end_inset
@@ -4943,6 +5069,7 @@ define INST_ADDR(name) (Label)&&I_##name
 \end_layout
 
 \begin_layout Scrap
+
 <<switch-INST-ADDR>>=
 \begin_inset Newline newline
 \end_inset
@@ -5781,6 +5908,7 @@ README
 \end_layout
 
 \begin_layout Scrap
+
 <<README>>=
 \begin_inset Newline newline
 \end_inset
@@ -5891,6 +6019,7 @@ simple.afvm - example afvm program
 \end_layout
 
 \begin_layout Scrap
+
 <<simple.afvm>>=
 \begin_inset Newline newline
 \end_inset
@@ -5915,6 +6044,7 @@ fib.afvm - example afvm program
 \end_layout
 
 \begin_layout Scrap
+
 <<fib.afvm>>=
 \begin_inset Newline newline
 \end_inset
@@ -5984,6 +6114,7 @@ test.afvm - example afvm program (tests everything)
 \end_layout
 
 \begin_layout Scrap
+
 <<test.afvm>>=
 \begin_inset Newline newline
 \end_inset
@@ -6368,6 +6499,7 @@ test.out - test.afvm output
 \end_layout
 
 \begin_layout Scrap
+
 <<test.out>>=
 \begin_inset Newline newline
 \end_inset
@@ -6530,6 +6662,7 @@ Makefile
 \end_layout
 
 \begin_layout Scrap
+
 <<Makefile>>=
 \begin_inset Newline newline
 \end_inset
@@ -6765,6 +6898,7 @@ We can also tell git to ignore the build artifacts.
 \end_layout
 
 \begin_layout Scrap
+
 <<.gitignore>>=
 \begin_inset Newline newline
 \end_inset
@@ -6812,6 +6946,7 @@ name "sub:Support.c---main()"
 \end_layout
 
 \begin_layout Scrap
+
 <<support.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -7634,6 +7769,7 @@ afvm.h - common declarations
 \end_layout
 
 \begin_layout Scrap
+
 <<afvm.h>>=
 \begin_inset Newline newline
 \end_inset
@@ -7927,6 +8063,7 @@ afvm-inst.vmg - simple VM instructions
 \end_layout
 
 \begin_layout Scrap
+
 <<afvm-inst.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -8071,6 +8208,7 @@ afvm-super.vmg - superinstructions (empty at first)
 \end_layout
 
 \begin_layout Scrap
+
 <<afvm-super.vmg>>=
 \begin_inset Newline newline
 \end_inset
@@ -8087,6 +8225,7 @@ afvm.l - scanner
 \end_layout
 
 \begin_layout Scrap
+
 <<afvm.l>>=
 \begin_inset Newline newline
 \end_inset
@@ -8252,6 +8391,7 @@ afvm.y - front end (parser, VM code generator)
 \end_layout
 
 \begin_layout Scrap
+
 <<afvm.y>>=
 \begin_inset Newline newline
 \end_inset
@@ -8786,6 +8926,7 @@ peephole-blacklist - list of instructions not allowed in superinstructions
 \end_layout
 
 \begin_layout Scrap
+
 <<peephole-blacklist>>=
 \begin_inset Newline newline
 \end_inset
@@ -8819,6 +8960,7 @@ peephole.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<peephole.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9184,6 +9326,7 @@ profile.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<profile.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9798,6 +9941,7 @@ disasm.c - wrapper file
 \end_layout
 
 \begin_layout Scrap
+
 <<disasm.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -9911,6 +10055,7 @@ name "sub:engine.c---wrapper"
 \end_layout
 
 \begin_layout Scrap
+
 <<engine>>=
 \begin_inset Newline newline
 \end_inset
@@ -9935,6 +10080,7 @@ engine-debug.o: engine.c afvm-vm.i afvm-labels.i afvm.h
 \end_layout
 
 \begin_layout Scrap
+
 <<engine.c>>=
 \begin_inset Newline newline
 \end_inset
@@ -10215,6 +10361,7 @@ stat.awk - script for aggregating profile information
 \end_layout
 
 \begin_layout Scrap
+
 <<stat.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10289,6 +10436,7 @@ seq2rule.awk - script for creating superinstructions
 \end_layout
 
 \begin_layout Scrap
+
 <<seq2rule.awk>>=
 \begin_inset Newline newline
 \end_inset
@@ -10339,6 +10487,7 @@ A script for converting this document to PDF form follows:
 \end_layout
 
 \begin_layout Scrap
+
 <<final>>=
 \begin_inset Newline newline
 \end_inset
@@ -10389,6 +10538,7 @@ git
 \end_layout
 
 \begin_layout Scrap
+
 <<.gitignore>>=
 \begin_inset Newline newline
 \end_inset
@@ -10426,6 +10576,7 @@ Each of these scripts can be pulled out manually given the default * script
 \end_layout
 
 \begin_layout Scrap
+
 <<*>>=
 \begin_inset Newline newline
 \end_inset
@@ -10467,6 +10618,7 @@ Once that script is pulled out and named extract, the following script can
 \end_layout
 
 \begin_layout Scrap
+
 <<extract-all>>=
 \begin_inset Newline newline
 \end_inset
@@ -10576,6 +10728,7 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
+
 <<copyright>>=
 \begin_inset Newline newline
 \end_inset
@@ -10649,6 +10802,7 @@ Although I would have preferred to use an MIT license, GForth uses a GNU
 \end_layout
 
 \begin_layout Scrap
+
 <<
 \backslash
 copyright>>=
@@ -10749,6 +10903,7 @@ copyright>>=
 \end_layout
 
 \begin_layout Scrap
+
 <<make-copyright>>=
 \begin_inset Newline newline
 \end_inset

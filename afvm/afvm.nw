@@ -1,6 +1,6 @@
-%% LyX 2.0.5 created this file.  For more info, see http://www.lyx.org/.
+%% LyX 2.0.5.1 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
-\documentclass[10pt]{article}
+\documentclass[10pt,english]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage[dvips]{geometry}
@@ -10,6 +10,7 @@
 \setlength{\parskip}{\smallskipamount}
 \setlength{\parindent}{0pt}
 \usepackage[active]{srcltx}
+\usepackage{babel}
 \usepackage{longtable}
 \usepackage{textcomp}
 \usepackage{url}
@@ -558,9 +559,19 @@ prefix first:
 
 <<type-prefix>>=
 \ type prefix definitions:
-\E s" Cell"   single data-stack type-prefix i
-\E s" char *" single data-stack type-prefix a
-\E s" Inst *" single data-stack type-prefix target
+\E s" Bool"              single data-stack type-prefix f
+\E s" char"              single data-stack type-prefix c
+\E s" Cell"              single data-stack type-prefix i
+\E s" Cell"              single data-stack type-prefix n
+\E s" Cell"              single data-stack type-prefix w
+\E s" UCell"             single data-stack type-prefix u
+\E s" DCell"             double data-stack type-prefix d
+\E s" Cell *"            single data-stack type-prefix a_
+\E s" char *"            single data-stack type-prefix a
+\E s" Xt"                single data-stack type-prefix xt
+\E s" Inst *"            single data-stack type-prefix target
+\E s" struct F83Name *"  single data-stack type-prefix f83name
+\E s" struct Longname *" single data-stack type-prefix longname 
 @
 
 This defines the prefix \texttt{\textbf{i}} to refer to the type \texttt{\textbf{Cell}}
@@ -575,6 +586,7 @@ to define it:
 <<stack-definitions>>=
 \ stack definitions:
 \E stack data-stack sp Cell
+\E stack return-stack rp Cell
 @
 
 This line defines the stack data-stack, which uses the stack pointer
@@ -599,8 +611,9 @@ part of the variable name. Stack prefixes are defined like this:
 
 <<stack-prefix>>=
 \ stack prefix definitions
-\E inst-stream stack-prefix #
-\E data-stack  stack-prefix S:
+\E inst-stream  stack-prefix #
+\E data-stack   stack-prefix S:
+\E return-stack stack-prefix R:
 @
 
 This definition defines that the stack prefix \texttt{\textbf{\#}}

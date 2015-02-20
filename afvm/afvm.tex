@@ -1,6 +1,8 @@
-%% LyX 2.0.5 created this file.  For more info, see http://www.lyx.org/.
-%% Do not edit unless you really know what you are doing.
-\documentclass[10pt]{article}
+\batchmode
+\makeatletter
+\def\input@path{{/usr/src/arrayForth/afvm//}}
+\makeatother
+\documentclass[10pt,english]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage[dvips]{geometry}
@@ -9,7 +11,8 @@
 \pagestyle{fancy}
 \setlength{\parskip}{\smallskipamount}
 \setlength{\parindent}{0pt}
-\usepackage[active]{srcltx}
+\synctex=-1
+\usepackage{babel}
 \usepackage{longtable}
 \usepackage{textcomp}
 \usepackage{url}
@@ -17,7 +20,6 @@
  bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
  breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
  {hyperref}
-\usepackage{breakurl}
 
 \makeatletter
 
@@ -49,8 +51,10 @@ A copy of the license is included in \nameref{sub:GNU-Free-Documentation}.
 
 \begin{longtable}{cc}
 \hline 
-\multicolumn{1}{c}{\textbf{Software Version}} & \textbf{Date}\tabularnewline
-\multicolumn{1}{c}{\projectVersion} & \projectDate\tabularnewline
+\multicolumn{1}{c}{\textbf{Software Version}} &
+\textbf{Date}\tabularnewline
+\multicolumn{1}{c}{\projectVersion} &
+\projectDate\tabularnewline
 \hline 
 \end{longtable}
 
@@ -558,9 +562,19 @@ prefix first:
 
 \nwenddocs{}\nwbegincode{7}\sublabel{NWafv7-typB-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-typB-1}}}\moddef{type-prefix~{\nwtagstyle{}\subpageref{NWafv7-typB-1}}}\endmoddef
 \\ type prefix definitions:
-\\E s" Cell"   single data-stack type-prefix i
-\\E s" char *" single data-stack type-prefix a
-\\E s" Inst *" single data-stack type-prefix target
+\\E s" Bool"              single data-stack type-prefix f
+\\E s" char"              single data-stack type-prefix c
+\\E s" Cell"              single data-stack type-prefix i
+\\E s" Cell"              single data-stack type-prefix n
+\\E s" Cell"              single data-stack type-prefix w
+\\E s" UCell"             single data-stack type-prefix u
+\\E s" DCell"             double data-stack type-prefix d
+\\E s" Cell *"            single data-stack type-prefix a_
+\\E s" char *"            single data-stack type-prefix a
+\\E s" Xt"                single data-stack type-prefix xt
+\\E s" Inst *"            single data-stack type-prefix target
+\\E s" struct F83Name *"  single data-stack type-prefix f83name
+\\E s" struct Longname *" single data-stack type-prefix longname 
 \nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{8}\nwdocspar
 
 This defines the prefix \texttt{\textbf{i}} to refer to the type \texttt{\textbf{Cell}}
@@ -575,6 +589,7 @@ to define it:
 \nwenddocs{}\nwbegincode{9}\sublabel{NWafv7-staH-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-staH-1}}}\moddef{stack-definitions~{\nwtagstyle{}\subpageref{NWafv7-staH-1}}}\endmoddef
 \\ stack definitions:
 \\E stack data-stack sp Cell
+\\E stack return-stack rp Cell
 \nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{10}\nwdocspar
 
 This line defines the stack data-stack, which uses the stack pointer
@@ -599,8 +614,9 @@ part of the variable name. Stack prefixes are defined like this:
 
 \nwenddocs{}\nwbegincode{13}\sublabel{NWafv7-staC-1}\nwmargintag{{\nwtagstyle{}\subpageref{NWafv7-staC-1}}}\moddef{stack-prefix~{\nwtagstyle{}\subpageref{NWafv7-staC-1}}}\endmoddef
 \\ stack prefix definitions
-\\E inst-stream stack-prefix #
-\\E data-stack  stack-prefix S:
+\\E inst-stream  stack-prefix #
+\\E data-stack   stack-prefix S:
+\\E return-stack stack-prefix R:
 \nwused{\\{NWafv7-afvD-1}}\nwendcode{}\nwbegindocs{14}\nwdocspar
 
 This definition defines that the stack prefix \texttt{\textbf{\#}}
