@@ -20,3 +20,8 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# Make GitHub detect *.{cf,e4,.blk} as Forth
+*.cf linguist-language=Forth
+*.e4 linguist-language=Forth
+*.blk linguist-language=Forth
